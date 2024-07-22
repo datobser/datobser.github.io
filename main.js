@@ -1,8 +1,15 @@
 var getScriptPromisify = (src) => {
   return new Promise((resolve, reject) => {
+    console.log(`Attempting to load script: ${src}`);
     $.getScript(src)
-      .done(() => resolve())
-      .fail((jqxhr, settings, exception) => reject(exception));
+      .done(() => {
+        console.log(`Successfully loaded script: ${src}`);
+        resolve();
+      })
+      .fail((jqxhr, settings, exception) => {
+        console.error(`Failed to load script: ${src}`, exception);
+        reject(exception);
+      });
   });
 };
 
@@ -21,6 +28,7 @@ var getScriptPromisify = (src) => {
   class HalfDoughnutPrepped extends HTMLElement {
     constructor() {
       super();
+      console.log("Constructing HalfDoughnutPrepped widget");
       this.attachShadow({ mode: "open" }).appendChild(prepared.content.cloneNode(true));
       this._root = this.shadowRoot.getElementById("root");
       this._props = {};
@@ -29,28 +37,40 @@ var getScriptPromisify = (src) => {
     }
 
     onCustomWidgetResize(width, height) {
+      console.log("Resizing widget:", width, height);
       this.render();
     }
 
     set myDataSource(dataBinding) {
+      console.log("Setting data source:", dataBinding);
       this._myDataSource = dataBinding;
       this.render();
     }
 
     async render() {
       try {
+        console.log("Rendering chart...");
         await getScriptPromisify("https://cdnjs.cloudflare.com/ajax/libs/echarts/5.0.0/echarts.min.js");
 
-        if (!this._myDataSource || this._myDataSource.state !== "success") {
+        if (!this._myDataSource) {
+          console.log("No data source provided.");
+          return;
+        }
+
+        if (this._myDataSource.state !== "success") {
+          console.log("Data source state is not 'success':", this._myDataSource.state);
           return;
         }
 
         const dimension = this._myDataSource.metadata.feeds.dimensions.values[0];
         const measure = this._myDataSource.metadata.feeds.measures.values[0];
+        console.log("Dimension:", dimension, "Measure:", measure);
+
         const data = this._myDataSource.data.map((data) => ({
           name: data[dimension].label,
           value: data[measure].raw,
         }));
+        console.log("Processed data:", data);
 
         const halfValue = data.reduce((accumulator, item) => accumulator + item.value, 0);
         data.push({
@@ -65,6 +85,7 @@ var getScriptPromisify = (src) => {
             show: false
           }
         });
+        console.log("Final data for chart:", data);
 
         const myChart = echarts.init(this._root, "wight");
         const option = {
@@ -90,12 +111,17 @@ var getScriptPromisify = (src) => {
             },
           ],
         };
+        console.log("Chart options:", option);
         myChart.setOption(option);
+        console.log("Chart rendered successfully.");
       } catch (error) {
         console.error("Failed to render chart:", error);
       }
     }
   }
 
+  // Registrierung des Custom Widgets
+  console.log("Registering custom widget: com-sap-sample-echarts-half_doughnut");
   customElements.define("com-sap-sample-echarts-half_doughnut", HalfDoughnutPrepped);
+  console.log("Custom widget registered successfully.");
 })();
