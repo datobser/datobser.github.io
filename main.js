@@ -129,6 +129,6 @@ var getScriptPromisify = (src) => {
 
   // Registrierung des Custom Widgets
   console.log("half-doughnut");
-  customElements.define("com-sap-sample-echarts-half_doughnut", HalfDoughnutPrepped);
+  customElements.define("half-doughnut", HalfDoughnutPrepped);
   console.log("Custom widget registered successfully.");
 })();
