@@ -1,3 +1,10 @@
+set myDataSource(dataBinding) {
+  this._myDataSource = dataBinding;
+  console.log("Data Source Set: ", this._myDataSource);
+  this.render();
+}
+
+
 var getScriptPromisify = (src) => {
   return new Promise((resolve, reject) => {
     console.log(`Attempting to load script: ${src}`);
