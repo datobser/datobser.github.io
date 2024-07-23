@@ -344,5 +344,5 @@ public.Actual,202401,999,TaskDebugger,2023-02-02,2023-05-05,X,1`;
 
     }
 
-    customElements.define('gantt-chart-widget-api', GanttChartWidgetAPI);
+    customElements.define('gantt-chart-widget', GanttChartWidgetAPI);
 })();
