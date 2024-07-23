@@ -153,7 +153,14 @@ input:checked + .slider:before {
             public.Actual,202401,999,TaskDebugger,2023-02-02,2023-05-05,X,1`;
 
             this._shadowRoot.getElementById('getAccessToken').addEventListener('click', () => window.getAccessToken(messagesElement));
-            this._shadowRoot.getElementById('getCsrfToken').addEventListener('click', () => window.getCsrfToken(messagesElement));
+            this._shadowRoot.getElementById('getCsrfToken').addEventListener('click', () => this.getCsrfToken().then(token => {
+                const messagesElement = this._shadowRoot.getElementById('messages');
+                messagesElement.textContent = `CSRF Token obtained: ${token}`;
+                }).catch
+                    (error => {
+                    const messagesElement = this._shadowRoot.getElementById('messages');
+                    messagesElement.textContent = `Error getting CSRF Token: ${error.message}`;
+            }));
             this._shadowRoot.getElementById('createJob').addEventListener('click', () => window.createJob(messagesElement));
             this._shadowRoot.getElementById('uploadData').addEventListener('click', () => window.uploadData(csvData_debugger, messagesElement));
             this._shadowRoot.getElementById('validateJob').addEventListener('click', () => window.validateJob(messagesElement));
@@ -187,7 +194,7 @@ input:checked + .slider:before {
             console.log('initializing api methods...');
             this.getAccessToken = 'https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token';
             console.log('initializing api methods...');
-            this.getCsrfToken = this.getCsrfToken();
+            this.getCsrfToken = this.getCsrfToken.bind(this);
             console.log('initializing api methods...');
             this.createJob = window.createJob;
             this.uploadData = window.uploadData;
@@ -362,7 +369,7 @@ input:checked + .slider:before {
 
                 // Ensure we have an access token
                 if (!this.accessToken) {
-                    return;
+                    throw new Error('Access token not available. Please get an access token first.');
                 }
 
                 const response = await fetch('/api/v1/csrf', {
