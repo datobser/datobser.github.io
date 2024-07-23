@@ -1,0 +1,77 @@
+{
+    "name": "GanttChartWidgetAPI",
+    "description": "Gantt Chart Widget with SAP API Integration",
+    "newInstancePrefix": "GanttChartWidgetAPI",
+    "eula": "",
+    "license": "Open Source",
+    "id": "GanttChartWidget",
+    "version": "1.1.0",
+    "icon": "https://planifyit.github.io/Pie_chart/PlanifyIT_Logo2.png",
+    "vendor": "Planifyit",
+    "webcomponents": [
+        {
+            "kind": "main",
+            "tag": "gantt-chart-widget-api",
+            "url": "https://datobser.github.io/GanttChartWidgetAPI.js",
+            "integrity": "",
+            "ignoreIntegrity": true
+        }
+    ],
+    "properties": {
+        "width": {
+            "type": "integer",
+            "default": 750
+        },
+        "height": {
+            "type": "integer",
+            "default": 700
+        }
+    },
+    "methods": {
+        "refreshFromSAPModel": {
+            "description": "Refresh the Gantt chart with the latest data from SAP",
+            "parameters": []
+        },
+        "insertTaskIntoSAPModel": {
+            "description": "Insert a new task into the SAP model",
+            "parameters": [
+                {
+                    "name": "task",
+                    "type": "object",
+                    "description": "The task object to be inserted"
+                }
+            ]
+        },
+        "updateSAPModel": {
+            "description": "Update the SAP model with all current tasks in the Gantt chart",
+            "parameters": []
+        }
+    },
+    "events": {
+        "onTaskAdded": {
+            "description": "Called when a new task is added to the Gantt chart"
+        },
+        "onTaskUpdated": {
+            "description": "Called when a task is updated in the Gantt chart"
+        },
+        "onTaskDeleted": {
+            "description": "Called when a task is deleted from the Gantt chart"
+        }
+    },
+    "dataBindings": {
+        "myDataBinding": {
+            "feeds": [
+                {
+                    "id": "dimensions",
+                    "description": "Dimensions",
+                    "type": "dimension"
+                },
+                {
+                    "id": "measures",
+                    "description": "Measures",
+                    "type": "mainStructureMember"
+                }
+            ]
+        }
+    }
+}
