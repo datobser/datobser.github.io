@@ -184,6 +184,7 @@ input:checked + .slider:before {
 
             //new code
             // Initialize SAP API methods
+            console.log('initializing api methods...');
             this.getAccessToken = 'https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token';
             this.getCsrfToken = this.getCsrfToken.bind(this);
             this.createJob = window.createJob;
