@@ -1,4 +1,3 @@
-
 {
   "eula": "",
   "vendor": "SAP",
@@ -12,39 +11,39 @@
   "webcomponents": [
     {
       "kind": "main",
-      "tag": "com-sap-sample-echarts-half_doughnut",
-      "url": "/main.js",
+      "tag": "half-doughnut",
+      "url": "https://datobser.github.io/main.js",
       "integrity": "",
       "ignoreIntegrity": true
     }
   ],
   "properties": {
-		"width": {
-			"type": "integer",
-			"default": 600
-		},
-		"height": {
-			"type": "integer",
-			"default": 420
-		},
+    "width": {
+      "type": "integer",
+      "default": 600
+    },
+    "height": {
+      "type": "integer",
+      "default": 420
+    },
     "dimensionFeed": {
-			"type": "string[]",
-			"default": []
-		},
-		"measureFeed": {
-			"type": "string[]",
-			"default": []
-		},
+      "type": "string[]",
+      "default": []
+    },
+    "measureFeed": {
+      "type": "string[]",
+      "default": []
+    },
     "caption": {
-  		"type": "string",
-  		"description": "",
-  		"default": ""
-  	}
+      "type": "string",
+      "description": "",
+      "default": ""
+    }
   },
   "dataBindings": {
-		"myDataSource": {
-			"feeds": [
-				{
+    "myDataSource": {
+      "feeds": [
+        {
           "id": "dimensions",
           "description": "Dimensions",
           "type": "dimension"
@@ -54,9 +53,9 @@
           "description": "Measures",
           "type": "mainStructureMember"
         }
-			]
-		}
-	},
+      ]
+    }
+  },
   "methods": {
     "getCaption": {
       "returnType": "string",
@@ -143,7 +142,6 @@
       ],
       "body": "this.dataBindings.getDataBinding('myDataSource').setModel(modelId);"
     }
-
   },
   "events": {
     "onResultChanged": {
@@ -152,4 +150,5 @@
     "onClick": {
       "description": "called when the result set of the widget changes"
     }
-}}
+  }
+}
