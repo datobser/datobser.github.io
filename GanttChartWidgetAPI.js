@@ -432,5 +432,5 @@ input:checked + .slider:before {
 
     }
 
-    customElements.define('gantt-chart-widget-api', GanttChartWidgetAPI);
+    customElements.define('gantt-chart', GanttChartWidgetAPI);
 })();
