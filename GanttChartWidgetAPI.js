@@ -187,7 +187,7 @@ input:checked + .slider:before {
             console.log('initializing api methods...');
             this.getAccessToken = 'https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token';
             console.log('initializing api methods...');
-            this.getCsrfToken = this.getCsrfToken.bind(this);
+            this.getCsrfToken = this.getCsrfToken();
             console.log('initializing api methods...');
             this.createJob = window.createJob;
             this.uploadData = window.uploadData;
