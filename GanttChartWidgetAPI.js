@@ -431,6 +431,4 @@ input:checked + .slider:before {
 
 customElements.define('gantt-chart-widget', GanttChartWidgetAPI);
 
-}
-
-);
+})();
