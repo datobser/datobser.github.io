@@ -197,23 +197,27 @@ input:checked + .slider:before {
         }
 
         //new code
-        // Lifecycle callbacks
-        connectedCallback() {
+       connectedCallback() {
             this.loadSAPUI5();
         }
 
         loadSAPUI5() {
-            sap.ui.getCore().attachInit(() => {
-                sap.ui.require([
-                    'sap/ui/unified/Menu',
-                    'sap/ui/unified/MenuItem',
-                    'sap/m/Button'
-                ], (Menu, MenuItem, Button) => {
-                    this.Menu = Menu;
-                    this.MenuItem = MenuItem;
-                    this.Button = Button;
-                    this.initializeComponents();
-                });
+            // Ensure SAPUI5 is loaded
+            if (!window.sap || !window.sap.ui) {
+                console.error("SAPUI5 is not loaded. Please ensure it's included in your SAC environment.");
+                return;
+            }
+
+            // Use sap.ui.define for module loading
+            sap.ui.define([
+                "sap/ui/unified/Menu",
+                "sap/ui/unified/MenuItem",
+                "sap/m/Button"
+            ], (Menu, MenuItem, Button) => {
+                this.Menu = Menu;
+                this.MenuItem = MenuItem;
+                this.Button = Button;
+                this.initializeComponents();
             });
         }
 
@@ -242,29 +246,57 @@ input:checked + .slider:before {
             public.Actual,202401,999,TaskDebugger,2023-02-02,2023-05-05,X,1`;
 
             const buttons = [
-                { id: 'getAccessToken', action: () => window.getAccessToken(messagesElement) },
-                { id: 'getCsrfToken', action: () => window.getCsrfToken(messagesElement) },
-                { id: 'createJob', action: () => window.createJob(messagesElement) },
-                { id: 'uploadData', action: () => window.uploadData(csvData_debugger, messagesElement) },
-                { id: 'validateJob', action: () => window.validateJob(messagesElement) },
-                { id: 'runJob', action: () => window.runJob(messagesElement) }
+                { id: 'getAccessToken', action: () => this.callSAPFunction('getAccessToken', messagesElement) },
+                { id: 'getCsrfToken', action: () => this.callSAPFunction('getCsrfToken', messagesElement) },
+                { id: 'createJob', action: () => this.callSAPFunction('createJob', messagesElement) },
+                { id: 'uploadData', action: () => this.callSAPFunction('uploadData', csvData_debugger, messagesElement) },
+                { id: 'validateJob', action: () => this.callSAPFunction('validateJob', messagesElement) },
+                { id: 'runJob', action: () => this.callSAPFunction('runJob', messagesElement) }
             ];
 
             buttons.forEach(({ id, action }) => {
-                const button = new this.Button({
+                new this.Button({
                     text: id,
                     press: action
-                });
-                button.placeAt(this._shadowRoot.getElementById(id));
+                }).placeAt(this._shadowRoot.getElementById(id));
             });
         }
 
         initializeRefreshButton() {
-            const refreshButton = new this.Button({
+            new this.Button({
                 text: 'Refresh from SAP',
                 press: () => this.refreshFromSAPModel()
-            });
-            refreshButton.placeAt(this._shadowRoot);
+            }).placeAt(this._shadowRoot);
+        }
+
+        callSAPFunction(functionName, ...args) {
+            if (typeof window[functionName] === 'function') {
+                return window[functionName](...args);
+            } else {
+                console.error(`SAP function ${functionName} is not available`);
+                const messagesElement = this._shadowRoot.getElementById('messages');
+                if (messagesElement) {
+                    messagesElement.textContent = `Error: SAP function ${functionName} is not available`;
+                }
+            }
+        }
+
+        static get metadata() {
+            return {
+                properties: {
+                    myDataBinding: {
+                        type: "data",
+                        defaultValue: null
+                    }
+                },
+                methods: {
+                    refresh: {
+                        returnType: "void",
+                        parameters: []
+                    }
+                },
+                events: ["onTaskAdded"]
+            };
         }
 
         loadExternalResources() {
