@@ -127,6 +127,67 @@ var getScriptPromisify = (src) => {
     }
   }
 
+  //new code
+  // Implement missing methods
+    getCaption() {
+      return this.caption;
+    }
+
+    setCaption(caption) {
+      this.caption = caption;
+    }
+
+    openSelectModelDialog() {
+      this.dataBindings.getDataBinding('myDataSource').openSelectModelDialog();
+    }
+
+    getDimensions() {
+      return this.dataBindings.getDataBinding('myDataSource').getDataSource().getDimensions();
+    }
+
+    getMeasures() {
+      return this.dataBindings.getDataBinding('myDataSource').getDataSource().getMeasures();
+    }
+
+    addDimension(dimensionId) {
+      // Implementation depends on how you want to handle dimensions
+      this.dimensionFeed = [...this.dimensionFeed, dimensionId];
+      this.render();
+    }
+
+    addMeasure(measureId) {
+      // Implementation depends on how you want to handle measures
+      this.measureFeed = [...this.measureFeed, measureId];
+      this.render();
+    }
+
+    removeDimension(dimensionId) {
+      this.dimensionFeed = this.dimensionFeed.filter(id => id !== dimensionId);
+      this.render();
+    }
+
+    removeMeasure(measureId) {
+      this.measureFeed = this.measureFeed.filter(id => id !== measureId);
+      this.render();
+    }
+
+    getDimensionsOnFeed() {
+      return this.dimensionFeed;
+    }
+
+    getMeasuresOnFeed() {
+      return this.measureFeed;
+    }
+
+    getDataSource() {
+      return this.dataBindings.getDataBinding('myDataSource').getDataSource();
+    }
+
+    setModel(modelId) {
+      this.dataBindings.getDataBinding('myDataSource').setModel(modelId);
+    }
+  }
+
   // Registrierung des Custom Widgets
   console.log("half-doughnut");
   customElements.define("half-doughnut", HalfDoughnutPrepped);
