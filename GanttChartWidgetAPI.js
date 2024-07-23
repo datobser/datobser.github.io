@@ -171,16 +171,16 @@ input:checked + .slider:before {
             dhtmlxGanttScript.onload = () => {
                 this._dhtmlxGanttReady = true;
                 this._renderChart();
-                                
+
             };
             this._shadowRoot.appendChild(dhtmlxGanttScript);
-    
-    
+
+
             // Load SACAPI_DataImport.js
             const script = document.createElement('script');
             script.src = 'https://datobser.github.io/SACAPI_DataImport.js';
             document.head.appendChild(script);
-    
+
             //new code
             // Initialize SAP API methods
             this.getAccessToken = window.getAccessToken;
@@ -189,7 +189,7 @@ input:checked + .slider:before {
             this.uploadData = window.uploadData;
             this.validateJob = window.validateJob;
             this.runJob = window.runJob;
-    
+
             const refreshButton = document.createElement('button');
             refreshButton.textContent = 'Refresh from SAP';
             refreshButton.addEventListener('click', () => this.refreshFromSAPModel());
@@ -387,16 +387,16 @@ input:checked + .slider:before {
             try {
                 await this.getAccessToken();
                 await this.getCsrfToken();
-                
+
                 // Create a new job
                 const jobId = await this.createJob();
-                
+
                 // Validate the job
                 await this.validateJob(jobId);
-                
+
                 // Run the job
                 await this.runJob(jobId);
-                
+
                 // Fetch the results
                 const response = await fetch(`/api/v1/dataexport/jobs/${jobId}/result`, {
                     method: 'GET',
@@ -431,7 +431,6 @@ input:checked + .slider:before {
 
 
 
-    }
+}
 
-    customElements.define('gantt-chart-widget', GanttChartWidgetAPI);
-})();
+); customElements.define('gantt-chart-widget', GanttChartWidgetAPI);
