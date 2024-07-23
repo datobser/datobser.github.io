@@ -1,4 +1,5 @@
 
+
 (function () {
     let tmpl = document.createElement('template');
     tmpl.innerHTML = `
@@ -183,8 +184,8 @@ input:checked + .slider:before {
 
             //new code
             // Initialize SAP API methods
-            this.getAccessToken = window.getAccessToken;
-            this.getCsrfToken = window.getCsrfToken;
+            this.getAccessToken = 'https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token';
+            this.getCsrfToken = this.getCsrfToken.bind(this);
             this.createJob = window.createJob;
             this.uploadData = window.uploadData;
             this.validateJob = window.validateJob;
@@ -352,6 +353,40 @@ input:checked + .slider:before {
 
         // new code
         // Interaction with SAP data model
+
+        async getCsrfToken() {
+            try {
+
+                // Ensure we have an access token
+                if (!this.accessToken) {
+                    await this.getAccessToken();
+                }
+
+                const response = await fetch('/api/v1/csrf', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${this.accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const csrfToken = response.headers.get('X-CSRF-Token');
+                if (!csrfToken) {
+                    throw new Error('CSRF token not found in response headers');
+                }
+
+                this.csrfToken = csrfToken;
+                console.log('CSRF token obtained successfully');
+                return this.csrfToken;
+            } catch (error) {
+                console.error('Error getting CSRF token:', error);
+                throw error;
+            }
+        }
+
         async insertTaskIntoSAPModel(task) {
             const csvData = this.taskToCsv(task);
             try {
@@ -429,6 +464,6 @@ input:checked + .slider:before {
         }
     }
 
-customElements.define('gantt-chart-widget', GanttChartWidgetAPI);
+    customElements.define('gantt-chart-widget', GanttChartWidgetAPI);
 
 })();
