@@ -11,7 +11,7 @@
     "webcomponents": [
         {
             "kind": "main",
-            "tag": "gantt-chart-widget-api",
+            "tag": "gantt-chart-widget",
             "url": "https://datobser.github.io/GanttChartWidgetAPI.js",
             "integrity": "",
             "ignoreIntegrity": true
