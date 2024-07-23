@@ -362,7 +362,7 @@ input:checked + .slider:before {
 
                 // Ensure we have an access token
                 if (!this.accessToken) {
-                    await this.getAccessToken();
+                    return;
                 }
 
                 const response = await fetch('/api/v1/csrf', {
