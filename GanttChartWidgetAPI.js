@@ -275,6 +275,13 @@ input:checked + .slider:before {
             });
         }
 
+        loadScript(src, onload = null) {
+            const script = document.createElement('script');
+            script.src = src;
+            if (onload) script.onload = onload;
+            this._shadowRoot.appendChild(script);
+        }
+
         taskToCsv(task) {
             // Convert the task data to the CSV format
             const version = 'public.Actual';
