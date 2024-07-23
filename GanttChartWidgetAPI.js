@@ -196,6 +196,7 @@ input:checked + .slider:before {
             this._shadowRoot.appendChild(refreshButton);
         }
 
+        //new code
         // Lifecycle callbacks
         connectedCallback() {
             this.loadSAPUI5();
@@ -215,7 +216,65 @@ input:checked + .slider:before {
                 });
             });
         }
-        
+
+        initializeComponents() {
+            this.initializeDebuggingMode();
+            this.initializeDebugButtons();
+            this.initializeRefreshButton();
+            this.loadExternalResources();
+        }
+
+        initializeDebuggingMode() {
+            const debugToggle = this._shadowRoot.getElementById('debugToggle');
+            const debuggingArea = this._shadowRoot.getElementById('debugging-area');
+            const debugStatus = this._shadowRoot.getElementById('debugStatus');
+
+            debugToggle.addEventListener('change', () => {
+                const isActive = debugToggle.checked;
+                debugStatus.textContent = `Debugging Mode ${isActive ? 'Active' : 'Inactive'}`;
+                debuggingArea.style.display = isActive ? 'block' : 'none';
+            });
+        }
+
+        initializeDebugButtons() {
+            const messagesElement = this._shadowRoot.getElementById('messages');
+            const csvData_debugger = `Version,Date,id,label,startDate,endDate,open,progress
+            public.Actual,202401,999,TaskDebugger,2023-02-02,2023-05-05,X,1`;
+
+            const buttons = [
+                { id: 'getAccessToken', action: () => window.getAccessToken(messagesElement) },
+                { id: 'getCsrfToken', action: () => window.getCsrfToken(messagesElement) },
+                { id: 'createJob', action: () => window.createJob(messagesElement) },
+                { id: 'uploadData', action: () => window.uploadData(csvData_debugger, messagesElement) },
+                { id: 'validateJob', action: () => window.validateJob(messagesElement) },
+                { id: 'runJob', action: () => window.runJob(messagesElement) }
+            ];
+
+            buttons.forEach(({ id, action }) => {
+                const button = new this.Button({
+                    text: id,
+                    press: action
+                });
+                button.placeAt(this._shadowRoot.getElementById(id));
+            });
+        }
+
+        initializeRefreshButton() {
+            const refreshButton = new this.Button({
+                text: 'Refresh from SAP',
+                press: () => this.refreshFromSAPModel()
+            });
+            refreshButton.placeAt(this._shadowRoot);
+        }
+
+        loadExternalResources() {
+            // Load DHTMLX Gantt
+            this.loadScript('https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js', () => {
+                this._dhtmlxGanttReady = true;
+                this._renderChart();
+            });
+        }
+
         taskToCsv(task) {
             // Convert the task data to the CSV format
             const version = 'public.Actual';
