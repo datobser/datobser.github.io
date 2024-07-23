@@ -1,185 +1,45 @@
-var getScriptPromisify = (src) => {
-  return new Promise((resolve, reject) => {
-    console.log(`Attempting to load script: ${src}`);
-    $.getScript(src)
-      .done(() => {
-        console.log(`Successfully loaded script: ${src}`);
-        resolve();
-      })
-      .fail((jqxhr, settings, exception) => {
-        console.error(`Failed to load script: ${src}`, exception);
-        reject(exception);
-      });
-  });
-};
-
-(function () {
-  const prepared = document.createElement("template");
-  prepared.innerHTML = `
-    <style>
-      #root {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-    <div id="root"></div>
-  `;
-
-  class HalfDoughnutPrepped extends HTMLElement {
-    constructor() {
-      super();
-      console.log("Constructing HalfDoughnutPrepped widget");
-      this.attachShadow({ mode: "open" }).appendChild(prepared.content.cloneNode(true));
-      this._root = this.shadowRoot.getElementById("root");
-      this._props = {};
-      this._myDataSource = null;
-      this.dimensionFeed = [];
-      this.measureFeed = [];
-      this.render();
-    }
-
-    onCustomWidgetResize(width, height) {
-      console.log("Resizing widget:", width, height);
-      this.render();
-    }
-
-    set myDataSource(dataBinding) {
-      console.log("Setting data source:", dataBinding);
-      this._myDataSource = dataBinding;
-      this.render();
-    }
-
-    async render() {
-      try {
-        console.log("Rendering chart...");
-        await getScriptPromisify("https://cdnjs.cloudflare.com/ajax/libs/echarts/5.0.0/echarts.min.js");
-
-        if (!this._myDataSource) {
-          console.log("No data source provided.");
-          return;
-        }
-
-        if (this._myDataSource.state !== "success") {
-          console.log("Data source state is not 'success':", this._myDataSource.state);
-          return;
-        }
-
-        const dimension = this._myDataSource.metadata.feeds.dimensions.values[0];
-        const measure = this._myDataSource.metadata.feeds.measures.values[0];
-        console.log("Dimension:", dimension, "Measure:", measure);
-
-        const data = this._myDataSource.data.map((data) => ({
-          name: data[dimension].label,
-          value: data[measure].raw,
-        }));
-        console.log("Processed data:", data);
-
-        const halfValue = data.reduce((accumulator, item) => accumulator + item.value, 0);
-        data.push({
-          value: halfValue,
-          itemStyle: {
-            color: 'none',
-            decal: {
-              symbol: 'none'
-            }
-          },
-          label: {
-            show: false
-          }
-        });
-        console.log("Final data for chart:", data);
-
-        const myChart = echarts.init(this._root, "wight");
-        const option = {
-          color: ['#0070F2', '#D2EFFF', '#4CB1FF', '#89D1FF'],
-          tooltip: {
-            trigger: "item",
-            formatter: "{a} <br/>{b}: {c} ({d}%)",
-          },
-          series: [
-            {
-              name: '',
-              type: 'pie',
-              radius: ['40%', '70%'],
-              center: ['50%', '70%'],
-              startAngle: 180,
-              label: {
-                show: true,
-                formatter(param) {
-                  return `${param.name} (${param.percent * 2}%)`;
-                }
-              },
-              data,
-            },
-          ],
-        };
-        console.log("Chart options:", option);
-        myChart.setOption(option);
-        console.log("Chart rendered successfully.");
-      } catch (error) {
-        console.error("Failed to render chart:", error);
-      }
-    }
-
-    getCaption() {
-      return this.caption;
-    }
-
-    setCaption(caption) {
-      this.caption = caption;
-    }
-
-    openSelectModelDialog() {
-      this.dataBindings.getDataBinding('myDataSource').openSelectModelDialog();
-    }
-
-    getDimensions() {
-      return this.dataBindings.getDataBinding('myDataSource').getDataSource().getDimensions();
-    }
-
-    getMeasures() {
-      return this.dataBindings.getDataBinding('myDataSource').getDataSource().getMeasures();
-    }
-
-    addDimension(dimensionId) {
-      this.dimensionFeed = [...this.dimensionFeed, dimensionId];
-      this.render();
-    }
-
-    addMeasure(measureId) {
-      this.measureFeed = [...this.measureFeed, measureId];
-      this.render();
-    }
-
-    removeDimension(dimensionId) {
-      this.dimensionFeed = this.dimensionFeed.filter(id => id !== dimensionId);
-      this.render();
-    }
-
-    removeMeasure(measureId) {
-      this.measureFeed = this.measureFeed.filter(id => id !== measureId);
-      this.render();
-    }
-
-    getDimensionsOnFeed() {
-      return this.dimensionFeed;
-    }
-
-    getMeasuresOnFeed() {
-      return this.measureFeed;
-    }
-
-    getDataSource() {
-      return this.dataBindings.getDataBinding('myDataSource').getDataSource();
-    }
-
-    setModel(modelId) {
-      this.dataBindings.getDataBinding('myDataSource').setModel(modelId);
-    }
-  }
-
-  // Registrierung des Custom Widgets
-  console.log("half-doughnut");
-  customElements.define("half-doughnut", HalfDoughnutPrepped);
-  console.log("Custom widget registered successfully.");
+(function() {
+              let template = document.createElement("template");
+              template.innerHTML = `
+                                    <style>
+                                      :host {
+                                        border-radius: 25px;
+                                        border-width: 4px;
+                                        border-color: black;
+                                        border-style: solid;
+                                        display: block;
+                                      }
+                                    </style>
+                                  `;
+              
+              class ColoredBox extends HTMLElement {
+                  constructor() {
+                      super();
+                      let shadowRoot = this.attachShadow({mode: "open"});
+                      shadowRoot.appendChild(template.content.cloneNode(true));
+                    
+                      this.addEventListener("click", event => {
+                      var event = new Event("onClick");
+                      this.dispatchEvent(event);
+                      });
+                    
+                      this._props = {};
+                  }
+                  
+                  onCustomWidgetBeforeUpdate(changedProperties) {
+                    this._props = { ...this._props, ...changedProperties };
+                  }
+                  
+                  onCustomWidgetAfterUpdate(changedProperties) {
+                    if ("color" in changedProperties) {
+                      this.style["background-color"] = changedProperties["color"];
+                    }
+                    if ("opacity" in changedProperties) {
+                      this.style["opacity"] = changedProperties["opacity"];
+                    }
+                  }
+              
+              }
+  
+  customElements.define("com-sap-sample-coloredbox", ColoredBox);
 })();
