@@ -196,6 +196,26 @@ input:checked + .slider:before {
             this._shadowRoot.appendChild(refreshButton);
         }
 
+        // Lifecycle callbacks
+        connectedCallback() {
+            this.loadSAPUI5();
+        }
+
+        loadSAPUI5() {
+            sap.ui.getCore().attachInit(() => {
+                sap.ui.require([
+                    'sap/ui/unified/Menu',
+                    'sap/ui/unified/MenuItem',
+                    'sap/m/Button'
+                ], (Menu, MenuItem, Button) => {
+                    this.Menu = Menu;
+                    this.MenuItem = MenuItem;
+                    this.Button = Button;
+                    this.initializeComponents();
+                });
+            });
+        }
+        
         taskToCsv(task) {
             // Convert the task data to the CSV format
             const version = 'public.Actual';
