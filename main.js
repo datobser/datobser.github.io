@@ -1,10 +1,3 @@
-set myDataSource(dataBinding) {
-  this._myDataSource = dataBinding;
-  console.log("Data Source Set: ", this._myDataSource);
-  this.render();
-}
-
-
 var getScriptPromisify = (src) => {
   return new Promise((resolve, reject) => {
     console.log(`Attempting to load script: ${src}`);
@@ -40,6 +33,8 @@ var getScriptPromisify = (src) => {
       this._root = this.shadowRoot.getElementById("root");
       this._props = {};
       this._myDataSource = null;
+      this.dimensionFeed = [];
+      this.measureFeed = [];
       this.render();
     }
 
@@ -125,10 +120,7 @@ var getScriptPromisify = (src) => {
         console.error("Failed to render chart:", error);
       }
     }
-  }
 
-  //new code
-  // Implement missing methods
     getCaption() {
       return this.caption;
     }
@@ -150,13 +142,11 @@ var getScriptPromisify = (src) => {
     }
 
     addDimension(dimensionId) {
-      // Implementation depends on how you want to handle dimensions
       this.dimensionFeed = [...this.dimensionFeed, dimensionId];
       this.render();
     }
 
     addMeasure(measureId) {
-      // Implementation depends on how you want to handle measures
       this.measureFeed = [...this.measureFeed, measureId];
       this.render();
     }
