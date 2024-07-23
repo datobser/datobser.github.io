@@ -1,3 +1,4 @@
+
 (function () {
     let tmpl = document.createElement('template');
     tmpl.innerHTML = `
@@ -148,7 +149,7 @@ input:checked + .slider:before {
 
             // Pass the reference to the functions
             const csvData_debugger = `Version,Date,id,label,startDate,endDate,open,progress
-            public.Actual,202401,999,TaskDebugger,2023-02-02,2023-05-05,X,1`;
+public.Actual,202401,999,TaskDebugger,2023-02-02,2023-05-05,X,1`;
 
             this._shadowRoot.getElementById('getAccessToken').addEventListener('click', () => window.getAccessToken(messagesElement));
             this._shadowRoot.getElementById('getCsrfToken').addEventListener('click', () => window.getCsrfToken(messagesElement));
@@ -170,29 +171,16 @@ input:checked + .slider:before {
             dhtmlxGanttScript.onload = () => {
                 this._dhtmlxGanttReady = true;
                 this._renderChart();
-                                
+
             };
             this._shadowRoot.appendChild(dhtmlxGanttScript);
-    
-    
+
+
             // Load SACAPI_DataImport.js
             const script = document.createElement('script');
             script.src = 'https://datobser.github.io/SACAPI_DataImport.js';
             document.head.appendChild(script);
-    
-            //new code
-            // Initialize SAP API methods
-            this.getAccessToken = window.getAccessToken;
-            this.getCsrfToken = window.getCsrfToken;
-            this.createJob = window.createJob;
-            this.uploadData = window.uploadData;
-            this.validateJob = window.validateJob;
-            this.runJob = window.runJob;
-    
-            const refreshButton = document.createElement('button');
-            refreshButton.textContent = 'Refresh from SAP';
-            refreshButton.addEventListener('click', () => this.refreshFromSAPModel());
-            this._shadowRoot.appendChild(refreshButton);
+
         }
 
         taskToCsv(task) {
@@ -349,88 +337,12 @@ input:checked + .slider:before {
             }
         }
 
-        // new code
-        // Interaction with SAP data model
-        async insertTaskIntoSAPModel(task) {
-            const csvData = this.taskToCsv(task);
-            try {
-                await this.getAccessToken();
-                await this.getCsrfToken();
-                await this.createJob();
-                await this.uploadData(csvData);
-                await this.validateJob();
-                await this.runJob();
-                console.log('Task inserted successfully into SAP model');
-            } catch (error) {
-                console.error('Error inserting task into SAP model:', error);
-            }
-        }
 
-        async updateSAPModel() {
-            const allTasks = gantt.getTaskByTime();
-            const csvData = allTasks.map(task => this.taskToCsv(task)).join('\n');
-            try {
-                await this.getAccessToken();
-                await this.getCsrfToken();
-                await this.createJob();
-                await this.uploadData(csvData);
-                await this.validateJob();
-                await this.runJob();
-                console.log('SAP model updated successfully');
-            } catch (error) {
-                console.error('Error updating SAP model:', error);
-            }
-        }
 
-        async fetchLatestDataFromSAP() {
-            try {
-                await this.getAccessToken();
-                await this.getCsrfToken();
-                
-                // Create a new job
-                const jobId = await this.createJob();
-                
-                // Validate the job
-                await this.validateJob(jobId);
-                
-                // Run the job
-                await this.runJob(jobId);
-                
-                // Fetch the results
-                const response = await fetch(`/api/v1/dataexport/jobs/${jobId}/result`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${this.accessToken}`,
-                        'X-CSRF-Token': this.csrfToken
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Error fetching latest data from SAP:', error);
-                throw error;
-            }
-        }
-
-        async refreshFromSAPModel() {
-            try {
-                const latestData = await this.fetchLatestDataFromSAP();
-                this._updateData({ data: latestData, state: 'success' });
-                console.log('Gantt chart refreshed with latest SAP data');
-            } catch (error) {
-                console.error('Error refreshing data from SAP model:', error);
-            }
-        }
-    }
 
 
 
     }
 
-    customElements.define('gantt-chart', GanttChartWidgetAPI);
+    customElements.define('gantt-chart-widget-api', GanttChartWidgetAPI);
 })();
