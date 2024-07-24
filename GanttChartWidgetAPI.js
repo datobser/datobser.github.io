@@ -342,8 +342,16 @@ input:checked + .slider:before {
         // new code
         // Interaction with SAP data model
         
-        getAccessToken() {
-            return "https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token";
+        async getAccessToken() {
+                console.log('Getting access token...');
+                // Simulating an async operation
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        this.accessToken = 'https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token';
+                        console.log('Access token obtained');
+                        resolve(this.accessToken);
+                    }, 1000);
+                });
         }
         
         async getCsrfToken() {
