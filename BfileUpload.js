@@ -1,12 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-
-import "@ui5/webcomponents/dist/Select";
-import "@ui5/webcomponents/dist/Option";
-import "@ui5/webcomponents/dist/Input";
-import "@ui5/webcomponents/dist/Button";
-
 (function() {
+    // Define a function to dynamically load scripts
+  function loadScript(url) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = url;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  // Define a function to load all required dependencies
+  async function loadDependencies() {
+    const dependencies = [
+      'https://unpkg.com/react@17/umd/react.production.min.js',
+      'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
+      'https://unpkg.com/@ui5/webcomponents-base@1.19.0/dist/bundle.js',
+      'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/bundle.js'
+    ];
+
+    for (const url of dependencies) {
+      await loadScript(url);
+    }
+
+    // Load specific UI5 Web Components
+    await Promise.all([
+      loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Select.js'),
+      loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Option.js'),
+      loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Input.js'),
+      loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Button.js')
+    ]);
+  }
+
+
     let template = document.createElement("template");
     template.innerHTML = `
         <style>
