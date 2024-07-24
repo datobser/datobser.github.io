@@ -11,7 +11,7 @@
     {
       "kind": "main",
       "tag": "com-sap-file-upload-widget",
-      "url": "https://your-hosting-url.com/file-upload-widget.js",
+      "url": "https://datobser.github.io/fileUpload.js",
       "integrity": "",
       "ignoreIntegrity": true
     },
