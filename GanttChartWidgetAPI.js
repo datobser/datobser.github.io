@@ -1,5 +1,3 @@
-
-
 (function () {
     let tmpl = document.createElement('template');
     tmpl.innerHTML = `
@@ -191,9 +189,9 @@ input:checked + .slider:before {
 
             //new code
             // Initialize SAP API methods
-            console.log('initializing api methods...');
-            this.getAccessToken = 'https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token';
-            console.log('initializing api methods...');
+            console.log('initializing access...');
+            this.getAccessToken = this.getAccessToken.bind(this);
+            console.log('initializing csrf...');
             this.getCsrfToken = this.getCsrfToken.bind(this);
             console.log('initializing api methods...');
             this.createJob = window.createJob;
@@ -363,7 +361,11 @@ input:checked + .slider:before {
 
         // new code
         // Interaction with SAP data model
-
+        
+        function getAccessToken() {
+            return "https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token";
+        }
+        
         async getCsrfToken() {
             try {
 
