@@ -557,7 +557,7 @@ import XLSX from 'xlsx';
     }
   }
 
-  customElements.define('com-sap-file-upload-widget-builder', FileUploadWidgetBuilder);
+  customElements.define('upload', FileUploadWidgetBuilder);
 
   const FileUploadWidgetBuilderComponent = (props) => {
     return (
