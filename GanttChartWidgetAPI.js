@@ -347,6 +347,7 @@ input:checked + .slider:before {
         }
         
         async getCsrfToken() {
+            console.log('getCsrfToken() called');
             try {
                 // Ensure we have an access token
                 if (!this.accessToken) {
