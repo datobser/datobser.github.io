@@ -138,19 +138,33 @@ var getScriptPromisify = (src) => {
       })
 
       data.forEach(row => {
-        // dimension
+        // Dimensionen verarbeiten
         const name = dimensions.map(dimension => {
-          return row[dimension.key].label
+          return row[dimension.key] ? row[dimension.key].label : 'Unbekannt'
         }).join('/')
       
-        // measures
-        series.forEach(series => {
-          series.data.push({
-            name,
-            value: row[series.key].raw
-          })
-        })
-      })
+        // Messwerte verarbeiten
+        measures.forEach(measure => {
+          // Finden Sie die passende Serie
+          const seriesData = series.find(s => s.name === measure.key);
+          
+          if (seriesData) {
+            // Überprüfen Sie, ob der Messwert in den Daten vorhanden ist
+            const measureData = row[measure.key];
+            if (measureData && measureData.raw !== undefined) {
+              seriesData.data.push({
+                name,
+                value: parse(measureData.raw, min, max) // Normalisierung der Werte
+              });
+            } else {
+              console.warn(`Messwert ${measure.key} oder raw-Wert fehlt in Zeile`, row);
+            }
+          } else {
+            console.warn(`Serie für ${measure.key} nicht gefunden`);
+          }
+        });
+      });
+
 
 
       this._echart = echarts.init(this._root)
