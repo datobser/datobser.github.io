@@ -1,26 +1,30 @@
-// React and ReactDOM
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-
-// UI5 Web Components
-import "@ui5/webcomponents/dist/Select";
-import "@ui5/webcomponents/dist/Option";
-import "@ui5/webcomponents/dist/Button";
-import "@ui5/webcomponents/dist/Dialog";
-import "@ui5/webcomponents/dist/Table";
-import "@ui5/webcomponents/dist/TableColumn";
-import "@ui5/webcomponents/dist/TableRow";
-import "@ui5/webcomponents/dist/TableCell";
-import "@ui5/webcomponents/dist/Input";
-import "@ui5/webcomponents/dist/CheckBox";
-
-// File parsing libraries
-import Papa from 'papaparse';
-import XLSX from 'xlsx';
-
-
-
 (function () {
+  // Define a function to dynamically load scripts
+  function loadScript(url) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = url;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  // Define a function to load all required dependencies
+  async function loadDependencies() {
+    const dependencies = [
+      'https://unpkg.com/react@17/umd/react.production.min.js',
+      'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
+      'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
+      'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
+      'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/bundle.js'
+    ];
+
+    for (const url of dependencies) {
+      await loadScript(url);
+    }
+  }
+  
   const template = document.createElement('template');
   template.innerHTML = `
     <style>
