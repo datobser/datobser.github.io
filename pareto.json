@@ -13,7 +13,7 @@
       {
         "kind": "main",
         "tag": "pareto-chart",
-        "url": "https://datobser.github.io/main.js",
+        "url": "https://datobser.github.io/pareto.js",
         "integrity": "",
         "ignoreIntegrity": true
       }
