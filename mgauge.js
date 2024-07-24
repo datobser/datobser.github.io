@@ -137,19 +137,45 @@ var getScriptPromisify = (src) => {
         }
       })
 
-      // data.forEach(row => {
-      //   // dimension
-      //   const name = dimensions.map(dimension => {
-      //     return row[dimension.key].label
-      //   }).join('/')
-      //   // measures
-      //   series.forEach(series => {
-      //     series.data.push({
-      //       name,
-      //       value: row[series.key].raw
-      //     })
-      //   })
-      // })
+      data.forEach(row => {
+          // Dimensionen verarbeiten
+          const name = dimensions.map(dimension => {
+            const label = row[dimension.key] ? row[dimension.key].label : '';
+            console.log(`Dimension ${dimension.key}: ${label}`); // Log für Dimensionen
+            return label;
+          }).join('/');
+        
+          console.log(`Generated name: ${name}`); // Log für den vollständigen Namen
+        
+          // Messwerte verarbeiten
+          measures.forEach(measure => {
+            const seriesData = series.find(s => s.name === measure.key); // Suchen Sie die passende Serie
+        
+            if (seriesData) {
+              const rawValue = row[measure.key] ? row[measure.key].raw : null;
+              const parsedValue = rawValue !== null ? parse(rawValue, min, max) : null;
+              
+              console.log(`Measure ${measure.key} raw value: ${rawValue}`); // Log für rohe Messwerte
+              console.log(`Measure ${measure.key} parsed value: ${parsedValue}`); // Log für normalisierte Messwerte
+              
+              if (parsedValue !== null) {
+                seriesData.data.push({
+                  name,
+                  value: parsedValue
+                });
+                console.log(`Added data to series ${measure.key}:`, { name, value: parsedValue }); // Log für hinzugefügte Daten
+              } else {
+                console.warn(`No raw value found for measure ${measure.key} in row:`, row); // Warnung, wenn kein Rohwert vorhanden ist
+              }
+            } else {
+              console.warn(`No series found for measure ${measure.key}`); // Warnung, wenn keine passende Serie gefunden wird
+            }
+          });
+      });
+        
+      // Log zur Überprüfung des finalen series Arrays
+      console.log('Final series data:', series);
+
       this._echart = echarts.init(this._root)
       // https://echarts.apache.org/en/option.html
       this._echart.setOption({
