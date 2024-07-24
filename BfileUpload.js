@@ -175,5 +175,5 @@ import "@ui5/webcomponents/dist/Button";
         );
     };
 
-    customElements.define("com-sap-sample-fileupload-builder", FileUploadWidgetBuilder);
+    customElements.define("upload-builder", FileUploadWidgetBuilder);
 })();
