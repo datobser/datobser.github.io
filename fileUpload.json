@@ -10,15 +10,15 @@
   "webcomponents": [
     {
       "kind": "main",
-      "tag": "com-sap-file-upload-widget",
+      "tag": "upload",
       "url": "https://datobser.github.io/fileUpload.js",
       "integrity": "",
       "ignoreIntegrity": true
     },
     {
       "kind": "builder",
-      "tag": "com-sap-file-upload-widget-builder",
-      "url": "https://your-hosting-url.com/file-upload-widget.js",
+      "tag": "upload-builder",
+      "url": "https://datobser.github.io//BfileUpload.js",
       "integrity": "",
       "ignoreIntegrity": true
     }
