@@ -12,14 +12,14 @@
   "webcomponents": [
     {
       "kind": "main",
-      "tag": "com-sap-sac-sample-echarts-gaugegrade",
+      "tag": "gauge-chart",
       "url": "https://datobser.github.io/mgauge.js",
       "integrity": "",
       "ignoreIntegrity": true
     },
     {
       "kind": "styling",
-      "tag": "com-sap-sac-sample-echarts-gaugegrade-styling",
+      "tag": "gauge-chart-styling",
       "url": "https://datobser.github.io/sgauge.js",
       "integrity": "",
       "ignoreIntegrity": true
