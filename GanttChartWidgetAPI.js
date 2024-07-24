@@ -343,7 +343,7 @@ input:checked + .slider:before {
         // Interaction with SAP data model
         
         getAccessToken() {
-            return "https";
+            return "https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token";
         }
         
         async getCsrfToken() {
