@@ -59,6 +59,10 @@ var getScriptPromisify = (src) => {
       const raw = data[0][measures[0].key].raw
       const value = parse(raw, min, max)
 
+      // Ausgabe des aktuellen Werts auf der Konsole
+      console.log('Aktueller Wert:', raw);
+      console.log('Berechneter Wert:', value);
+
       // measures
       const series = measures.map(measure => {
         // https://echarts.apache.org/examples/en/editor.html?c=gauge-grade
