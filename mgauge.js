@@ -100,7 +100,7 @@ var getScriptPromisify = (src) => {
             }
           },
           axisLabel: {
-            show: false
+            show: false,
             color: '#464646',
             fontSize: 20,
             distance: -60,
