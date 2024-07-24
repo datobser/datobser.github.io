@@ -101,21 +101,24 @@ var getScriptPromisify = (src) => {
           },
           axisLabel: {
             show: false
-            // color: '#464646',
-            // fontSize: 20,
-            // distance: -60,
-            // formatter: function (value) {
-            //   if (value === 0.875) {
-            //     return 'A'
-            //   } else if (value === 0.625) {
-            //     return 'B'
-            //   } else if (value === 0.375) {
-            //     return 'C'
-            //   } else if (value === 0.125) {
-            //     return 'D'
-            //   }
-            //   return ''
-            // }
+            color: '#464646',
+            fontSize: 20,
+            distance: -60,
+            formatter: function (value) {
+              if (value === 0.875) {
+                 return 'A'
+              } 
+              else if (value === 0.625) {
+                 return 'B'
+              } 
+              else if (value === 0.375) {
+                 return 'C'
+              } 
+              else if (value === 0.125) {
+                 return 'D'
+              }
+                 return ''
+            }
           },
           title: {
             show: false
@@ -132,19 +135,19 @@ var getScriptPromisify = (src) => {
         }
       })
 
-      // data.forEach(row => {
-      //   // dimension
-      //   const name = dimensions.map(dimension => {
-      //     return row[dimension.key].label
-      //   }).join('/')
-      //   // measures
-      //   series.forEach(series => {
-      //     series.data.push({
-      //       name,
-      //       value: row[series.key].raw
-      //     })
-      //   })
-      // })
+      data.forEach(row => {
+         // dimension
+         const name = dimensions.map(dimension => {
+           return row[dimension.key].label
+         }).join('/')
+         // measures
+         series.forEach(series => {
+           series.data.push({
+             name,
+             value: row[series.key].raw
+           })
+         })
+       })
       this._echart = echarts.init(this._root)
       // https://echarts.apache.org/en/option.html
       this._echart.setOption({
