@@ -224,42 +224,62 @@
     }
 
     const BuilderPanel = (props) => {
-        const [modelId, setModelId] = useState(props.modelId || "");
-        const [importType, setImportType] = useState(props.importType || "");
-
-        const handleModelChange = (event) => {
-            const newModelId = event.detail.selectedOption.getAttribute("value");
-            setModelId(newModelId);
-            props.setModelId(newModelId);
-        };
-
-        const handleImportTypeChange = (event) => {
-            const newImportType = event.detail.selectedOption.getAttribute("value");
-            setImportType(newImportType);
-            props.setImportType(newImportType);
-        };
-
-        return (
-            <div>
-                <div className="builder-row">
-                    <label className="builder-label" htmlFor="modelSelect">Select Model:</label>
-                    <ui5-select id="modelSelect" onChange={handleModelChange}>
-                        {props.models && props.models.map(model => (
-                            <ui5-option key={model.id} value={model.id}>{model.name}</ui5-option>
-                        ))}
-                    </ui5-select>
-                </div>
-                <div className="builder-row">
-                    <label className="builder-label" htmlFor="importTypeSelect">Import Type:</label>
-                    <ui5-select id="importTypeSelect" onChange={handleImportTypeChange}>
-                        <ui5-option value="factData">Fact Data</ui5-option>
-                        <ui5-option value="masterData">Master Data</ui5-option>
-                        <ui5-option value="privateFactData">Private Fact Data</ui5-option>
-                    </ui5-select>
-                </div>
-                {/* Add more configuration options here as needed */}
-            </div>
-        );
+      const [modelId, setModelId] = React.useState(props.modelId || "");
+      const [importType, setImportType] = React.useState(props.importType || "");
+    
+      const handleModelChange = (event) => {
+        const newModelId = event.detail.selectedOption.getAttribute("value");
+        setModelId(newModelId);
+        props.setModelId(newModelId);
+      };
+    
+      const handleImportTypeChange = (event) => {
+        const newImportType = event.detail.selectedOption.getAttribute("value");
+        setImportType(newImportType);
+        props.setImportType(newImportType);
+      };
+    
+      return React.createElement(
+        'div',
+        null,
+        React.createElement(
+          'div',
+          { className: "builder-row" },
+          React.createElement(
+            'label',
+            { className: "builder-label", htmlFor: "modelSelect" },
+            "Select Model:"
+          ),
+          React.createElement(
+            'ui5-select',
+            { id: "modelSelect", onChange: handleModelChange },
+            props.models && props.models.map(model =>
+              React.createElement(
+                'ui5-option',
+                { key: model.id, value: model.id },
+                model.name
+              )
+            )
+          )
+        ),
+        React.createElement(
+          'div',
+          { className: "builder-row" },
+          React.createElement(
+            'label',
+            { className: "builder-label", htmlFor: "importTypeSelect" },
+            "Import Type:"
+          ),
+          React.createElement(
+            'ui5-select',
+            { id: "importTypeSelect", onChange: handleImportTypeChange },
+            React.createElement('ui5-option', { value: "factData" }, "Fact Data"),
+            React.createElement('ui5-option', { value: "masterData" }, "Master Data"),
+            React.createElement('ui5-option', { value: "privateFactData" }, "Private Fact Data")
+          )
+        )
+        // Add more configuration options here as needed
+      );
     };
 
     customElements.define("upload-builder", FileUploadWidgetBuilder);
