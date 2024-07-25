@@ -561,7 +561,7 @@
     }
   }
 
-  customElements.define('upload', FileUploadWidgetBuilder);
+  customElements.define('upload-main', FileUploadWidgetBuilder);
 
   const FileUploadWidgetBuilderComponent = (props) => {
     return (
