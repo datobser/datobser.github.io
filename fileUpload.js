@@ -1,36 +1,55 @@
 (function () {
-  // Define a function to dynamically load scripts
-  function loadScript(url) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = url;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  // Define a function to load all required dependencies
-  async function loadDependencies() {
-    const dependencies = [
-      'https://unpkg.com/react@17/umd/react.production.min.js',
-      'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
-      'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
-      'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
-      'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/bundle.js'
-    ];
-
-    for (const url of dependencies) {
-      await loadScript(url);
-    }
-  }
-  
   const template = document.createElement('template');
   template.innerHTML = `
     <style>
       /* Add your styles here */
     </style>
     <div id="root"></div>
+
+    <script>
+      async function loadDependencies() {
+        const dependencies = [
+          'https://unpkg.com/react@17/umd/react.production.min.js',
+          'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
+          'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
+          'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
+          'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/bundle.js',
+          'https://unpkg.com/@babel/standalone/babel.min.js'  // Add this line
+        ];
+        for (const url of dependencies) {
+          await loadScript(url);
+        }
+      }
+  
+      function loadScript(url) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = url;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+  
+      loadDependencies().then(() => {
+        Babel.transformScriptTags();
+      });
+    </script>
+  
+    <script type="text/babel">
+      const JobSettingsSelector = ({ onUpdate, currentJobSettings, importType }) => {
+        // ... (your component code here)
+      };
+  
+      ReactDOM.render(
+        <JobSettingsSelector 
+          onUpdate={(settings) => console.log(settings)} 
+          currentJobSettings={{}} 
+          importType="factData"
+        />,
+        document.getElementById('root')
+      );
+    </script>
   `;
 
   class FileUploadWidget extends HTMLElement {
