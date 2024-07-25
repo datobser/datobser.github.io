@@ -53,6 +53,9 @@
             'https://unpkg.com/@ui5/webcomponents/dist/Select.js',
             'https://unpkg.com/@ui5/webcomponents/dist/Option.js',
             'https://unpkg.com/@babel/standalone/babel.min.js'
+            'https://unpkg.com/@ui5/webcomponents/dist/Input.js';
+            'https://unpkg.com/@ui5/webcomponents/dist/Button.js';
+            'https://unpkg.com/@ui5/webcomponents/dist/F6Navigation.js';
           ];
     
           for (const url of dependencies) {
