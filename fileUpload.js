@@ -172,7 +172,7 @@
     }
   }
 
-  customElements.define('upload-widget', FileUploadWidget);
+  customElements.define('upload-main', FileUploadWidget);
 
   // React Components
 
