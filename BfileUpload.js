@@ -36,7 +36,9 @@
     
         connectedCallback() {
           this._loadDependencies().then(() => {
-            this.render();
+            this.loadModels().then(() => {
+              this.render();
+            });
           });
         }
     
@@ -46,31 +48,16 @@
             'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
             'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
             'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
-            'https://unpkg.com/@ui5/webcomponents-localization@1.19.0/dist/Assets.js',
-            'https://unpkg.com/@ui5/webcomponents-theming@1.19.0/dist/Assets.js',
-            'https://unpkg.com/@ui5/webcomponents-icons@1.19.0/dist/Assets.js',
-            'https://unpkg.com/@ui5/webcomponents-base/dist/features/F6Navigation.js',
-            'https://unpkg.com/@ui5/webcomponents/dist/Select.js',
-            'https://unpkg.com/@ui5/webcomponents/dist/Option.js',
-            'https://unpkg.com/@babel/standalone/babel.min.js',
-            'https://unpkg.com/@ui5/webcomponents/dist/Input.js',
-            'https://unpkg.com/@ui5/webcomponents/dist/Button.js',
-            'https://unpkg.com/@ui5/webcomponents/dist/F6Navigation.js'
+            'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Select.js',
+            'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Option.js',
+            'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Input.js',
+            'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Button.js'
           ];
     
           for (const url of dependencies) {
             await this._loadScript(url);
           }
-    
-          // After loading Babel, transform the script
-          Babel.transformScriptTags();
         }
-    
-        // Load UI5 Web Components themes and i18n
-        await Promise.all([
-          loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/generated/json-imports/Themes.js'),
-          loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/generated/json-imports/i18n.js')
-        ]);
     
         _loadScript(url) {
           return new Promise((resolve, reject) => {
@@ -84,11 +71,6 @@
 
         updateProps(event) {
             this._props = { ...this._props, ...event.detail.properties };
-            this.render();
-        }
-
-        async connectedCallback() {
-            await this.loadModels();
             this.render();
         }
 
