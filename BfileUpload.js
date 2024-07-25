@@ -219,7 +219,7 @@
           return DataImportServiceApi.instance;
         }
     
-        async fetchJson(url, options = {}) {
+        async fetchJson(baseUrl, options = {}) {
           const response = await fetch(url, {
             ...options,
             headers: {
