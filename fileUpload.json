@@ -10,7 +10,7 @@
   "webcomponents": [
     {
       "kind": "main",
-      "tag": "upload",
+      "tag": "upload-main",
       "url": "https://datobser.github.io/fileUpload.js",
       "integrity": "",
       "ignoreIntegrity": true
