@@ -5,59 +5,14 @@
       /* Add your styles here */
     </style>
     <div id="root"></div>
-
-    <script>
-      async function loadDependencies() {
-        const dependencies = [
-          'https://unpkg.com/react@17/umd/react.production.min.js',
-          'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
-          'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
-          'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
-          'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/bundle.js',
-          'https://unpkg.com/@babel/standalone/babel.min.js'  // Add this line
-        ];
-        for (const url of dependencies) {
-          await loadScript(url);
-        }
-      }
-  
-      function loadScript(url) {
-        return new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = url;
-          script.onload = resolve;
-          script.onerror = reject;
-          document.head.appendChild(script);
-        });
-      }
-  
-      loadDependencies().then(() => {
-        Babel.transformScriptTags();
-      });
-    </script>
-  
-    <script type="text/babel">
-      const JobSettingsSelector = ({ onUpdate, currentJobSettings, importType }) => {
-        // ... (your component code here)
-      };
-  
-      ReactDOM.render(
-        <JobSettingsSelector 
-          onUpdate={(settings) => console.log(settings)} 
-          currentJobSettings={{}} 
-          importType="factData"
-        />,
-        document.getElementById('root')
-      );
-    </script>
   `;
 
   class FileUploadWidget extends HTMLElement {
     constructor() {
       super();
       this._shadowRoot = this.attachShadow({ mode: 'open' });
-      this._root = document.createElement('div');
-      this._shadowRoot.appendChild(this._root);
+      this._shadowRoot.appendChild(template.content.cloneNode(true));
+      this._root = this._shadowRoot.getElementById('root');
       this._props = {
         modelId: '',
         importType: '',
@@ -70,15 +25,82 @@
     }
 
     connectedCallback() {
-      this.render();
+      this._loadDependencies().then(() => {
+        this.render();
+      });
+    }
+
+    async _loadDependencies() {
+      const dependencies = [
+        'https://unpkg.com/react@17/umd/react.production.min.js',
+        'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
+        'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
+        'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
+        'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/bundle.js',
+        'https://unpkg.com/@babel/standalone/babel.min.js'
+      ];
+
+      for (const url of dependencies) {
+        await this._loadScript(url);
+      }
+
+      // After loading Babel, transform the script
+      Babel.transformScriptTags();
+    }
+
+    _loadScript(url) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
     }
 
     render() {
-      ReactDOM.render(React.createElement(FileUploadWidgetComponent, {
-        ...this._props,
-        onDialogClose: this.closeDialog.bind(this),
-        onImportComplete: this.handleImportComplete.bind(this)
-      }), this._root);
+      const FileUploadWidgetComponent = ({ modelId, importType, mappings, defaultValues, jobSettings, isDialogOpen, onDialogClose, onImportComplete }) => {
+        const [fileData, setFileData] = React.useState(null);
+
+        const handleFileUpload = async (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const data = await FileHandler.handleFile(file);
+            setFileData(data);
+          }
+        };
+
+        const handleImport = async () => {
+          if (fileData) {
+            try {
+              const result = await importData(modelId, importType, fileData, mappings, defaultValues, jobSettings);
+              console.log('Import successful:', result);
+              onImportComplete(result);
+            } catch (error) {
+              console.error('Import failed:', error);
+            }
+          }
+        };
+
+        return React.createElement('div', null, 
+          React.createElement('button', { onClick: () => this._props.isDialogOpen = true }, 'Open File Upload'),
+          isDialogOpen && React.createElement('dialog', { open: true },
+            React.createElement('h2', null, 'File Upload'),
+            React.createElement('input', { type: 'file', onChange: handleFileUpload, accept: '.csv,.xlsx,.xls' }),
+            fileData && React.createElement('button', { onClick: handleImport }, 'Import Data'),
+            React.createElement('button', { onClick: onDialogClose }, 'Close')
+          )
+        );
+      };
+
+      ReactDOM.render(
+        React.createElement(FileUploadWidgetComponent, {
+          ...this._props,
+          onDialogClose: this.closeDialog.bind(this),
+          onImportComplete: this.handleImportComplete.bind(this)
+        }),
+        this._root
+      );
     }
 
     setModel(modelId) {
@@ -223,10 +245,6 @@
     );
   };
 
-
-
-  // Implement other components: ImportTypeSelector, MappingSelector, DefaultValuesSelector, JobSettingsSelector
-
   const ImportTypeSelector = ({ onSelect, currentValue }) => {
     const importTypes = [
       { key: 'factData', text: 'Fact Data' },
@@ -235,32 +253,32 @@
     ];
 
     const handleChange = (event) => {
-      onSelect(event.detail.selectedOption.getAttribute('data-key'));
+      onSelect(event.target.value);
     };
 
     return (
       <div>
         <label htmlFor="importTypeSelect">Import Type:</label>
-        <Select
+        <select
           id="importTypeSelect"
           onChange={handleChange}
-          selectedKey={currentValue}
+          value={currentValue}
         >
           {importTypes.map(type => (
-            <ui5-option key={type.key} value={type.key}>
+            <option key={type.key} value={type.key}>
               {type.text}
-            </ui5-option>
+            </option>
           ))}
-        </Select>
+        </select>
       </div>
     );
   };
 
   const MappingSelector = ({ onUpdate, modelMetadata, currentMappings }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [mappings, setMappings] = useState(currentMappings || {});
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [mappings, setMappings] = React.useState(currentMappings || {});
 
-    useEffect(() => {
+    React.useEffect(() => {
       setMappings(currentMappings || {});
     }, [currentMappings]);
 
@@ -278,318 +296,77 @@
 
     return (
       <div>
-        <Button onClick={handleOpen}>Configure Mappings</Button>
-        <Dialog open={isOpen} onAfterClose={handleClose}>
-          <Table>
-            <TableColumn>Model Column</TableColumn>
-            <TableColumn>File Column</TableColumn>
-            {modelMetadata.map(column => (
-              <TableRow key={column.name}>
-                <TableCell>{column.name}</TableCell>
-                <TableCell>
-                  <Input
-                    value={mappings[column.name] || ''}
-                    onChange={(e) => handleMappingChange(column.name, e.target.value)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </Table>
-          <Button onClick={handleSave}>Save Mappings</Button>
-        </Dialog>
+        <button onClick={handleOpen}>Configure Mappings</button>
+        {isOpen && (
+          <dialog open>
+            <table>
+              <thead>
+                <tr>
+                  <th>Column</th>
+                  <th>Map to</th>
+                </tr>
+              </thead>
+              <tbody>
+                {modelMetadata.map(column => (
+                  <tr key={column}>
+                    <td>{column}</td>
+                    <td>
+                      <input
+                        type="text"
+                        value={mappings[column] || ''}
+                        onChange={e => handleMappingChange(column, e.target.value)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button onClick={handleSave}>Save</button>
+            <button onClick={handleClose}>Cancel</button>
+          </dialog>
+        )}
       </div>
     );
   };
 
-  const DefaultValuesSelector = ({ onUpdate, modelMetadata, currentDefaultValues }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [defaultValues, setDefaultValues] = useState(currentDefaultValues || {});
+  const FileHandler = {
+    async handleFile(file) {
+      const extension = file.name.split('.').pop().toLowerCase();
+      if (extension === 'csv') {
+        return this._handleCSV(file);
+      } else if (['xls', 'xlsx'].includes(extension)) {
+        return this._handleExcel(file);
+      }
+      throw new Error('Unsupported file format');
+    },
 
-    useEffect(() => {
-      setDefaultValues(currentDefaultValues || {});
-    }, [currentDefaultValues]);
-
-    const handleOpen = () => setIsOpen(true);
-    const handleClose = () => setIsOpen(false);
-
-    const handleDefaultValueChange = (columnName, value) => {
-      setDefaultValues(prev => ({ ...prev, [columnName]: value }));
-    };
-
-    const handleSave = () => {
-      onUpdate(defaultValues);
-      handleClose();
-    };
-
-    return (
-      <div>
-        <Button onClick={handleOpen}>Configure Default Values</Button>
-        <Dialog open={isOpen} onAfterClose={handleClose}>
-          <Table>
-            <TableColumn>Column</TableColumn>
-            <TableColumn>Default Value</TableColumn>
-            {modelMetadata.map(column => (
-              <TableRow key={column.name}>
-                <TableCell>{column.name}</TableCell>
-                <TableCell>
-                  <Input
-                    value={defaultValues[column.name] || ''}
-                    onChange={(e) => handleDefaultValueChange(column.name, e.target.value)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </Table>
-          <Button onClick={handleSave}>Save Default Values</Button>
-        </Dialog>
-      </div>
-    );
-  };
-
-  const JobSettingsSelector = ({ onUpdate, currentJobSettings, importType }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [jobSettings, setJobSettings] = useState(currentJobSettings || {
-      executeWithFailedRows: true,
-      ignoreAdditionalColumns: false,
-      importMethod: 'Update',
-      dateFormat: 'YYYY-MM-DD'
-    });
-
-    useEffect(() => {
-      setJobSettings(currentJobSettings || {
-        executeWithFailedRows: true,
-        ignoreAdditionalColumns: false,
-        importMethod: 'Update',
-        dateFormat: 'YYYY-MM-DD'
-      });
-    }, [currentJobSettings]);
-
-    const handleOpen = () => setIsOpen(true);
-    const handleClose = () => setIsOpen(false);
-
-    const handleSettingChange = (setting, value) => {
-      setJobSettings(prev => ({ ...prev, [setting]: value }));
-    };
-
-    const handleSave = () => {
-      onUpdate(jobSettings);
-      handleClose();
-    };
-
-    return (
-      <div>
-        <Button onClick={handleOpen}>Configure Job Settings</Button>
-        <Dialog open={isOpen} onAfterClose={handleClose}>
-          <CheckBox
-            text="Execute With Failed Rows"
-            checked={jobSettings.executeWithFailedRows}
-            onChange={(e) => handleSettingChange('executeWithFailedRows', e.target.checked)}
-          />
-          <CheckBox
-            text="Ignore Additional Columns"
-            checked={jobSettings.ignoreAdditionalColumns}
-            onChange={(e) => handleSettingChange('ignoreAdditionalColumns', e.target.checked)}
-          />
-          {importType === 'factData' && (
-            <Select
-              label="Import Method"
-              onChange={(e) => handleSettingChange('importMethod', e.detail.selectedOption.getAttribute('data-key'))}
-              selectedKey={jobSettings.importMethod}
-            >
-              <ui5-option key="Update" value="Update">Update</ui5-option>
-              <ui5-option key="Append" value="Append">Append</ui5-option>
-            </Select>
-          )}
-          <Input
-            label="Date Format"
-            value={jobSettings.dateFormat}
-            onChange={(e) => handleSettingChange('dateFormat', e.target.value)}
-          />
-          <Button onClick={handleSave}>Save Job Settings</Button>
-        </Dialog>
-      </div>
-    );
-  };
-
-
-
-
-  class FileHandler {
-    static parseCSV(file) {
+    async _handleCSV(file) {
       return new Promise((resolve, reject) => {
         Papa.parse(file, {
-          complete: (results) => resolve(results.data),
-          error: (error) => reject(error),
-          header: true,
-          worker: true
+          complete: (result) => resolve(result.data),
+          error: (error) => reject(error)
         });
       });
+    },
+
+    async _handleExcel(file) {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      return XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
     }
+  };
 
-    static parseXLSX(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            resolve(jsonData);
-          } catch (error) {
-            reject(error);
-          }
-        };
-        reader.onerror = (error) => reject(error);
-        reader.readAsArrayBuffer(file);
-      });
-    }
-
-    static async handleFile(file) {
-      const fileExtension = file.name.split('.').pop().toLowerCase();
-      if (fileExtension === 'csv') {
-        return await FileHandler.parseCSV(file);
-      } else if (['xlsx', 'xls'].includes(fileExtension)) {
-        return await FileHandler.parseXLSX(file);
-      } else {
-        throw new Error('Unsupported file format');
-      }
-    }
-  }
-
-  // DataImportServiceApi implementation
-  class DataImportServiceApi {
-    static instance = null;
-
-    constructor() {
-      this.baseUrl = 'https://a2pp.authentication.eu10.hana.ondemand.com/api/v1/'; // Adjust this based on your SAC environment
-    }
-
-    static getInstance() {
-      if (!DataImportServiceApi.instance) {
-        DataImportServiceApi.instance = new DataImportServiceApi();
-      }
-      return DataImportServiceApi.instance;
-    }
-
-    async fetchJson(url, options = {}) {
-      const response = await fetch(url, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    }
-
-    async getModels() {
-      return this.fetchJson(`${this.baseUrl}/models`);
-    }
-
-    async getModelMetadata(modelId) {
-      return this.fetchJson(`${this.baseUrl}/models/${modelId}/metadata`);
-    }
-
-    async createImportJob(modelId, importType, mappings, defaultValues, jobSettings) {
-      return this.fetchJson(`${this.baseUrl}/jobs`, {
-        method: 'POST',
-        body: JSON.stringify({
-          modelId,
-          importType,
-          mappings,
-          defaultValues,
-          jobSettings,
-        }),
-      });
-    }
-
-    async postDataToJob(jobId, data) {
-      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}`, {
-        method: 'POST',
-        body: JSON.stringify({ data }),
-      });
-    }
-
-    async validateJob(jobId) {
-      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}/validate`, {
-        method: 'POST',
-      });
-    }
-
-    async runJob(jobId) {
-      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}/run`, {
-        method: 'POST',
-      });
-    }
-
-    async getJobStatus(jobId) {
-      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}/status`);
-    }
-
-    async getInvalidRows(jobId) {
-      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}/invalidRows`);
-    }
-
-    async getJobs(modelId) {
-      return this.fetchJson(`${this.baseUrl}/jobs?modelId=${modelId}`);
-    }
-  }
-
-  // Import data function
-  const importData = async (modelId, importType, data, mappings, defaultValues, jobSettings) => {
+  async function importData(modelId, importType, fileData, mappings, defaultValues, jobSettings) {
     const api = DataImportServiceApi.getInstance();
-
-    // Create import job
-    const jobId = await api.createImportJob(modelId, importType, mappings, defaultValues, jobSettings);
-
-    // Post data to job
-    const chunkSize = 100000;
-    for (let i = 0; i < data.length; i += chunkSize) {
-      const chunk = data.slice(i, i + chunkSize);
-      await api.postDataToJob(jobId, chunk);
-    }
-
-    // Validate and run job
-    await api.validateJob(jobId);
-    const result = await api.runJob(jobId);
-
-    return result;
-  };
-
-  // Builder panel implementation
-  class FileUploadWidgetBuilder extends HTMLElement {
-    constructor() {
-      super();
-      this._shadowRoot = this.attachShadow({ mode: 'open' });
-      this._shadowRoot.appendChild(template.content.cloneNode(true));
-      this._root = this._shadowRoot.getElementById('root');
-      this._props = {};
-    }
-
-    connectedCallback() {
-      this.render();
-    }
-
-    render() {
-      ReactDOM.render(React.createElement(FileUploadWidgetBuilderComponent, this._props), this._root);
-    }
-  }
-
-  customElements.define('upload-main', FileUploadWidgetBuilder);
-
-  const FileUploadWidgetBuilderComponent = (props) => {
-    return (
-      <div>
-        <h2>File Upload Widget Settings</h2>
-        <ModelSelector onSelect={(modelId) => console.log('Selected model:', modelId)} />
-        {/* Add other configuration components */}
-      </div>
+    const response = await api.importData(
+      modelId,
+      importType,
+      fileData,
+      mappings,
+      defaultValues,
+      jobSettings
     );
-  };
-
+    return response.data;
+  }
 })();
