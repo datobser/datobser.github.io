@@ -48,7 +48,7 @@
             'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
             'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
             'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
-            'https://sdk.openui5.org/resources/sap-ui-core.js'
+            'https://sdk.openui5.org/resources/sap-ui-core.js',
             'https://unpkg.com/@ui5/webcomponents@1.10.0/dist/Bundle.js'
           ];
 
