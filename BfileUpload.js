@@ -48,15 +48,24 @@
             'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
             'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
             'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
-            'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Select.js',
-            'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Option.js',
-            'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Input.js',
-            'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Button.js'
+            'https://sdk.openui5.org/resources/sap-ui-core.js'
           ];
     
           for (const url of dependencies) {
             await this._loadScript(url);
           }
+
+          // Load UI5 Web Components
+          await new Promise((resolve) => {
+            sap.ui.getCore().attachInit(() => {
+              sap.ui.require([
+                "sap/ui/webc/main/Select",
+                "sap/ui/webc/main/Option",
+                "sap/ui/webc/main/Input",
+                "sap/ui/webc/main/Button"
+              ], resolve);
+            });
+          });
         }
     
         _loadScript(url) {
@@ -68,7 +77,7 @@
             document.head.appendChild(script);
           });
         }
-
+        
         updateProps(event) {
             this._props = { ...this._props, ...event.detail.properties };
             this.render();
