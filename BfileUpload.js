@@ -51,7 +51,10 @@
             'https://sdk.openui5.org/resources/sap-ui-core.js'
             'https://unpkg.com/@ui5/webcomponents@1.10.0/dist/Bundle.js'
           ];
-    
+
+          for (const url of dependencies) {
+            await this._loadScript(url);
+          }
         }
     
         _loadScript(url) {
