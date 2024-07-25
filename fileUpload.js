@@ -177,155 +177,183 @@
   // React Components
 
   const FileUploadWidgetComponent = ({ modelId, importType, mappings, defaultValues, jobSettings }) => {
-    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-    const [fileData, setFileData] = React.useState(null);
-
-    const handleFileUpload = async (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const data = await FileHandler.handleFile(file);
-        setFileData(data);
-      }
-    };
-
-    const handleImport = async () => {
-      if (fileData) {
-        try {
-          const result = await importData(modelId, importType, fileData, mappings, defaultValues, jobSettings);
-          console.log('Import successful:', result);
-          // Trigger onSuccess event
-        } catch (error) {
-          console.error('Import failed:', error);
-          // Trigger onFailure event
+      const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+      const [fileData, setFileData] = React.useState(null);
+    
+      const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          const data = await FileHandler.handleFile(file);
+          setFileData(data);
         }
-      }
-    };
-
-    return (
-      <div>
-        <button onClick={() => setIsDialogOpen(true)}>Open File Upload</button>
-        {isDialogOpen && (
-          <dialog open>
-            <h2>File Upload</h2>
-            <input type="file" onChange={handleFileUpload} accept=".csv,.xlsx,.xls" />
-            {fileData && <button onClick={handleImport}>Import Data</button>}
-            <button onClick={() => setIsDialogOpen(false)}>Close</button>
-          </dialog>
-        )}
-      </div>
-    );
-  };
-
-  const ModelSelector = ({ onSelect }) => {
-    const [models, setModels] = React.useState([]);
-    const [selectedModel, setSelectedModel] = React.useState('');
-
-    React.useEffect(() => {
-      const fetchModels = async () => {
-        const api = DataImportServiceApi.getInstance();
-        const modelList = await api.getModels();
-        setModels(modelList);
       };
-      fetchModels();
-    }, []);
-
-    const handleChange = (event) => {
-      const modelId = event.target.value;
-      setSelectedModel(modelId);
-      onSelect(modelId);
+    
+      const handleImport = async () => {
+        if (fileData) {
+          try {
+            const result = await importData(modelId, importType, fileData, mappings, defaultValues, jobSettings);
+            console.log('Import successful:', result);
+            // Trigger onSuccess event
+          } catch (error) {
+            console.error('Import failed:', error);
+            // Trigger onFailure event
+          }
+        }
+      };
+    
+      return React.createElement(
+        'div',
+        null,
+        React.createElement(
+          'button',
+          { onClick: () => setIsDialogOpen(true) },
+          'Open File Upload'
+        ),
+        isDialogOpen && React.createElement(
+          'dialog',
+          { open: true },
+          React.createElement('h2', null, 'File Upload'),
+          React.createElement('input', {
+            type: 'file',
+            onChange: handleFileUpload,
+            accept: '.csv,.xlsx,.xls'
+          }),
+          fileData && React.createElement(
+            'button',
+            { onClick: handleImport },
+            'Import Data'
+          ),
+          React.createElement(
+            'button',
+            { onClick: () => setIsDialogOpen(false) },
+            'Close'
+          )
+        )
+      );
     };
 
-    return (
-      <select value={selectedModel} onChange={handleChange}>
-        <option value="">Select a model</option>
-        {models.map(model => (
-          <option key={model.id} value={model.id}>{model.name}</option>
-        ))}
-      </select>
-    );
-  };
-
-  const ImportTypeSelector = ({ onSelect, currentValue }) => {
-    const importTypes = [
-      { key: 'factData', text: 'Fact Data' },
-      { key: 'masterData', text: 'Master Data' },
-      { key: 'privateFactData', text: 'Private Fact Data' }
-    ];
-
-    const handleChange = (event) => {
-      onSelect(event.target.value);
+    const ModelSelector = ({ onSelect }) => {
+      const [models, setModels] = React.useState([]);
+      const [selectedModel, setSelectedModel] = React.useState('');
+    
+      React.useEffect(() => {
+        const fetchModels = async () => {
+          const api = DataImportServiceApi.getInstance();
+          const modelList = await api.getModels();
+          setModels(modelList);
+        };
+        fetchModels();
+      }, []);
+    
+      const handleChange = (event) => {
+        const modelId = event.target.value;
+        setSelectedModel(modelId);
+        onSelect(modelId);
+      };
+    
+      return React.createElement(
+        'select',
+        { value: selectedModel, onChange: handleChange },
+        React.createElement('option', { value: '' }, 'Select a model'),
+        models.map(model =>
+          React.createElement('option', { key: model.id, value: model.id }, model.name)
+        )
+      );
     };
-
-    return (
-      <div>
-        <label htmlFor="importTypeSelect">Import Type:</label>
-        <select
-          id="importTypeSelect"
-          onChange={handleChange}
-          value={currentValue}
-        >
-          {importTypes.map(type => (
-            <option key={type.key} value={type.key}>
-              {type.text}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  };
-
+  
+    const ImportTypeSelector = ({ onSelect, currentValue }) => {
+      const importTypes = [
+        { key: 'factData', text: 'Fact Data' },
+        { key: 'masterData', text: 'Master Data' },
+        { key: 'privateFactData', text: 'Private Fact Data' }
+      ];
+    
+      const handleChange = (event) => {
+        onSelect(event.target.value);
+      };
+    
+      return React.createElement(
+        'div',
+        null,
+        React.createElement('label', { htmlFor: 'importTypeSelect' }, 'Import Type:'),
+        React.createElement(
+          'select',
+          {
+            id: 'importTypeSelect',
+            onChange: handleChange,
+            value: currentValue
+          },
+          importTypes.map(type =>
+            React.createElement('option', { key: type.key, value: type.key }, type.text)
+          )
+        )
+      );
+    };
+  
   const MappingSelector = ({ onUpdate, modelMetadata, currentMappings }) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const [mappings, setMappings] = React.useState(currentMappings || {});
-
+  
     React.useEffect(() => {
       setMappings(currentMappings || {});
     }, [currentMappings]);
-
+  
     const handleOpen = () => setIsOpen(true);
     const handleClose = () => setIsOpen(false);
-
+  
     const handleMappingChange = (columnName, value) => {
       setMappings(prev => ({ ...prev, [columnName]: value }));
     };
-
+  
     const handleSave = () => {
       onUpdate(mappings);
       handleClose();
     };
-
-    return (
-      <div>
-        <button onClick={handleOpen}>Configure Mappings</button>
-        {isOpen && (
-          <dialog open>
-            <table>
-              <thead>
-                <tr>
-                  <th>Column</th>
-                  <th>Map to</th>
-                </tr>
-              </thead>
-              <tbody>
-                {modelMetadata.map(column => (
-                  <tr key={column}>
-                    <td>{column}</td>
-                    <td>
-                      <input
-                        type="text"
-                        value={mappings[column] || ''}
-                        onChange={e => handleMappingChange(column, e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <button onClick={handleSave}>Save</button>
-            <button onClick={handleClose}>Cancel</button>
-          </dialog>
-        )}
-      </div>
+  
+    return React.createElement(
+      'div',
+      null,
+      React.createElement('button', { onClick: handleOpen }, 'Configure Mappings'),
+      isOpen && React.createElement(
+        'dialog',
+        { open: true },
+        React.createElement(
+          'table',
+          null,
+          React.createElement(
+            'thead',
+            null,
+            React.createElement(
+              'tr',
+              null,
+              React.createElement('th', null, 'Column'),
+              React.createElement('th', null, 'Map to')
+            )
+          ),
+          React.createElement(
+            'tbody',
+            null,
+            modelMetadata.map(column =>
+              React.createElement(
+                'tr',
+                { key: column },
+                React.createElement('td', null, column),
+                React.createElement(
+                  'td',
+                  null,
+                  React.createElement('input', {
+                    type: 'text',
+                    value: mappings[column] || '',
+                    onChange: e => handleMappingChange(column, e.target.value)
+                  })
+                )
+              )
+            )
+          )
+        ),
+        React.createElement('button', { onClick: handleSave }, 'Save'),
+        React.createElement('button', { onClick: handleClose }, 'Cancel')
+      )
     );
   };
 
