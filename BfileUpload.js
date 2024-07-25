@@ -1,41 +1,7 @@
 (function() {
-    // Define a function to dynamically load scripts
-  function loadScript(url) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = url;
-      script.onload = resolve;
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
-  // Define a function to load all required dependencies
-  async function loadDependencies() {
-    const dependencies = [
-      'https://unpkg.com/react@17/umd/react.production.min.js',
-      'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
-      'https://unpkg.com/@ui5/webcomponents-base@1.19.0/dist/bundle.js',
-      'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/bundle.js'
-    ];
-
-    for (const url of dependencies) {
-      await loadScript(url);
-    }
-
-    // Load specific UI5 Web Components
-    await Promise.all([
-      loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Select.js'),
-      loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Option.js'),
-      loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Input.js'),
-      loadScript('https://unpkg.com/@ui5/webcomponents@1.19.0/dist/Button.js')
-    ]);
-  }
-
-
     let template = document.createElement("template");
     template.innerHTML = `
-        <style>
+           <style>
             .builder-container {
                 padding: 1rem;
                 font-family: "72", "72full", Arial, Helvetica, sans-serif;
@@ -47,8 +13,103 @@
                 display: block;
                 margin-bottom: 0.5rem;
             }
-        </style>
-        <div class="builder-container" id="root"></div>
+          </style>
+          <div id="root"></div>
+
+          <script>
+            async function loadDependencies() {
+              const dependencies = [
+                'https://unpkg.com/react@17/umd/react.production.min.js',
+                'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
+                'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
+                'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
+                'https://unpkg.com/@ui5/webcomponents@1.19.0/dist/bundle.js',
+                'https://unpkg.com/@babel/standalone/babel.min.js'
+              ];
+              for (const url of dependencies) {
+                await loadScript(url);
+              }
+            }
+        
+            function loadScript(url) {
+              return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+              });
+            }
+        
+            loadDependencies().then(() => {
+              Babel.transformScriptTags();
+            });
+          </script>
+        
+          <script type="text/babel">
+            const BuilderPanel = (props) => {
+              const [modelId, setModelId] = React.useState(props.modelId || "");
+              const [importType, setImportType] = React.useState(props.importType || "");
+        
+              const handleModelChange = (event) => {
+                const newModelId = event.detail.selectedOption.getAttribute("value");
+                setModelId(newModelId);
+                props.setModelId(newModelId);
+              };
+        
+              const handleImportTypeChange = (event) => {
+                const newImportType = event.detail.selectedOption.getAttribute("value");
+                setImportType(newImportType);
+                props.setImportType(newImportType);
+              };
+        
+              return React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'div',
+                  { className: "builder-row" },
+                  React.createElement('label', { className: "builder-label", htmlFor: "modelSelect" }, "Select Model:"),
+                  React.createElement(
+                    'ui5-select',
+                    { id: "modelSelect", onChange: handleModelChange },
+                    props.models && props.models.map(model =>
+                      React.createElement('ui5-option', { key: model.id, value: model.id }, model.name)
+                    )
+                  )
+                ),
+                React.createElement(
+                  'div',
+                  { className: "builder-row" },
+                  React.createElement('label', { className: "builder-label", htmlFor: "importTypeSelect" }, "Import Type:"),
+                  React.createElement(
+                    'ui5-select',
+                    { id: "importTypeSelect", onChange: handleImportTypeChange },
+                    React.createElement('ui5-option', { value: "factData" }, "Fact Data"),
+                    React.createElement('ui5-option', { value: "masterData" }, "Master Data"),
+                    React.createElement('ui5-option', { value: "privateFactData" }, "Private Fact Data")
+                  )
+                )
+              );
+            };
+        
+            const props = {
+              modelId: "",
+              importType: "",
+              setModelId: (id) => console.log("Model ID set to:", id),
+              setImportType: (type) => console.log("Import Type set to:", type),
+              models: [
+                { id: '1', name: 'Model 1' },
+                { id: '2', name: 'Model 2' },
+                { id: '3', name: 'Model 3' }
+              ]
+            };
+        
+            ReactDOM.render(
+              <BuilderPanel {...props} />,
+              document.getElementById('root')
+            );
+          </script>
     `;
 
     class FileUploadWidgetBuilder extends HTMLElement {
