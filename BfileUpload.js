@@ -15,6 +15,20 @@
             }
           </style>
           <div id="root"></div>
+          <div class="builder-container">
+            <div class="builder-row">
+                <label class="builder-label" for="modelSelect">Select Model:</label>
+                <select id="modelSelect"></select>
+            </div>
+            <div class="builder-row">
+                <label class="builder-label" for="importTypeSelect">Import Type:</label>
+                <select id="importTypeSelect">
+                    <option value="factData">Fact Data</option>
+                    <option value="masterData">Master Data</option>
+                    <option value="privateFactData">Private Fact Data</option>
+                </select>
+            </div>
+        </div>
     `;
 
     class FileUploadWidgetBuilder extends HTMLElement {
@@ -32,29 +46,20 @@
             isDialogOpen: false
           };
           this._lastJobResult = null;
+
+          this._modelSelect = this._shadowRoot.getElementById('modelSelect');
+          this._importTypeSelect = this._shadowRoot.getElementById('importTypeSelect');
+
+          this._modelSelect.addEventListener('change', this._handleModelChange.bind(this));
+          this._importTypeSelect.addEventListener('change', this._handleImportTypeChange.bind(this));
         }
     
         connectedCallback() {
-          this._loadDependencies().then(() => {
+          
             this.loadModels().then(() => {
               this.render();
             });
-          });
-        }
-    
-        async _loadDependencies() {
-          const dependencies = [
-            'https://unpkg.com/react@17/umd/react.production.min.js',
-            'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
-            'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
-            'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
-            'https://sdk.openui5.org/resources/sap-ui-core.js',
-            'https://unpkg.com/@ui5/webcomponents@1.10.0/dist/Bundle.js'
-          ];
-
-          for (const url of dependencies) {
-            await this._loadScript(url);
-          }
+         
         }
     
         _loadScript(url) {
