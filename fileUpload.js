@@ -385,6 +385,88 @@
     }
   };
 
+  // DataImportServiceApi implementation
+  class DataImportServiceApi {
+    static instance = null;
+
+    constructor() {
+      this.baseUrl = 'https://a2pp.authentication.eu10.hana.ondemand.com/api/v1/'; // Adjust this based on your SAC environment
+    }
+
+    static getInstance() {
+      if (!DataImportServiceApi.instance) {
+        DataImportServiceApi.instance = new DataImportServiceApi();
+      }
+      return DataImportServiceApi.instance;
+    }
+
+    async fetchJson(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    }
+
+    async getModels() {
+      return this.fetchJson(`${this.baseUrl}/models`);
+    }
+
+    async getModelMetadata(modelId) {
+      return this.fetchJson(`${this.baseUrl}/models/${modelId}/metadata`);
+    }
+
+    async createImportJob(modelId, importType, mappings, defaultValues, jobSettings) {
+      return this.fetchJson(`${this.baseUrl}/jobs`, {
+        method: 'POST',
+        body: JSON.stringify({
+          modelId,
+          importType,
+          mappings,
+          defaultValues,
+          jobSettings,
+        }),
+      });
+    }
+
+    async postDataToJob(jobId, data) {
+      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}`, {
+        method: 'POST',
+        body: JSON.stringify({ data }),
+      });
+    }
+
+    async validateJob(jobId) {
+      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}/validate`, {
+        method: 'POST',
+      });
+    }
+
+    async runJob(jobId) {
+      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}/run`, {
+        method: 'POST',
+      });
+    }
+
+    async getJobStatus(jobId) {
+      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}/status`);
+    }
+
+    async getInvalidRows(jobId) {
+      return this.fetchJson(`${this.baseUrl}/jobs/${jobId}/invalidRows`);
+    }
+
+    async getJobs(modelId) {
+      return this.fetchJson(`${this.baseUrl}/jobs?modelId=${modelId}`);
+    }
+  }
+  
   async function importData(modelId, importType, fileData, mappings, defaultValues, jobSettings) {
     const api = DataImportServiceApi.getInstance();
     const response = await api.importData(
