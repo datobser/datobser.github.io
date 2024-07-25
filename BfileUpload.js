@@ -49,23 +49,9 @@
             'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
             'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
             'https://sdk.openui5.org/resources/sap-ui-core.js'
+            'https://unpkg.com/@ui5/webcomponents@1.10.0/dist/Bundle.js'
           ];
     
-          for (const url of dependencies) {
-            await this._loadScript(url);
-          }
-
-          // Load UI5 Web Components
-          await new Promise((resolve) => {
-            sap.ui.getCore().attachInit(() => {
-              sap.ui.require([
-                "sap/ui/webc/main/Select",
-                "sap/ui/webc/main/Option",
-                "sap/ui/webc/main/Input",
-                "sap/ui/webc/main/Button"
-              ], resolve);
-            });
-          });
         }
     
         _loadScript(url) {
