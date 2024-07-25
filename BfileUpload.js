@@ -46,7 +46,9 @@
             'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
             'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
             'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
-            'https://unpkg.com/@ui5/webcomponents/dist/Assets.js',
+            'https://unpkg.com/@ui5/webcomponents-localization@1.19.0/dist/Assets.js',
+            'https://unpkg.com/@ui5/webcomponents-theming@1.19.0/dist/Assets.js',
+            'https://unpkg.com/@ui5/webcomponents-icons@1.19.0/dist/Assets.js'
             'https://unpkg.com/@ui5/webcomponents-base/dist/features/F6Navigation.js',
             'https://unpkg.com/@ui5/webcomponents/dist/Select.js',
             'https://unpkg.com/@ui5/webcomponents/dist/Option.js',
