@@ -182,46 +182,6 @@
         setImportType(newImportType);
         props.setImportType(newImportType);
       };
-    
-      return React.createElement(
-        'div',
-        null,
-        React.createElement(
-          'div',
-          { className: "builder-row" },
-          React.createElement(
-            'label',
-            { className: "builder-label", htmlFor: "modelSelect" },
-            "Select Model:"
-          ),
-          React.createElement(
-            'ui5-select',
-            { id: "modelSelect", onChange: handleModelChange },
-            props.models && props.models.map(model =>
-              React.createElement(
-                'ui5-option',
-                { key: model.id, value: model.id },
-                model.name
-              )
-            )
-          )
-        ),
-        React.createElement(
-          'div',
-          { className: "builder-row" },
-          React.createElement(
-            'label',
-            { className: "builder-label", htmlFor: "importTypeSelect" },
-            "Import Type:"
-          ),
-          React.createElement(
-            'ui5-select',
-            { id: "importTypeSelect", onChange: handleImportTypeChange },
-            React.createElement('ui5-option', { value: "factData" }, "Fact Data"),
-            React.createElement('ui5-option', { value: "masterData" }, "Master Data"),
-            React.createElement('ui5-option', { value: "privateFactData" }, "Private Fact Data")
-          )
-        )
         // Add more configuration options here as needed
       );
     };
