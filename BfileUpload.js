@@ -65,19 +65,6 @@
           // After loading Babel, transform the script
           Babel.transformScriptTags();
         }
-
-        // Load specific UI5 Web Components
-        const ui5Components = [
-          'Select',
-          'Option',
-          'Input',
-          'Button',
-          'F6Navigation'
-        ];
-    
-        await Promise.all(ui5Components.map(component => 
-          loadScript(`https://unpkg.com/@ui5/webcomponents@1.19.0/dist/${component}.js`)
-        ));
     
         // Load UI5 Web Components themes and i18n
         await Promise.all([
