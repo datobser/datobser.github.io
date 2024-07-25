@@ -55,23 +55,11 @@
         }
     
         connectedCallback() {
-          
-            this.loadModels().then(() => {
-              this.render();
-            });
-         
-        }
-    
-        _loadScript(url) {
-          return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = url;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
+          this.loadModels().then(() => {
+            this.render();
           });
         }
-        
+    
         updateProps(event) {
             this._props = { ...this._props, ...event.detail.properties };
             this.render();
@@ -88,7 +76,56 @@
         }
 
         render() {
-            ReactDOM.render(React.createElement(BuilderPanel, this._props), this._root);
+            // Instead of using ReactDOM.render, we'll update the DOM directly
+            const root = this._root;
+            root.innerHTML = ''; // Clear existing content
+
+            const panel = document.createElement('div');
+            panel.className = 'builder-panel';
+
+            const modelLabel = document.createElement('label');
+            modelLabel.textContent = 'Model:';
+            panel.appendChild(modelLabel);
+
+            const modelSelect = document.createElement('select');
+            modelSelect.id = 'modelSelect';
+            this._props.models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = model.name;
+                modelSelect.appendChild(option);
+            });
+            modelSelect.value = this._props.modelId;
+            modelSelect.addEventListener('change', this._handleModelChange.bind(this));
+            panel.appendChild(modelSelect);
+
+            const importTypeLabel = document.createElement('label');
+            importTypeLabel.textContent = 'Import Type:';
+            panel.appendChild(importTypeLabel);
+
+            const importTypeSelect = document.createElement('select');
+            importTypeSelect.id = 'importTypeSelect';
+            ['factData', 'masterData', 'privateFactData'].forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                importTypeSelect.appendChild(option);
+            });
+            importTypeSelect.value = this._props.importType;
+            importTypeSelect.addEventListener('change', this._handleImportTypeChange.bind(this));
+            panel.appendChild(importTypeSelect);
+
+            root.appendChild(panel);
+        }
+
+        _handleModelChange(event) {
+            const newModelId = event.target.value;
+            this.setModelId(newModelId);
+        }
+
+        _handleImportTypeChange(event) {
+            const newImportType = event.target.value;
+            this.setImportType(newImportType);
         }
 
         getModelId() {
@@ -167,27 +204,8 @@
         }
     }
 
-    const BuilderPanel = (props) => {
-      const [modelId, setModelId] = React.useState(props.modelId || "");
-      const [importType, setImportType] = React.useState(props.importType || "");
-    
-      const handleModelChange = (event) => {
-        const newModelId = event.detail.selectedOption.getAttribute("value");
-        setModelId(newModelId);
-        props.setModelId(newModelId);
-      };
-    
-      const handleImportTypeChange = (event) => {
-        const newImportType = event.detail.selectedOption.getAttribute("value");
-        setImportType(newImportType);
-        props.setImportType(newImportType);
-      };
-        // Add more configuration options here as needed
-      );
-    };
-
     // DataImportServiceApi implementation
-      class DataImportServiceApi {
+    class DataImportServiceApi {
         static instance = null;
     
         constructor() {
@@ -201,7 +219,7 @@
           return DataImportServiceApi.instance;
         }
     
-        async fetchJson(baseUrl, options = {}) {
+        async fetchJson(url, options = {}) {
           const response = await fetch(url, {
             ...options,
             headers: {
@@ -266,7 +284,7 @@
         async getJobs(modelId) {
           return this.fetchJson(`${this.baseUrl}/jobs?modelId=${modelId}`);
         }
-      }
+    }
 
     customElements.define("upload-builder", FileUploadWidgetBuilder);
 })();
