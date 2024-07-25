@@ -3,6 +3,25 @@
   template.innerHTML = `
     <style>
       /* Add your styles here */
+      .dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border: 1px solid #ccc;
+        z-index: 1000;
+      }
+      .dialog-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
     </style>
     <div id="root"></div>
   `;
@@ -25,85 +44,82 @@
     }
 
     connectedCallback() {
-      this._loadDependencies().then(() => {
-        this.render();
-      });
-    }
-
-    async _loadDependencies() {
-      const dependencies = [
-        'https://unpkg.com/react@17/umd/react.production.min.js',
-        'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js',
-        'https://unpkg.com/papaparse@5.3.0/papaparse.min.js',
-        'https://unpkg.com/xlsx@0.17.0/dist/xlsx.full.min.js',
-        'https://unpkg.com/@ui5/webcomponents/dist/Assets.js',
-        'https://unpkg.com/@ui5/webcomponents-base/dist/features/F6Navigation.js',
-        'https://unpkg.com/@ui5/webcomponents/dist/Select.js',
-        'https://unpkg.com/@ui5/webcomponents/dist/Option.js',
-        'https://unpkg.com/@babel/standalone/babel.min.js'
-      ];
-
-      for (const url of dependencies) {
-        await this._loadScript(url);
-      }
-
-      // After loading Babel, transform the script
-      Babel.transformScriptTags();
-    }
-
-    _loadScript(url) {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = url;
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
+      this.render();
     }
 
     render() {
-      const FileUploadWidgetComponent = ({ modelId, importType, mappings, defaultValues, jobSettings, isDialogOpen, onDialogClose, onImportComplete }) => {
-        const [fileData, setFileData] = React.useState(null);
+      this._root.innerHTML = '';
+      const openButton = document.createElement('button');
+      openButton.textContent = 'Open File Upload';
+      openButton.addEventListener('click', () => this.open());
+      this._root.appendChild(openButton);
 
-        const handleFileUpload = async (event) => {
-          const file = event.target.files[0];
-          if (file) {
-            const data = await FileHandler.handleFile(file);
-            setFileData(data);
-          }
-        };
+      if (this._props.isDialogOpen) {
+        const dialog = document.createElement('div');
+        dialog.className = 'dialog';
+        
+        const backdrop = document.createElement('div');
+        backdrop.className = 'dialog-backdrop';
+        backdrop.addEventListener('click', () => this.closeDialog());
+        
+        const title = document.createElement('h2');
+        title.textContent = 'File Upload';
+        
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.csv,.xlsx,.xls';
+        fileInput.addEventListener('change', (event) => this.handleFileUpload(event));
+        
+        const importButton = document.createElement('button');
+        importButton.textContent = 'Import Data';
+        importButton.style.display = 'none';
+        importButton.addEventListener('click', () => this.handleImport());
+        
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'Close';
+        closeButton.addEventListener('click', () => this.closeDialog());
+        
+        dialog.appendChild(title);
+        dialog.appendChild(fileInput);
+        dialog.appendChild(importButton);
+        dialog.appendChild(closeButton);
+        
+        this._root.appendChild(backdrop);
+        this._root.appendChild(dialog);
+      }
+    }
 
-        const handleImport = async () => {
-          if (fileData) {
-            try {
-              const result = await importData(modelId, importType, fileData, mappings, defaultValues, jobSettings);
-              console.log('Import successful:', result);
-              onImportComplete(result);
-            } catch (error) {
-              console.error('Import failed:', error);
-            }
-          }
-        };
+    async handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        try {
+          const data = await FileHandler.handleFile(file);
+          this._fileData = data;
+          const importButton = this._shadowRoot.querySelector('button:nth-of-type(2)');
+          importButton.style.display = 'inline-block';
+        } catch (error) {
+          console.error('File upload failed:', error);
+        }
+      }
+    }
 
-        return React.createElement('div', null, 
-          React.createElement('button', { onClick: () => this._props.isDialogOpen = true }, 'Open File Upload'),
-          isDialogOpen && React.createElement('dialog', { open: true },
-            React.createElement('h2', null, 'File Upload'),
-            React.createElement('input', { type: 'file', onChange: handleFileUpload, accept: '.csv,.xlsx,.xls' }),
-            fileData && React.createElement('button', { onClick: handleImport }, 'Import Data'),
-            React.createElement('button', { onClick: onDialogClose }, 'Close')
-          )
-        );
-      };
-
-      ReactDOM.render(
-        React.createElement(FileUploadWidgetComponent, {
-          ...this._props,
-          onDialogClose: this.closeDialog.bind(this),
-          onImportComplete: this.handleImportComplete.bind(this)
-        }),
-        this._root
-      );
+    async handleImport() {
+      if (this._fileData) {
+        try {
+          const result = await importData(
+            this._props.modelId,
+            this._props.importType,
+            this._fileData,
+            this._props.mappings,
+            this._props.defaultValues,
+            this._props.jobSettings
+          );
+          console.log('Import successful:', result);
+          this.handleImportComplete(result);
+        } catch (error) {
+          console.error('Import failed:', error);
+        }
+      }
     }
 
     setModel(modelId) {
@@ -177,189 +193,6 @@
 
   customElements.define('upload-main', FileUploadWidget);
 
-  // React Components
-
-  const FileUploadWidgetComponent = ({ modelId, importType, mappings, defaultValues, jobSettings }) => {
-      const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-      const [fileData, setFileData] = React.useState(null);
-    
-      const handleFileUpload = async (event) => {
-        const file = event.target.files[0];
-        if (file) {
-          const data = await FileHandler.handleFile(file);
-          setFileData(data);
-        }
-      };
-    
-      const handleImport = async () => {
-        if (fileData) {
-          try {
-            const result = await importData(modelId, importType, fileData, mappings, defaultValues, jobSettings);
-            console.log('Import successful:', result);
-            // Trigger onSuccess event
-          } catch (error) {
-            console.error('Import failed:', error);
-            // Trigger onFailure event
-          }
-        }
-      };
-    
-      return React.createElement(
-        'div',
-        null,
-        React.createElement(
-          'button',
-          { onClick: () => setIsDialogOpen(true) },
-          'Open File Upload'
-        ),
-        isDialogOpen && React.createElement(
-          'dialog',
-          { open: true },
-          React.createElement('h2', null, 'File Upload'),
-          React.createElement('input', {
-            type: 'file',
-            onChange: handleFileUpload,
-            accept: '.csv,.xlsx,.xls'
-          }),
-          fileData && React.createElement(
-            'button',
-            { onClick: handleImport },
-            'Import Data'
-          ),
-          React.createElement(
-            'button',
-            { onClick: () => setIsDialogOpen(false) },
-            'Close'
-          )
-        )
-      );
-    };
-
-    const ModelSelector = ({ onSelect }) => {
-      const [models, setModels] = React.useState([]);
-      const [selectedModel, setSelectedModel] = React.useState('');
-    
-      React.useEffect(() => {
-        const fetchModels = async () => {
-          const api = DataImportServiceApi.getInstance();
-          const modelList = await api.getModels();
-          setModels(modelList);
-        };
-        fetchModels();
-      }, []);
-    
-      const handleChange = (event) => {
-        const modelId = event.target.value;
-        setSelectedModel(modelId);
-        onSelect(modelId);
-      };
-    
-      return React.createElement(
-        'select',
-        { value: selectedModel, onChange: handleChange },
-        React.createElement('option', { value: '' }, 'Select a model'),
-        models.map(model =>
-          React.createElement('option', { key: model.id, value: model.id }, model.name)
-        )
-      );
-    };
-  
-    const ImportTypeSelector = ({ onSelect, currentValue }) => {
-      const importTypes = [
-        { key: 'factData', text: 'Fact Data' },
-        { key: 'masterData', text: 'Master Data' },
-        { key: 'privateFactData', text: 'Private Fact Data' }
-      ];
-    
-      const handleChange = (event) => {
-        onSelect(event.target.value);
-      };
-    
-      return React.createElement(
-        'div',
-        null,
-        React.createElement('label', { htmlFor: 'importTypeSelect' }, 'Import Type:'),
-        React.createElement(
-          'select',
-          {
-            id: 'importTypeSelect',
-            onChange: handleChange,
-            value: currentValue
-          },
-          importTypes.map(type =>
-            React.createElement('option', { key: type.key, value: type.key }, type.text)
-          )
-        )
-      );
-    };
-  
-  const MappingSelector = ({ onUpdate, modelMetadata, currentMappings }) => {
-    const [isOpen, setIsOpen] = React.useState(false);
-    const [mappings, setMappings] = React.useState(currentMappings || {});
-  
-    React.useEffect(() => {
-      setMappings(currentMappings || {});
-    }, [currentMappings]);
-  
-    const handleOpen = () => setIsOpen(true);
-    const handleClose = () => setIsOpen(false);
-  
-    const handleMappingChange = (columnName, value) => {
-      setMappings(prev => ({ ...prev, [columnName]: value }));
-    };
-  
-    const handleSave = () => {
-      onUpdate(mappings);
-      handleClose();
-    };
-  
-    return React.createElement(
-      'div',
-      null,
-      React.createElement('button', { onClick: handleOpen }, 'Configure Mappings'),
-      isOpen && React.createElement(
-        'dialog',
-        { open: true },
-        React.createElement(
-          'table',
-          null,
-          React.createElement(
-            'thead',
-            null,
-            React.createElement(
-              'tr',
-              null,
-              React.createElement('th', null, 'Column'),
-              React.createElement('th', null, 'Map to')
-            )
-          ),
-          React.createElement(
-            'tbody',
-            null,
-            modelMetadata.map(column =>
-              React.createElement(
-                'tr',
-                { key: column },
-                React.createElement('td', null, column),
-                React.createElement(
-                  'td',
-                  null,
-                  React.createElement('input', {
-                    type: 'text',
-                    value: mappings[column] || '',
-                    onChange: e => handleMappingChange(column, e.target.value)
-                  })
-                )
-              )
-            )
-          )
-        ),
-        React.createElement('button', { onClick: handleSave }, 'Save'),
-        React.createElement('button', { onClick: handleClose }, 'Cancel')
-      )
-    );
-  };
-
   const FileHandler = {
     async handleFile(file) {
       const extension = file.name.split('.').pop().toLowerCase();
@@ -372,19 +205,22 @@
     },
 
     async _handleCSV(file) {
-      return new Promise((resolve, reject) => {
-        Papa.parse(file, {
-          complete: (result) => resolve(result.data),
-          error: (error) => reject(error)
-        });
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const csv = event.target.result;
+          const lines = csv.split('\n');
+          const result = lines.map(line => line.split(','));
+          resolve(result);
+        };
+        reader.readAsText(file);
       });
     },
 
     async _handleExcel(file) {
-      const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: 'array' });
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      return XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+      // Note: Excel handling requires external library. 
+      // For now, we'll just return an error message.
+      throw new Error('Excel handling not implemented in native version');
     }
   };
 
@@ -393,7 +229,7 @@
     static instance = null;
 
     constructor() {
-      this.baseUrl = 'https://a2pp.authentication.eu10.hana.ondemand.com/api/v1/'; // Adjust this based on your SAC environment
+      this.baseUrl = 'https://a2pp.authentication.eu10.hana.ondemand.com/api/v1/';
     }
 
     static getInstance() {
@@ -468,6 +304,14 @@
     async getJobs(modelId) {
       return this.fetchJson(`${this.baseUrl}/jobs?modelId=${modelId}`);
     }
+
+    async importData(modelId, importType, fileData, mappings, defaultValues, jobSettings) {
+      const job = await this.createImportJob(modelId, importType, mappings, defaultValues, jobSettings);
+      await this.postDataToJob(job.id, fileData);
+      await this.validateJob(job.id);
+      const result = await this.runJob(job.id);
+      return result;
+    }
   }
   
   async function importData(modelId, importType, fileData, mappings, defaultValues, jobSettings) {
@@ -480,6 +324,6 @@
       defaultValues,
       jobSettings
     );
-    return response.data;
+    return response;
   }
 })();
