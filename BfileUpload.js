@@ -220,7 +220,7 @@
         }
     
         async fetchJson(baseUrl, options = {}) {
-          const response = await fetch(url, {
+          const response = await fetch(baseUrl, {
             ...options,
             headers: {
               'Content-Type': 'application/json',
