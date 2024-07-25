@@ -172,7 +172,7 @@
     }
   }
 
-  customElements.define('com-sap-file-upload-widget', FileUploadWidget);
+  customElements.define('upload-widget', FileUploadWidget);
 
   // React Components
 
