@@ -13,7 +13,7 @@
                 height: 100%;
             }
         </style>
-        <div id="chart"></div>
+        <canvas id="chart"></canvas>
     `;
 
     class RevenueImpactWidget extends HTMLElement {
@@ -29,8 +29,13 @@
                 growthRate2: 10,
                 growthRate3: 15
             };
+            this._chartInitialized = false;
 
-            // Load Chart.js
+            this._loadChartJs();
+        }
+
+        _loadChartJs() {
+            console.log('Loading Chart.js');
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
             script.onload = () => {
@@ -40,9 +45,21 @@
             this._shadowRoot.appendChild(script);
         }
 
+        connectedCallback() {
+            console.log('RevenueImpactWidget connected to DOM');
+            if (window.Chart && !this._chartInitialized) {
+                this._initializeChart();
+            }
+        }
+
         _initializeChart() {
             console.log('Initializing chart');
-            const ctx = this._shadowRoot.getElementById('chart').getContext('2d');
+            const ctx = this._shadowRoot.getElementById('chart');
+            if (!ctx) {
+                console.error('Canvas element not found');
+                return;
+            }
+
             this._chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -75,6 +92,7 @@
                     }
                 }
             });
+            this._chartInitialized = true;
             this._updateChart();
         }
 
@@ -102,7 +120,11 @@
 
         onCustomWidgetAfterUpdate(changedProperties) {
             console.log('onCustomWidgetAfterUpdate called with:', changedProperties);
-            this._updateChart();
+            if (this._chartInitialized) {
+                this._updateChart();
+            } else {
+                console.log('Chart not initialized yet, skipping update');
+            }
         }
 
         // Getter and setter for baseRevenue
