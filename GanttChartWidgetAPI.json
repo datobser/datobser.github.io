@@ -5,7 +5,7 @@
     "eula": "",
     "license": "Open Source",
     "id": "GanttChartWidget",
-    "version": "",
+    "version": "1.1.0",
     "icon": "",
     "vendor": "AA",
     "webcomponents": [
@@ -36,9 +36,9 @@
             "description": "Insert a new task into the SAP model",
             "parameters": [
                 {
-                    "name": "task",
-                    "type": "object",
-                    "description": "The task object to be inserted"
+                    "name": "taskJson",
+                    "type": "string",
+                    "description": "The task object as a JSON string"
                 }
             ]
         },
