@@ -464,7 +464,8 @@ input:checked + .slider:before {
         }
 
         _downloadCSV() {
-            const csvContent = this._convertTasksToCSV(this.tasks);
+            const currentTasks = this._getCurrentTasks();
+            const csvContent = this._convertTasksToCSV(currentTasks);
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             if (link.download !== undefined) {
@@ -493,6 +494,32 @@ input:checked + .slider:before {
                 header.join(','),
                 ...rows.map(row => row.join(','))
             ].join('\n');
+        }
+
+        _getCurrentTasks() {
+            if (gantt && typeof gantt.getTaskByTime === 'function') {
+                // Get all tasks from the Gantt chart
+                const allTasks = gantt.getTaskByTime();
+                return allTasks.map(task => ({
+                    id: task.id,
+                    text: task.text,
+                    start_date: task.start_date,
+                    end_date: task.end_date,
+                    progress: task.progress,
+                    open: task.open
+                }));
+            } else {
+                console.error('Gantt chart is not initialized or getTaskByTime method is not available');
+                return [];
+            }
+        }
+
+        _updateLocalTasks(action) {
+            // Fetch all current tasks from Gantt chart
+            const currentTasks = this._getCurrentTasks();
+            // Update this.tasks with the current state
+            this.tasks = currentTasks;
+            console.log(`Tasks ${action}ed, local tasks updated:`, this.tasks);
         }
 
     }
