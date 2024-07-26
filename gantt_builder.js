@@ -20,18 +20,23 @@
                     <tr>
                         <td>Start Date Column</td>
                         <td><input id="bps_start_date_col" type="text"></td>
+        let template = document.createElement("template");
+    template.innerHTML = `
+        <form id="form">
+            <fieldset>
+                <legend>Gantt Chart Properties</legend>
+                <table>
+                    <tr>
+                        <td>Date Format</td>
+                        <td><input id="bps_date_format" type="text"></td>
                     </tr>
                     <tr>
-                        <td>End Date Column</td>
-                        <td><input id="bps_end_date_col" type="text"></td>
+                        <td>Show Progress</td>
+                        <td><input id="bps_show_progress" type="checkbox"></td>
                     </tr>
                     <tr>
-                        <td>Progress Column</td>
-                        <td><input id="bps_progress_col" type="text"></td>
-                    </tr>
-                    <tr>
-                        <td>Open Status Column</td>
-                        <td><input id="bps_open_col" type="text"></td>
+                        <td>Bar Color</td>
+                        <td><input id="bps_bar_color" type="color"></td>
                     </tr>
                 </table>
             </fieldset>
@@ -51,81 +56,40 @@
             this.dispatchEvent(new CustomEvent("propertiesChanged", {
                 detail: {
                     properties: {
-                        dataSource: this.dataSource,
-                        idColumn: this.idColumn,
-                        taskColumn: this.taskColumn,
-                        startDateColumn: this.startDateColumn,
-                        endDateColumn: this.endDateColumn,
-                        progressColumn: this.progressColumn,
-                        openColumn: this.openColumn
+                        dateFormat: this.dateFormat,
+                        showProgress: this.showProgress,
+                        barColor: this.barColor
                     }
                 }
             }));
         }
 
-        set dataSource(dataSource) {
-            this._dataSource = dataSource;
-            if (this._dataSource && this._dataSource.type === "ResultSet") {
-                this._shadowRoot.getElementById("dataSource").innerHTML = "Data Source Type: Result Set";
-            } else {
-                this._shadowRoot.getElementById("dataSource").innerHTML = "Data Source Type: Unknown";
-            }
+        set dateFormat(newFormat) {
+            this._shadowRoot.getElementById("bps_date_format").value = newFormat;
         }
 
-        get dataSource() {
-            return this._dataSource;
+        get dateFormat() {
+            return this._shadowRoot.getElementById("bps_date_format").value;
         }
 
-        set idColumn(newIdCol) {
-            this._shadowRoot.getElementById("bps_id_col").value = newIdCol;
+        set showProgress(show) {
+            this._shadowRoot.getElementById("bps_show_progress").checked = show;
         }
 
-        get idColumn() {
-            return this._shadowRoot.getElementById("bps_id_col").value;
+        get showProgress() {
+            return this._shadowRoot.getElementById("bps_show_progress").checked;
         }
 
-        set taskColumn(newTaskCol) {
-            this._shadowRoot.getElementById("bps_task_col").value = newTaskCol;
+        set barColor(color) {
+            this._shadowRoot.getElementById("bps_bar_color").value = color;
         }
 
-        get taskColumn() {
-            return this._shadowRoot.getElementById("bps_task_col").value;
-        }
-
-        set startDateColumn(newStartDateCol) {
-            this._shadowRoot.getElementById("bps_start_date_col").value = newStartDateCol;
-        }
-
-        get startDateColumn() {
-            return this._shadowRoot.getElementById("bps_start_date_col").value;
-        }
-
-        set endDateColumn(newEndDateCol) {
-            this._shadowRoot.getElementById("bps_end_date_col").value = newEndDateCol;
-        }
-
-        get endDateColumn() {
-            return this._shadowRoot.getElementById("bps_end_date_col").value;
-        }
-
-        set progressColumn(newProgressCol) {
-            this._shadowRoot.getElementById("bps_progress_col").value = newProgressCol;
-        }
-
-        get progressColumn() {
-            return this._shadowRoot.getElementById("bps_progress_col").value;
-        }
-
-        set openColumn(newOpenCol) {
-            this._shadowRoot.getElementById("bps_open_col").value = newOpenCol;
-        }
-
-        get openColumn() {
-            return this._shadowRoot.getElementById("bps_open_col").value;
+        get barColor() {
+            return this._shadowRoot.getElementById("bps_bar_color").value;
         }
 
         static get observedAttributes() {
-            return ["data-source", "id-column", "task-column", "start-date-column", "end-date-column", "progress-column", "open-column"];
+            return ["date-format", "show-progress", "bar-color"];
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
