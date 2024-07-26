@@ -113,5 +113,5 @@
         }
     }
 
-    customElements.define('revenue', RevenueImpactWidget);
+    customElements.define('revenue-widget', RevenueImpactWidget);
 })();
