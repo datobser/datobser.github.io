@@ -26,7 +26,7 @@
                         <td><input id="growth_rate3" type="number" step="0.1"></td>
                     </tr>
                 </table>
-                <input type="submit" style="display:none;">
+                <input type="submit">
             </fieldset>
         </form>
     `;
