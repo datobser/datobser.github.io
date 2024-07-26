@@ -1,4 +1,4 @@
-(function () {
+(function() {
     let template = document.createElement('template');
     template.innerHTML = `
         <style>
@@ -19,9 +19,15 @@
     class RevenueImpactWidget extends HTMLElement {
         constructor() {
             super();
-            this._shadowRoot = this.attachShadow({ mode: 'open' });
+            this._shadowRoot = this.attachShadow({mode: 'open'});
             this._shadowRoot.appendChild(template.content.cloneNode(true));
-            this._props = {};
+            this._props = {
+                baseRevenue: 1000000,
+                baseCosts: 800000,
+                growthRate1: 5,
+                growthRate2: 10,
+                growthRate3: 15
+            };
 
             // Load Chart.js
             const script = document.createElement('script');
@@ -87,26 +93,46 @@
             this._updateChart();
         }
 
+        // Getter and setter for baseRevenue
+        get baseRevenue() {
+            return this._props.baseRevenue;
+        }
         set baseRevenue(value) {
             this._props.baseRevenue = value;
             this._updateChart();
         }
 
+        // Getter and setter for baseCosts
+        get baseCosts() {
+            return this._props.baseCosts;
+        }
         set baseCosts(value) {
             this._props.baseCosts = value;
             this._updateChart();
         }
 
+        // Getter and setter for growthRate1
+        get growthRate1() {
+            return this._props.growthRate1;
+        }
         set growthRate1(value) {
             this._props.growthRate1 = value;
             this._updateChart();
         }
 
+        // Getter and setter for growthRate2
+        get growthRate2() {
+            return this._props.growthRate2;
+        }
         set growthRate2(value) {
             this._props.growthRate2 = value;
             this._updateChart();
         }
 
+        // Getter and setter for growthRate3
+        get growthRate3() {
+            return this._props.growthRate3;
+        }
         set growthRate3(value) {
             this._props.growthRate3 = value;
             this._updateChart();
