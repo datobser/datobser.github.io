@@ -1,33 +1,37 @@
-(function () {
+(function() {
     let template = document.createElement("template");
     template.innerHTML = `
         <form id="form">
             <fieldset>
-                <legend>Gantt Chart Data Bindings</legend>
+                <legend>Gantt Chart Properties</legend>
                 <table>
                     <tr>
-                        <td>Task ID Dimension</td>
-                        <td><input id="bps_id_dim" type="text"></td>
+                        <td>Data Source</td>
+                        <td><div id="dataSource"></div></td>
                     </tr>
                     <tr>
-                        <td>Task Name Dimension</td>
-                        <td><input id="bps_task_dim" type="text"></td>
+                        <td>Task ID Column</td>
+                        <td><input id="bps_id_col" type="text"></td>
                     </tr>
                     <tr>
-                        <td>Start Date Dimension</td>
-                        <td><input id="bps_start_date_dim" type="text"></td>
+                        <td>Task Name Column</td>
+                        <td><input id="bps_task_col" type="text"></td>
                     </tr>
                     <tr>
-                        <td>End Date Dimension</td>
-                        <td><input id="bps_end_date_dim" type="text"></td>
+                        <td>Start Date Column</td>
+                        <td><input id="bps_start_date_col" type="text"></td>
                     </tr>
                     <tr>
-                        <td>Progress Measure</td>
-                        <td><input id="bps_progress_measure" type="text"></td>
+                        <td>End Date Column</td>
+                        <td><input id="bps_end_date_col" type="text"></td>
                     </tr>
                     <tr>
-                        <td>Open Status Dimension</td>
-                        <td><input id="bps_open_dim" type="text"></td>
+                        <td>Progress Column</td>
+                        <td><input id="bps_progress_col" type="text"></td>
+                    </tr>
+                    <tr>
+                        <td>Open Status Column</td>
+                        <td><input id="bps_open_col" type="text"></td>
                     </tr>
                 </table>
             </fieldset>
@@ -47,67 +51,81 @@
             this.dispatchEvent(new CustomEvent("propertiesChanged", {
                 detail: {
                     properties: {
-                        idDimension: this.idDimension,
-                        taskDimension: this.taskDimension,
-                        startDateDimension: this.startDateDimension,
-                        endDateDimension: this.endDateDimension,
-                        progressMeasure: this.progressMeasure,
-                        openDimension: this.openDimension
+                        dataSource: this.dataSource,
+                        idColumn: this.idColumn,
+                        taskColumn: this.taskColumn,
+                        startDateColumn: this.startDateColumn,
+                        endDateColumn: this.endDateColumn,
+                        progressColumn: this.progressColumn,
+                        openColumn: this.openColumn
                     }
                 }
             }));
         }
 
-        set idDimension(newIdDim) {
-            this._shadowRoot.getElementById("bps_id_dim").value = newIdDim;
+        set dataSource(dataSource) {
+            this._dataSource = dataSource;
+            if (this._dataSource && this._dataSource.type === "ResultSet") {
+                this._shadowRoot.getElementById("dataSource").innerHTML = "Data Source Type: Result Set";
+            } else {
+                this._shadowRoot.getElementById("dataSource").innerHTML = "Data Source Type: Unknown";
+            }
         }
 
-        get idDimension() {
-            return this._shadowRoot.getElementById("bps_id_dim").value;
+        get dataSource() {
+            return this._dataSource;
         }
 
-        set taskDimension(newTaskDim) {
-            this._shadowRoot.getElementById("bps_task_dim").value = newTaskDim;
+        set idColumn(newIdCol) {
+            this._shadowRoot.getElementById("bps_id_col").value = newIdCol;
         }
 
-        get taskDimension() {
-            return this._shadowRoot.getElementById("bps_task_dim").value;
+        get idColumn() {
+            return this._shadowRoot.getElementById("bps_id_col").value;
         }
 
-        set startDateDimension(newStartDateDim) {
-            this._shadowRoot.getElementById("bps_start_date_dim").value = newStartDateDim;
+        set taskColumn(newTaskCol) {
+            this._shadowRoot.getElementById("bps_task_col").value = newTaskCol;
         }
 
-        get startDateDimension() {
-            return this._shadowRoot.getElementById("bps_start_date_dim").value;
+        get taskColumn() {
+            return this._shadowRoot.getElementById("bps_task_col").value;
         }
 
-        set endDateDimension(newEndDateDim) {
-            this._shadowRoot.getElementById("bps_end_date_dim").value = newEndDateDim;
+        set startDateColumn(newStartDateCol) {
+            this._shadowRoot.getElementById("bps_start_date_col").value = newStartDateCol;
         }
 
-        get endDateDimension() {
-            return this._shadowRoot.getElementById("bps_end_date_dim").value;
+        get startDateColumn() {
+            return this._shadowRoot.getElementById("bps_start_date_col").value;
         }
 
-        set progressMeasure(newProgressMeasure) {
-            this._shadowRoot.getElementById("bps_progress_measure").value = newProgressMeasure;
+        set endDateColumn(newEndDateCol) {
+            this._shadowRoot.getElementById("bps_end_date_col").value = newEndDateCol;
         }
 
-        get progressMeasure() {
-            return this._shadowRoot.getElementById("bps_progress_measure").value;
+        get endDateColumn() {
+            return this._shadowRoot.getElementById("bps_end_date_col").value;
         }
 
-        set openDimension(newOpenDim) {
-            this._shadowRoot.getElementById("bps_open_dim").value = newOpenDim;
+        set progressColumn(newProgressCol) {
+            this._shadowRoot.getElementById("bps_progress_col").value = newProgressCol;
         }
 
-        get openDimension() {
-            return this._shadowRoot.getElementById("bps_open_dim").value;
+        get progressColumn() {
+            return this._shadowRoot.getElementById("bps_progress_col").value;
+        }
+
+        set openColumn(newOpenCol) {
+            this._shadowRoot.getElementById("bps_open_col").value = newOpenCol;
+        }
+
+        get openColumn() {
+            return this._shadowRoot.getElementById("bps_open_col").value;
         }
 
         static get observedAttributes() {
-            return ["id-dimension", "task-dimension", "start-date-dimension", "end-date-dimension", "progress-measure", "open-dimension"];
+            return ["data-source", "id-column", "task-column", "start-date-column", "end-date-column", "progress-column", "open-column"];
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
