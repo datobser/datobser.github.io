@@ -117,5 +117,5 @@
         }
     }
 
-    customElements.define("-gantt--builder", GanttChartWidgetBuilder);
+    customElements.define("gantt-builder", GanttChartWidgetBuilder);
 })();
