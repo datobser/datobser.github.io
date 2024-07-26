@@ -261,24 +261,35 @@ input:checked + .slider:before {
                 this.tasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
-                    if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3 && row.measures_0) {
-                        const startDate = this._parseDate(row.dimensions_2.id);
-                        const endDate = this._parseDate(row.dimensions_3.id);
+                    // Check if we have the measures_0 property
+                    if (row.measures_0) {
+                        // Parse the combined date and progress
+                        const [dateStr, progressStr] = row.measures_0.id.split(' ');
                         
-                        console.log('Start date:', startDate, 'End date:', endDate);
+                        // Parse the date
+                        const startDate = this._parseDate(dateStr);
+                        
+                        // Parse the progress (remove % sign and convert to decimal)
+                        const progress = progressStr ? parseFloat(progressStr.replace('%', '')) / 100 : 0;
         
-                        if (!startDate || !endDate) {
-                            console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
+                        console.log('Parsed date:', startDate, 'Progress:', progress);
+        
+                        if (!startDate) {
+                            console.error('Invalid date:', dateStr);
                             return null;
                         }
         
+                        // Create a task with default end date (1 year duration)
+                        const endDate = new Date(startDate.getTime());
+                        endDate.setFullYear(endDate.getFullYear() + 1);
+        
                         const task = {
-                            id: row.dimensions_0.id,
-                            text: row.dimensions_1.id,
+                            id: index.toString(), // Use index as id
+                            text: `Task ${index + 1}`, // Default task name
                             start_date: startDate,
                             end_date: endDate,
-                            progress: parseFloat(row.measures_0.raw),
-                            open: row.dimensions_4 ? row.dimensions_4.id === 'X' : false
+                            progress: progress,
+                            open: true
                         };
                         console.log('Created task:', task);
                         return task;
@@ -300,6 +311,15 @@ input:checked + .slider:before {
         
         // Helper method to parse date strings
         _parseDate(dateString) {
+            // Assuming the date format is YYYY
+            if (dateString.length === 4 && !isNaN(dateString)) {
+                return new Date(parseInt(dateString), 0, 1); // January 1st of the given year
+            }
+            return null;
+        }
+        
+        // Helper method to parse date strings
+        _parseDate(dateString) {
             // Assuming the date format is YYYY-MM-DD
             const parts = dateString.split('-');
             if (parts.length === 3) {
@@ -314,10 +334,10 @@ input:checked + .slider:before {
                 const chartElement = this._shadowRoot.getElementById('chart');
         
                 gantt.config.fit_tasks = true;
-                gantt.config.scale_unit = "month";
-                gantt.config.date_scale = "%F, %Y";
+                gantt.config.scale_unit = "year";
+                gantt.config.date_scale = "%Y";
                 gantt.config.subscales = [
-                    {unit: "day", step: 1, date: "%j" }
+                    {unit: "month", step: 1, date: "%M" }
                 ];
         
                 // Set the date format for tasks
@@ -326,8 +346,7 @@ input:checked + .slider:before {
                 // Configure the columns in the grid
                 gantt.config.columns = [
                     {name: "text", label: "Task name", tree: true, width: 230},
-                    {name: "start_date", label: "Start date", align: "center", width: 100},
-                    {name: "end_date", label: "End date", align: "center", width: 100},
+                    {name: "start_date", label: "Start year", align: "center", width: 100},
                     {name: "progress", label: "Progress", align: "center", width: 80, template: function(obj) {
                         return Math.round(obj.progress * 100) + "%";
                     }}
