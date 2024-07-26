@@ -1,3 +1,4 @@
+
 (function () {
     let tmpl = document.createElement('template');
     tmpl.innerHTML = `
@@ -260,41 +261,34 @@ input:checked + .slider:before {
                 console.log('Raw data:', dataBinding.data);
                 this.tasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
-                    
-                    // Check if we have the measures_0 property
-                    if (row.measures_0) {
-                        // Parse the combined date and progress
-                        const [dateStr, progressStr] = row.measures_0.id.split(' ');
-                        
-                        // Parse the date
-                        const startDate = this._parseDate(dateStr);
-                        
-                        // Parse the progress (remove % sign and convert to decimal)
-                        const progress = progressStr ? parseFloat(progressStr.replace('%', '')) / 100 : 0;
+                    if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
+                        // Parse the date string correctly
+                        const startDate = this._parseDate(row.dimensions_2.id);
+                        const endDate = this._parseDate(row.dimensions_3.id);
         
-                        console.log('Parsed date:', startDate, 'Progress:', progress);
+                        console.log('Start date:', startDate, 'End date:', endDate);
         
-                        if (!startDate) {
-                            console.error('Invalid date:', dateStr);
+                        if (!startDate || !endDate) {
+                            console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
+                            return null;
+                        }
+                        if (startDate > endDate) {
+                            console.error('Start date is after end date:', startDate, endDate);
                             return null;
                         }
         
-                        // Create a task with default end date (1 year duration)
-                        const endDate = new Date(startDate.getTime());
-                        endDate.setFullYear(endDate.getFullYear() + 1);
-        
                         const task = {
-                            id: index.toString(), // Use index as id
-                            text: `Task ${index + 1}`, // Default task name
+                            id: row.dimensions_0.id,
+                            text: row.dimensions_1.id,
                             start_date: startDate,
                             end_date: endDate,
-                            progress: progress,
-                            open: true
+                            progress: row.measures_0 ? parseFloat(row.measures_0.raw) / 100 : 0, // Assuming progress is in percentage
+                            open: row.dimensions_4 ? row.dimensions_4.id === 'X' : true
                         };
                         console.log('Created task:', task);
                         return task;
                     } else {
-                        console.error('Row is missing required data:', row);
+                        console.error('Row is missing required dimensions:', row);
                         return null;
                     }
                 }).filter(Boolean);
@@ -311,15 +305,6 @@ input:checked + .slider:before {
         
         // Helper method to parse date strings
         _parseDate(dateString) {
-            // Assuming the date format is YYYY
-            if (dateString.length === 4 && !isNaN(dateString)) {
-                return new Date(parseInt(dateString), 0, 1); // January 1st of the given year
-            }
-            return null;
-        }
-        
-        // Helper method to parse date strings
-        _parseDate(dateString) {
             // Assuming the date format is YYYY-MM-DD
             const parts = dateString.split('-');
             if (parts.length === 3) {
@@ -332,34 +317,19 @@ input:checked + .slider:before {
             console.log('_renderChart called');
             if (this._dhtmlxGanttReady) {
                 const chartElement = this._shadowRoot.getElementById('chart');
-        
+    
                 gantt.config.fit_tasks = true;
-                gantt.config.scale_unit = "year";
-                gantt.config.date_scale = "%Y";
-                gantt.config.subscales = [
-                    {unit: "month", step: 1, date: "%M" }
-                ];
-        
-                // Set the date format for tasks
-                gantt.config.xml_date = "%Y-%m-%d";
-        
-                // Configure the columns in the grid
-                gantt.config.columns = [
-                    {name: "text", label: "Task name", tree: true, width: 230},
-                    {name: "start_date", label: "Start year", align: "center", width: 100},
-                    {name: "progress", label: "Progress", align: "center", width: 80, template: function(obj) {
-                        return Math.round(obj.progress * 100) + "%";
-                    }}
-                ];
-        
+                gantt.config.scale_unit = "month";
+                gantt.config.step = 1;
+    
                 gantt.init(chartElement);
-        
+    
                 // Clear existing tasks
                 gantt.clearAll();
-        
+    
                 // Load the new tasks
                 gantt.parse({ data: this.tasks });
-        
+    
                 console.log('Gantt chart rendered with tasks:', this.tasks);
             } else {
                 console.error('DHTMLX Gantt is not ready');
