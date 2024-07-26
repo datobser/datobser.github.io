@@ -25,13 +25,6 @@
                         <td>Growth Rate 3 (%)</td>
                         <td><input id="growth_rate3" type="number" step="0.1"></td>
                     </tr>
-                    <tr>
-                        <td colspan="2">
-                            <input id="profit_formula" type="text" readonly 
-                                   value="Profit = (Base Revenue * (1 + Growth Rate / 100)) - Base Costs" 
-                                   style="width: 100%; font-style: italic;">
-                        </td>
-                    </tr>
                 </table>
                 <div id="formula_container">
                     <p>Profit Formula:</p>
