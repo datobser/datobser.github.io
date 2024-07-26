@@ -257,7 +257,7 @@ input:checked + .slider:before {
                     console.log('Processing row:', row);
                     if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
                         const startDate = new Date(row.dimensions_2.id);
-                        const endDate = new Date(row.dimensions_3.id);
+                        const endDate = new Date(row.dimensions_1.id);
     
                         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
                             console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
