@@ -1,4 +1,4 @@
-(function () {
+(function() {
     let template = document.createElement('template');
     template.innerHTML = `
         <form id="form">
@@ -26,7 +26,7 @@
                         <td><input id="growth_rate3" type="number" step="0.1"></td>
                     </tr>
                 </table>
-                <input type="submit">
+                <input type="submit" style="display:none;">
             </fieldset>
         </form>
     `;
@@ -34,67 +34,110 @@
     class RevenueImpactBuilderPanel extends HTMLElement {
         constructor() {
             super();
-            this._shadowRoot = this.attachShadow({ mode: 'open' });
+            this._shadowRoot = this.attachShadow({mode: 'open'});
             this._shadowRoot.appendChild(template.content.cloneNode(true));
             this._shadowRoot.getElementById('form').addEventListener('submit', this._submit.bind(this));
-            this._shadowRoot.getElementById('form').addEventListener('change', this._change.bind(this));
+            
+            // Add event listeners for each input
+            this._shadowRoot.getElementById('base_revenue').addEventListener('change', this._changeBaseRevenue.bind(this));
+            this._shadowRoot.getElementById('base_costs').addEventListener('change', this._changeBaseCosts.bind(this));
+            this._shadowRoot.getElementById('growth_rate1').addEventListener('change', this._changeGrowthRate1.bind(this));
+            this._shadowRoot.getElementById('growth_rate2').addEventListener('change', this._changeGrowthRate2.bind(this));
+            this._shadowRoot.getElementById('growth_rate3').addEventListener('change', this._changeGrowthRate3.bind(this));
         }
 
         _submit(e) {
             e.preventDefault();
         }
 
-        _change(e) {
-            var eventDetail = {
-                properties: {
-                    baseRevenue: this.baseRevenue,
-                    baseCosts: this.baseCosts,
-                    growthRate1: this.growthRate1,
-                    growthRate2: this.growthRate2,
-                    growthRate3: this.growthRate3
+        _changeBaseRevenue(e) {
+            this.dispatchEvent(new CustomEvent('propertiesChanged', {
+                detail: {
+                    properties: {
+                        baseRevenue: Number(e.target.value)
+                    }
                 }
-            };
-            this.dispatchEvent(new CustomEvent('propertiesChanged', { detail: eventDetail }));
+            }));
         }
 
-        set baseRevenue(newBaseRevenue) {
-            this._shadowRoot.getElementById('base_revenue').value = newBaseRevenue;
+        _changeBaseCosts(e) {
+            this.dispatchEvent(new CustomEvent('propertiesChanged', {
+                detail: {
+                    properties: {
+                        baseCosts: Number(e.target.value)
+                    }
+                }
+            }));
         }
 
+        _changeGrowthRate1(e) {
+            this.dispatchEvent(new CustomEvent('propertiesChanged', {
+                detail: {
+                    properties: {
+                        growthRate1: Number(e.target.value)
+                    }
+                }
+            }));
+        }
+
+        _changeGrowthRate2(e) {
+            this.dispatchEvent(new CustomEvent('propertiesChanged', {
+                detail: {
+                    properties: {
+                        growthRate2: Number(e.target.value)
+                    }
+                }
+            }));
+        }
+
+        _changeGrowthRate3(e) {
+            this.dispatchEvent(new CustomEvent('propertiesChanged', {
+                detail: {
+                    properties: {
+                        growthRate3: Number(e.target.value)
+                    }
+                }
+            }));
+        }
+
+        // Getter and setter for baseRevenue
         get baseRevenue() {
             return Number(this._shadowRoot.getElementById('base_revenue').value);
         }
-
-        set baseCosts(newBaseCosts) {
-            this._shadowRoot.getElementById('base_costs').value = newBaseCosts;
+        set baseRevenue(value) {
+            this._shadowRoot.getElementById('base_revenue').value = value;
         }
 
+        // Getter and setter for baseCosts
         get baseCosts() {
             return Number(this._shadowRoot.getElementById('base_costs').value);
         }
-
-        set growthRate1(newGrowthRate1) {
-            this._shadowRoot.getElementById('growth_rate1').value = newGrowthRate1;
+        set baseCosts(value) {
+            this._shadowRoot.getElementById('base_costs').value = value;
         }
 
+        // Getter and setter for growthRate1
         get growthRate1() {
             return Number(this._shadowRoot.getElementById('growth_rate1').value);
         }
-
-        set growthRate2(newGrowthRate2) {
-            this._shadowRoot.getElementById('growth_rate2').value = newGrowthRate2;
+        set growthRate1(value) {
+            this._shadowRoot.getElementById('growth_rate1').value = value;
         }
 
+        // Getter and setter for growthRate2
         get growthRate2() {
             return Number(this._shadowRoot.getElementById('growth_rate2').value);
         }
-
-        set growthRate3(newGrowthRate3) {
-            this._shadowRoot.getElementById('growth_rate3').value = newGrowthRate3;
+        set growthRate2(value) {
+            this._shadowRoot.getElementById('growth_rate2').value = value;
         }
 
+        // Getter and setter for growthRate3
         get growthRate3() {
             return Number(this._shadowRoot.getElementById('growth_rate3').value);
+        }
+        set growthRate3(value) {
+            this._shadowRoot.getElementById('growth_rate3').value = value;
         }
     }
 
