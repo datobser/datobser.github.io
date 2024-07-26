@@ -235,107 +235,77 @@ input:checked + .slider:before {
         }
     
         onCustomWidgetBeforeUpdate(changedProperties) {
-            //console.log('onCustomWidgetBeforeUpdate called');
-            this._props = { ...this._props, ...changedProperties };
-        }
-    
+        this._props = { ...this._props, ...changedProperties };
+    }
+
         onCustomWidgetAfterUpdate(changedProperties) {
-            //console.log('onCustomWidgetAfterUpdate called');
+            console.log('onCustomWidgetAfterUpdate called', changedProperties);
             if ("myDataBinding" in changedProperties) {
                 const dataBinding = changedProperties.myDataBinding;
-                if (dataBinding.state === 'success') {
+                console.log('Data binding changed:', dataBinding);
+                if (dataBinding && dataBinding.state === 'success') {
                     this._updateData(dataBinding);
                 }
             }
         }
     
         _updateData(dataBinding) {
-            console.log('_updateData called');
-            if (dataBinding && Array.isArray(dataBinding.data)) {
+            console.log('_updateData called', dataBinding);
+            if (dataBinding && dataBinding.data) {
                 this.tasks = dataBinding.data.map((row, index) => {
+                    console.log('Processing row:', row);
                     if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
-                        //console.log('original startDate:', row.dimensions_2.id, 'endDate:', row.dimensions_3.id);  // Log the start and end dates
-                        //console.log('the rest measure:', row.measures_0.raw, 'the rest dim', row.dimensions_4.id);  // Log the start and end dates
-    
                         const startDate = new Date(row.dimensions_2.id);
                         const endDate = new Date(row.dimensions_3.id);
     
-                        //console.log('original startDate:', startDate, 'endDate:', endDate);  // Log the start and end dates
-    
-                        // Check if startDate and endDate are valid dates
                         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
                             console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
                             return null;
                         }
-                        // Check if startDate is before endDate
                         if (startDate > endDate) {
                             console.error('Start date is after end date:', startDate, endDate);
                             return null;
                         }
-                        //console.log('startDate:', startDate, 'endDate:', endDate);  // Log the start and end dates
+    
                         return {
-                            id: row.dimensions_0.label,  // Unique id of task
-                            text: row.dimensions_1.label,  // Name of task
-                            start_date: startDate,  // Start date of task
-                            end_date: endDate,  // End date of task
-                            progress: row.measures_0.raw,  // Progress of task in percent
-                            open: row.dimensions_4.id  // Task is open by default
+                            id: row.dimensions_0.id,
+                            text: row.dimensions_1.id,
+                            start_date: startDate,
+                            end_date: endDate,
+                            progress: row.measures_0 ? row.measures_0.raw : 0,
+                            open: row.dimensions_4 ? row.dimensions_4.id === 'X' : true
                         };
                     }
-                }).filter(Boolean);  // Filter out any null values
+                    return null;
+                }).filter(Boolean);
     
-                // Check if all tasks have valid start and end dates
-                for (let task of this.tasks) {
-                    if (!task.start_date || !task.end_date) {
-                        console.error('Task with null start or end date:', task);
-                    }
-                }
-    
-                console.log('Tasks:', this.tasks);  // Log the tasks
-    
+                console.log('Processed tasks:', this.tasks);
                 this._renderChart();
+            } else {
+                console.error('Invalid data binding or no data available');
             }
         }
     
         _renderChart() {
-            //console.log('_renderChart called');
+            console.log('_renderChart called');
             if (this._dhtmlxGanttReady) {
                 const chartElement = this._shadowRoot.getElementById('chart');
     
-                // Set fit_tasks to false to enable horizontal scrolling
                 gantt.config.fit_tasks = true;
-                // Configure the Gantt chart to use a monthly scale
                 gantt.config.scale_unit = "month";
                 gantt.config.step = 1;
     
-                // Initialize the Gantt chart
                 gantt.init(chartElement);
     
-                gantt.attachEvent("onAfterTaskAdd", (id, task) => {
-                    console.log("New task was added: ", task);
-                    // Convert the task to CSV
-                    const csvData = this.taskToCsv(task);
-                    // Retrieve the tokens and then call createJob, uploadData, validateJob, and runJob
-                    this.getAccessToken().then(() => {
-                        this.getCsrfToken().then(() => {
-                            this.createJob().then(() => {
-                                this.uploadData(csvData).then(() => {
-                                    this.validateJob().then(() => {
-                                        this.runJob();
-                                        gantt.clearAll();
-                                        // Load the new data
-                                        gantt.parse({ data: this.tasks });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
+                // Clear existing tasks
+                gantt.clearAll();
     
-                // Load the tasks into the Gantt chart
+                // Load the new tasks
                 gantt.parse({ data: this.tasks });
     
-                console.log('Gantt chart rendered');
+                console.log('Gantt chart rendered with tasks:', this.tasks);
+            } else {
+                console.error('DHTMLX Gantt is not ready');
             }
         }
     
