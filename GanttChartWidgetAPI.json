@@ -1,13 +1,13 @@
 {
     "name": "GanttChartWidgetAPI",
     "description": "Gantt Chart Widget with SAP API Integration",
-    "newInstancePrefix": "GanttChartWidgetAPI",
+    "newInstancePrefix": "GanttChartWidget",
     "eula": "",
     "license": "Open Source",
     "id": "GanttChartWidget",
-    "version": "1.1.0",
-    "icon": "https://planifyit.github.io/Pie_chart/PlanifyIT_Logo2.png",
-    "vendor": "Planifyit",
+    "version": "",
+    "icon": "",
+    "vendor": "AA",
     "webcomponents": [
         {
             "kind": "main",
