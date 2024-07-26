@@ -34,6 +34,7 @@
     class RevenueImpactBuilderPanel extends HTMLElement {
         constructor() {
             super();
+            console.log('RevenueImpactBuilderPanel constructor called');
             this._shadowRoot = this.attachShadow({mode: 'open'});
             this._shadowRoot.appendChild(template.content.cloneNode(true));
             this._shadowRoot.getElementById('form').addEventListener('submit', this._submit.bind(this));
@@ -48,9 +49,11 @@
 
         _submit(e) {
             e.preventDefault();
+            console.log('Form submission prevented');
         }
 
         _changeBaseRevenue(e) {
+            console.log('Base Revenue changed to:', e.target.value);
             this.dispatchEvent(new CustomEvent('propertiesChanged', {
                 detail: {
                     properties: {
@@ -61,6 +64,7 @@
         }
 
         _changeBaseCosts(e) {
+            console.log('Base Costs changed to:', e.target.value);
             this.dispatchEvent(new CustomEvent('propertiesChanged', {
                 detail: {
                     properties: {
@@ -71,6 +75,7 @@
         }
 
         _changeGrowthRate1(e) {
+            console.log('Growth Rate 1 changed to:', e.target.value);
             this.dispatchEvent(new CustomEvent('propertiesChanged', {
                 detail: {
                     properties: {
@@ -81,6 +86,7 @@
         }
 
         _changeGrowthRate2(e) {
+            console.log('Growth Rate 2 changed to:', e.target.value);
             this.dispatchEvent(new CustomEvent('propertiesChanged', {
                 detail: {
                     properties: {
@@ -91,6 +97,7 @@
         }
 
         _changeGrowthRate3(e) {
+            console.log('Growth Rate 3 changed to:', e.target.value);
             this.dispatchEvent(new CustomEvent('propertiesChanged', {
                 detail: {
                     properties: {
@@ -105,6 +112,7 @@
             return Number(this._shadowRoot.getElementById('base_revenue').value);
         }
         set baseRevenue(value) {
+            console.log('Setting base revenue to:', value);
             this._shadowRoot.getElementById('base_revenue').value = value;
         }
 
@@ -113,6 +121,7 @@
             return Number(this._shadowRoot.getElementById('base_costs').value);
         }
         set baseCosts(value) {
+            console.log('Setting base costs to:', value);
             this._shadowRoot.getElementById('base_costs').value = value;
         }
 
@@ -121,6 +130,7 @@
             return Number(this._shadowRoot.getElementById('growth_rate1').value);
         }
         set growthRate1(value) {
+            console.log('Setting growth rate 1 to:', value);
             this._shadowRoot.getElementById('growth_rate1').value = value;
         }
 
@@ -129,6 +139,7 @@
             return Number(this._shadowRoot.getElementById('growth_rate2').value);
         }
         set growthRate2(value) {
+            console.log('Setting growth rate 2 to:', value);
             this._shadowRoot.getElementById('growth_rate2').value = value;
         }
 
@@ -137,9 +148,10 @@
             return Number(this._shadowRoot.getElementById('growth_rate3').value);
         }
         set growthRate3(value) {
+            console.log('Setting growth rate 3 to:', value);
             this._shadowRoot.getElementById('growth_rate3').value = value;
         }
     }
 
-    customElements.define('revenue-builder', RevenueImpactBuilderPanel);
+    customElements.define('com-sap-sample-revenueimpact-builder', RevenueImpactBuilderPanel);
 })();
