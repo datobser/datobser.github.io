@@ -83,30 +83,32 @@ input:checked + .slider:before {
 
         
     </style>
-
-
-     <div id="image-container"> <svg width="750" height="100">  </svg></div> 
+    <div id="image-container"> <svg width="750" height="100">  </svg></div> 
+    <div id="chart"></div>
+    <button id="download-csv">Download Tasks as CSV</button>
+    
+    <div id="image-container"> <svg width="750" height="100">  </svg></div> 
     <div id="chart"></div>
 
-<div style="display: flex; align-items: center;">
-  <label class="switch">
-    <input type="checkbox" id="debugToggle">
-    <span class="slider round"></span>
-  </label>
-  <p id="debugStatus" style="margin-left: 10px;">Debugging Mode Inactive</p>
-</div>
-
-<div id="debugging-area" style="display: none;">
-  <h2>Debugging Mode</h2>
-  <button id="getAccessToken">Get Access Token</button>
-  <button id="getCsrfToken">Get CSRF Token</button>
-  <button id="createJob">Create Job</button>
-  <button id="uploadData">Upload Data</button>
-  <button id="validateJob">Validate Job</button>
-  <button id="runJob">Run Job</button>
-  <h3>Messages</h3>
-  <div id="messages"></div>
-</div>
+    <div style="display: flex; align-items: center;">
+      <label class="switch">
+        <input type="checkbox" id="debugToggle">
+        <span class="slider round"></span>
+      </label>
+      <p id="debugStatus" style="margin-left: 10px;">Debugging Mode Inactive</p>
+    </div>
+    
+    <div id="debugging-area" style="display: none;">
+      <h2>Debugging Mode</h2>
+      <button id="getAccessToken">Get Access Token</button>
+      <button id="getCsrfToken">Get CSRF Token</button>
+      <button id="createJob">Create Job</button>
+      <button id="uploadData">Upload Data</button>
+      <button id="validateJob">Validate Job</button>
+      <button id="runJob">Run Job</button>
+      <h3>Messages</h3>
+      <div id="messages"></div>
+    </div>
 
     `;
 
@@ -132,6 +134,8 @@ input:checked + .slider:before {
                     debuggingArea.style.display = 'none';
                 }
             });
+            
+            this._shadowRoot.getElementById('download-csv').addEventListener('click', this._downloadCSV.bind(this));
     
             // Get a reference to the messages element
             const messagesElement = this._shadowRoot.getElementById('messages');
@@ -458,6 +462,39 @@ input:checked + .slider:before {
                 console.error('Error refreshing data from SAP model:', error);
             }
         }
+
+        _downloadCSV() {
+            const csvContent = this._convertTasksToCSV(this.tasks);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "gantt_tasks.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        _convertTasksToCSV(tasks) {
+            const header = ["ID", "Task", "Start Date", "End Date", "Progress", "Open"];
+            const rows = tasks.map(task => [
+                task.id,
+                task.text,
+                task.start_date.toISOString().slice(0, 10),
+                task.end_date.toISOString().slice(0, 10),
+                task.progress,
+                task.open ? 'X' : ''
+            ]);
+            
+            return [
+                header.join(','),
+                ...rows.map(row => row.join(','))
+            ].join('\n');
+        }
+
     }
     customElements.define('gantt-chart-widget', GanttChartWidgetAPI);
 
