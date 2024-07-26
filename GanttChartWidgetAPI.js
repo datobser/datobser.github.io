@@ -216,14 +216,14 @@ input:checked + .slider:before {
             const csvData_raw = 'Version,Date,id,label,startDate,endDate,open,progress\n' + csvString;
     
             // Return the CSV string
-            console.log('Data_raw:', csvData_raw);
+            //console.log('Data_raw:', csvData_raw);
     
             return csvData_raw;
         }
     
         // GanttChart methods
         static get metadata() {
-            console.log('metadata called');
+            //console.log('metadata called');
             return {
                 properties: {
                     myDataBinding: {
@@ -235,12 +235,12 @@ input:checked + .slider:before {
         }
     
         onCustomWidgetBeforeUpdate(changedProperties) {
-            console.log('onCustomWidgetBeforeUpdate called');
+            //console.log('onCustomWidgetBeforeUpdate called');
             this._props = { ...this._props, ...changedProperties };
         }
     
         onCustomWidgetAfterUpdate(changedProperties) {
-            console.log('onCustomWidgetAfterUpdate called');
+            //console.log('onCustomWidgetAfterUpdate called');
             if ("myDataBinding" in changedProperties) {
                 const dataBinding = changedProperties.myDataBinding;
                 if (dataBinding.state === 'success') {
@@ -254,13 +254,13 @@ input:checked + .slider:before {
             if (dataBinding && Array.isArray(dataBinding.data)) {
                 this.tasks = dataBinding.data.map((row, index) => {
                     if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
-                        console.log('original startDate:', row.dimensions_2.id, 'endDate:', row.dimensions_3.id);  // Log the start and end dates
-                        console.log('the rest measure:', row.measures_0.raw, 'the rest dim', row.dimensions_4.id);  // Log the start and end dates
+                        //console.log('original startDate:', row.dimensions_2.id, 'endDate:', row.dimensions_3.id);  // Log the start and end dates
+                        //console.log('the rest measure:', row.measures_0.raw, 'the rest dim', row.dimensions_4.id);  // Log the start and end dates
     
                         const startDate = new Date(row.dimensions_2.id);
                         const endDate = new Date(row.dimensions_3.id);
     
-                        console.log('original startDate:', startDate, 'endDate:', endDate);  // Log the start and end dates
+                        //console.log('original startDate:', startDate, 'endDate:', endDate);  // Log the start and end dates
     
                         // Check if startDate and endDate are valid dates
                         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
@@ -272,7 +272,7 @@ input:checked + .slider:before {
                             console.error('Start date is after end date:', startDate, endDate);
                             return null;
                         }
-                        console.log('startDate:', startDate, 'endDate:', endDate);  // Log the start and end dates
+                        //console.log('startDate:', startDate, 'endDate:', endDate);  // Log the start and end dates
                         return {
                             id: row.dimensions_0.label,  // Unique id of task
                             text: row.dimensions_1.label,  // Name of task
@@ -298,7 +298,7 @@ input:checked + .slider:before {
         }
     
         _renderChart() {
-            console.log('_renderChart called');
+            //console.log('_renderChart called');
             if (this._dhtmlxGanttReady) {
                 const chartElement = this._shadowRoot.getElementById('chart');
     
@@ -343,12 +343,12 @@ input:checked + .slider:before {
         // Interaction with SAP data model
         
         async getAccessToken() {
-                console.log('Getting access token...');
+                //console.log('Getting access token...');
                 // Simulating an async operation
                 return new Promise((resolve) => {
                     setTimeout(() => {
                         this.accessToken = 'https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token';
-                        console.log('Access token obtained');
+                        //console.log('Access token obtained');
                         resolve(this.accessToken);
                     }, 1000);
                 });
@@ -519,7 +519,7 @@ input:checked + .slider:before {
             const currentTasks = this._getCurrentTasks();
             // Update this.tasks with the current state
             this.tasks = currentTasks;
-            console.log(`Tasks ${action}ed, local tasks updated:`, this.tasks);
+            //console.log(`Tasks ${action}ed, local tasks updated:`, this.tasks);
         }
 
     }
