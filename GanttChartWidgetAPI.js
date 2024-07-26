@@ -312,19 +312,35 @@ input:checked + .slider:before {
             console.log('_renderChart called');
             if (this._dhtmlxGanttReady) {
                 const chartElement = this._shadowRoot.getElementById('chart');
-    
+        
                 gantt.config.fit_tasks = true;
                 gantt.config.scale_unit = "month";
-                gantt.config.step = 1;
-    
+                gantt.config.date_scale = "%F, %Y";
+                gantt.config.subscales = [
+                    {unit: "day", step: 1, date: "%j" }
+                ];
+        
+                // Set the date format for tasks
+                gantt.config.xml_date = "%Y-%m-%d";
+        
+                // Configure the columns in the grid
+                gantt.config.columns = [
+                    {name: "text", label: "Task name", tree: true, width: 230},
+                    {name: "start_date", label: "Start date", align: "center", width: 100},
+                    {name: "end_date", label: "End date", align: "center", width: 100},
+                    {name: "progress", label: "Progress", align: "center", width: 80, template: function(obj) {
+                        return Math.round(obj.progress * 100) + "%";
+                    }}
+                ];
+        
                 gantt.init(chartElement);
-    
+        
                 // Clear existing tasks
                 gantt.clearAll();
-    
+        
                 // Load the new tasks
                 gantt.parse({ data: this.tasks });
-    
+        
                 console.log('Gantt chart rendered with tasks:', this.tasks);
             } else {
                 console.error('DHTMLX Gantt is not ready');
