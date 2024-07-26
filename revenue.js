@@ -156,5 +156,5 @@
         }
     }
 
-    customElements.define('com-sap-sample-revenueimpact', RevenueImpactWidget);
+    customElements.define('revenue-widget', RevenueImpactWidget);
 })();
