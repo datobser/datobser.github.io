@@ -255,10 +255,10 @@ input:checked + .slider:before {
             if (dataBinding && dataBinding.data) {
                 this.tasks = dataBinding.data.map((row, index) => {
                     console.log('Processing row:', row);
-                    if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
+                    if (row.dimensions_1 && row.dimensions_2 && row.dimensions_3 && row.dimensions_4) {
                         const startDate = new Date(row.dimensions_2.id);
                         const endDate = new Date(row.dimensions_1.id);
-    
+        
                         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
                             console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
                             return null;
@@ -267,25 +267,26 @@ input:checked + .slider:before {
                             console.error('Start date is after end date:', startDate, endDate);
                             return null;
                         }
-    
+        
                         return {
-                            id: row.dimensions_0.id,
-                            text: row.dimensions_1.id,
+                            id: row.dimensions_3.id,
+                            text: row.dimensions_4.id,
                             start_date: startDate,
                             end_date: endDate,
-                            progress: row.measures_0 ? row.measures_0.raw : 0,
-                            open: row.dimensions_4 ? row.dimensions_4.id === 'X' : true
+                            progress: 0, // Assuming progress is 0 since `measures_0` is removed
+                            open: row.dimensions_4 && row.dimensions_4.id === 'X'
                         };
                     }
                     return null;
                 }).filter(Boolean);
-    
+        
                 console.log('Processed tasks:', this.tasks);
                 this._renderChart();
             } else {
                 console.error('Invalid data binding or no data available');
             }
         }
+
     
         _renderChart() {
             console.log('_renderChart called');
