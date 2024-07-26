@@ -245,30 +245,21 @@ input:checked + .slider:before {
                 const dataBinding = changedProperties.myDataBinding;
                 console.log('Data binding changed:', dataBinding);
                 if (dataBinding && dataBinding.state === 'success') {
-                    console.log('Data binding successful, updating data');
                     this._updateData(dataBinding);
-                } else {
-                    console.error('Data binding unsuccessful or in incorrect state', dataBinding.state);
                 }
-            } else {
-                console.log('No data binding change detected');
             }
         }
     
         _updateData(dataBinding) {
             console.log('_updateData called', dataBinding);
             if (dataBinding && dataBinding.data) {
-                console.log('Raw data:', dataBinding.data);
                 this.tasks = dataBinding.data.map((row, index) => {
-                    console.log(`Processing row ${index}:`, row);
+                    console.log('Processing row:', row);
                     if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
-                        // Parse the date string correctly
-                        const startDate = this._parseDate(row.dimensions_2.id);
-                        const endDate = this._parseDate(row.dimensions_3.id);
-        
-                        console.log('Start date:', startDate, 'End date:', endDate);
-        
-                        if (!startDate || !endDate) {
+                        const startDate = new Date(row.dimensions_2.id);
+                        const endDate = new Date(row.dimensions_3.id);
+    
+                        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
                             console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
                             return null;
                         }
@@ -276,41 +267,24 @@ input:checked + .slider:before {
                             console.error('Start date is after end date:', startDate, endDate);
                             return null;
                         }
-        
-                        const task = {
+    
+                        return {
                             id: row.dimensions_0.id,
                             text: row.dimensions_1.id,
                             start_date: startDate,
                             end_date: endDate,
-                            progress: row.measures_0 ? parseFloat(row.measures_0.raw) / 100 : 0, // Assuming progress is in percentage
+                            progress: row.measures_0 ? row.measures_0.raw : 0,
                             open: row.dimensions_4 ? row.dimensions_4.id === 'X' : true
                         };
-                        console.log('Created task:', task);
-                        return task;
-                    } else {
-                        console.error('Row is missing required dimensions:', row);
-                        return null;
                     }
+                    return null;
                 }).filter(Boolean);
-        
+    
                 console.log('Processed tasks:', this.tasks);
-                if (this.tasks.length === 0) {
-                    console.error('No valid tasks were created from the data');
-                }
                 this._renderChart();
             } else {
                 console.error('Invalid data binding or no data available');
             }
-        }
-        
-        // Helper method to parse date strings
-        _parseDate(dateString) {
-            // Assuming the date format is YYYY-MM-DD
-            const parts = dateString.split('-');
-            if (parts.length === 3) {
-                return new Date(parts[0], parts[1] - 1, parts[2]); // Month is 0-indexed
-            }
-            return null;
         }
     
         _renderChart() {
