@@ -153,5 +153,5 @@
         }
     }
 
-    customElements.define('com-sap-sample-revenueimpact-builder', RevenueImpactBuilderPanel);
+    customElements.define('revenue-builder', RevenueImpactBuilderPanel);
 })();
