@@ -19,6 +19,7 @@
     class RevenueImpactWidget extends HTMLElement {
         constructor() {
             super();
+            console.log('RevenueImpactWidget constructor called');
             this._shadowRoot = this.attachShadow({mode: 'open'});
             this._shadowRoot.appendChild(template.content.cloneNode(true));
             this._props = {
@@ -32,11 +33,15 @@
             // Load Chart.js
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-            script.onload = () => this._initializeChart();
+            script.onload = () => {
+                console.log('Chart.js loaded');
+                this._initializeChart();
+            };
             this._shadowRoot.appendChild(script);
         }
 
         _initializeChart() {
+            console.log('Initializing chart');
             const ctx = this._shadowRoot.getElementById('chart').getContext('2d');
             this._chart = new Chart(ctx, {
                 type: 'bar',
@@ -74,7 +79,11 @@
         }
 
         _updateChart() {
-            if (!this._chart) return;
+            console.log('Updating chart with current properties:', this._props);
+            if (!this._chart) {
+                console.log('Chart not initialized yet');
+                return;
+            }
 
             const baseProfit = this._props.baseRevenue - this._props.baseCosts;
             const profit1 = this._props.baseRevenue * (1 + this._props.growthRate1 / 100) - this._props.baseCosts;
@@ -83,13 +92,16 @@
 
             this._chart.data.datasets[0].data = [baseProfit, profit1, profit2, profit3];
             this._chart.update();
+            console.log('Chart updated with new data:', [baseProfit, profit1, profit2, profit3]);
         }
 
         onCustomWidgetBeforeUpdate(changedProperties) {
+            console.log('onCustomWidgetBeforeUpdate called with:', changedProperties);
             this._props = { ...this._props, ...changedProperties };
         }
 
         onCustomWidgetAfterUpdate(changedProperties) {
+            console.log('onCustomWidgetAfterUpdate called with:', changedProperties);
             this._updateChart();
         }
 
@@ -98,6 +110,7 @@
             return this._props.baseRevenue;
         }
         set baseRevenue(value) {
+            console.log('baseRevenue setter called with:', value);
             this._props.baseRevenue = value;
             this._updateChart();
         }
@@ -107,6 +120,7 @@
             return this._props.baseCosts;
         }
         set baseCosts(value) {
+            console.log('baseCosts setter called with:', value);
             this._props.baseCosts = value;
             this._updateChart();
         }
@@ -116,6 +130,7 @@
             return this._props.growthRate1;
         }
         set growthRate1(value) {
+            console.log('growthRate1 setter called with:', value);
             this._props.growthRate1 = value;
             this._updateChart();
         }
@@ -125,6 +140,7 @@
             return this._props.growthRate2;
         }
         set growthRate2(value) {
+            console.log('growthRate2 setter called with:', value);
             this._props.growthRate2 = value;
             this._updateChart();
         }
@@ -134,10 +150,11 @@
             return this._props.growthRate3;
         }
         set growthRate3(value) {
+            console.log('growthRate3 setter called with:', value);
             this._props.growthRate3 = value;
             this._updateChart();
         }
     }
 
-    customElements.define('revenue-widget', RevenueImpactWidget);
+    customElements.define('com-sap-sample-revenueimpact', RevenueImpactWidget);
 })();
