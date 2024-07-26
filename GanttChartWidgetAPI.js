@@ -255,12 +255,12 @@ input:checked + .slider:before {
             if (dataBinding && dataBinding.data) {
                 this.tasks = dataBinding.data.map((row, index) => {
                     console.log('Processing row:', row);
-                    if (row.dimensions_1 && row.dimensions_2 && row.dimensions_3 && row.dimensions_4) {
-                        const startDate = new Date(row.dimensions_2.id);
-                        const endDate = new Date(row.dimensions_1.id);
+                    if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
+                        const startDate = new Date(row.dimensions_1.label);
+                        const endDate = new Date(row.dimensions_0.label);
         
                         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                            console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
+                            console.error('Invalid date:', row.dimensions_1.label, row.dimensions_0.label);
                             return null;
                         }
                         if (startDate > endDate) {
@@ -269,12 +269,12 @@ input:checked + .slider:before {
                         }
         
                         return {
-                            id: row.dimensions_3.id,
-                            text: row.dimensions_4.id,
+                            id: row.dimensions_2.id,
+                            text: row.dimensions_2.label,
                             start_date: startDate,
                             end_date: endDate,
-                            progress: 0, // Assuming progress is 0 since `measures_0` is removed
-                            open: row.dimensions_4 && row.dimensions_4.id === 'X'
+                            progress: row.measures_0 ? row.measures_0.raw : 0,
+                            open: row.dimensions_4 ? row.dimensions_4.label === 'Yes' : true
                         };
                     }
                     return null;
@@ -286,6 +286,7 @@ input:checked + .slider:before {
                 console.error('Invalid data binding or no data available');
             }
         }
+
 
     
         _renderChart() {
