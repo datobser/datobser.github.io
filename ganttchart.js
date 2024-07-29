@@ -132,50 +132,31 @@
             };
             this._shadowRoot.appendChild(frappeGanttScript);
 
-            // Add event listeners
-            const toggleSwitch = this._shadowRoot.getElementById('toggle-form-switch');
-            const formStatus = this._shadowRoot.getElementById('form-status');
-            const formContainer = this._shadowRoot.querySelector('.form-container');
+            //outsourced
+            this._initializeElements();
+            this._addEventListeners();
 
-            if (toggleSwitch) {
-                toggleSwitch.addEventListener('change', () => {
-                    if (toggleSwitch.checked) {
-                        formContainer.classList.add('show');
-                        formStatus.textContent = 'Hide Form';
-                    } else {
-                        formContainer.classList.remove('show');
-                        formStatus.textContent = 'Show Form';
-                    }
-                });
-            } else {
-                console.error('Toggle switch not found');
-            }
+        }
 
-            const addTaskBtn = this._shadowRoot.getElementById('add-task-btn');
-            if (addTaskBtn) {
-                addTaskBtn.addEventListener('click', () => {
-                    this._addTask();
-                });
-            } else {
-                console.error('Add Task button not found');
-            }
-
-            const downloadBtn = this._shadowRoot.getElementById('download-btn');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', () => {
-                    this._downloadCSV();
-                });
-            } else {
-                console.error('Download button not found');
-            }
-
-            // listeners for edit
+        _initializeElements() {
+        this._toggleSwitch = this._shadowRoot.getElementById('toggle-form-switch');
+        this._formStatus = this._shadowRoot.getElementById('form-status');
+        this._formContainer = this._shadowRoot.querySelector('.form-container');
+        this._addTaskBtn = this._shadowRoot.getElementById('add-task-btn');
+        this._downloadBtn = this._shadowRoot.getElementById('download-btn');
+        this._updateTaskBtn = this._shadowRoot.getElementById('update-task-btn');
+        this._deleteTaskBtn = this._shadowRoot.getElementById('delete-task-btn');
+        this._cancelEditBtn = this._shadowRoot.getElementById('cancel-edit-btn');
+        this._taskEditContainer = this._shadowRoot.getElementById('task-edit-container');
+        }
+    
+        _addEventListeners() {
+            this._toggleSwitch.addEventListener('change', () => this._toggleForm());
             this._addTaskBtn.addEventListener('click', () => this._addTask());
             this._downloadBtn.addEventListener('click', () => this._downloadCSV());
             this._updateTaskBtn.addEventListener('click', () => this._updateTask());
             this._deleteTaskBtn.addEventListener('click', () => this._deleteTask());
             this._cancelEditBtn.addEventListener('click', () => this._cancelEdit());
-
         }
 
         // Gantt chart methods
@@ -265,12 +246,12 @@
                 console.log('Rendering chart with tasks:', this.tasks);
                 const chartElement = this._shadowRoot.getElementById('chart');
                 chartElement.innerHTML = ''; // Clear previous chart
-                new Gantt(chartElement, this.tasks, {
+                this.ganttChart = new Gantt(chartElement, this.tasks, {
                     view_modes: ['Quarter Day', 'Half Day', 'Day', 'Week', 'Month'],
                     view_mode: 'Month',
                     date_format: 'YYYY-MM-DD',
                     popup_trigger: 'click',
-                    onClick: (task) => this._onTaskClick(task)
+                    on_click: (task) => this._onTaskClick(task)
                 });
                 console.log('Chart rendered');
             } else {
@@ -388,12 +369,11 @@
                     const updatedTask = {
                         id,
                         name,
-                        start: new Date(start).toISOString(),
-                        end: new Date(end).toISOString(),
+                        start,
+                        end,
                         progress: parseFloat(progress) || 0
                     };
         
-                    // Update the task in the list
                     const index = this.tasks.findIndex(task => task.id === this.currentEditingTask.id);
                     if (index !== -1) {
                         this.tasks[index] = updatedTask;
@@ -411,7 +391,6 @@
         
         _deleteTask() {
             if (this.currentEditingTask) {
-                // Remove the task from the list
                 this.tasks = this.tasks.filter(task => task.id !== this.currentEditingTask.id);
                 console.log('Task deleted:', this.currentEditingTask);
                 this._renderChart();
