@@ -108,13 +108,13 @@
 
         _parseDate(dateString) {
             // Überprüfen, ob das Format den Erwartungen entspricht
-            console.log(dateString);
+            console.log("_parseDate bekommt: " +dateString);
             const regex = /\[\w+\] & \[(\d{4}-\d{2}-\d{2})\]/;
             const match = regex.exec(dateString);
 
             if (match) {
                 const extractedDate = match[1];  // Extrahiertes Datum
-                console.log(extractedDate);      // Ausgabe: 2024-07-29
+                console.log("Das extrahierte Datum ist: " + extractedDate);  
                 return extractedDate;
             }
         }
