@@ -66,6 +66,16 @@
             .slider.round:before {
                 border-radius: 50%;
             }
+            <div class="task-edit-container" id="task-edit-container">
+                <input type="text" id="edit-task-id" placeholder="ID" readonly />
+                <input type="text" id="edit-task-name" placeholder="Name" />
+                <input type="date" id="edit-task-start" placeholder="Start Date" />
+                <input type="date" id="edit-task-end" placeholder="End Date" />
+                <input type="number" id="edit-task-progress" placeholder="Progress" />
+                <button id="update-task-btn">Update Task</button>
+                <button id="delete-task-btn">Delete Task</button>
+                <button id="cancel-edit-btn">Cancel</button>
+            </div>
         </style>
 
         <label class="switch">
@@ -146,6 +156,33 @@
                 });
             } else {
                 console.error('Download button not found');
+            }
+
+            const updateTaskBtn = this._shadowRoot.getElementById('update-task-btn');
+            if (updateTaskBtn) {
+                updateTaskBtn.addEventListener('click', () => {
+                    this._updateTask();
+                });
+            } else {
+                console.error('Update Task button not found');
+            }
+
+            const deleteTaskBtn = this._shadowRoot.getElementById('delete-task-btn');
+            if (deleteTaskBtn) {
+                deleteTaskBtn.addEventListener('click', () => {
+                    this._deleteTask();
+                });
+            } else {
+                console.error('Delete Task button not found');
+            }
+
+            const cancelEditBtn = this._shadowRoot.getElementById('cancel-edit-btn');
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', () => {
+                    this._cancelEdit();
+                });
+            } else {
+                console.error('Cancel Edit button not found');
             }
         
         }
@@ -284,6 +321,7 @@
             }
         }
 
+        // Addtask functionality
         _addTask() {
             const id = this._shadowRoot.getElementById('task-id').value.trim();
             const name = this._shadowRoot.getElementById('task-name').value.trim();
@@ -327,6 +365,73 @@
                 toggleButton.textContent = 'Hide Form';
             }
         }
+
+        // edit functionality
+        _onTaskClick(task) {
+            console.log('Task clicked:', task);
+            this.currentEditingTask = task;
+
+            // Populate the edit form with the task details
+            if (this.currentEditingTask) {
+                const editContainer = this._shadowRoot.getElementById('task-edit-container');
+                this._shadowRoot.getElementById('edit-task-id').value = this.currentEditingTask.id;
+                this._shadowRoot.getElementById('edit-task-name').value = this.currentEditingTask.name;
+                this._shadowRoot.getElementById('edit-task-start').value = new Date(this.currentEditingTask.start).toISOString().split('T')[0];
+                this._shadowRoot.getElementById('edit-task-end').value = new Date(this.currentEditingTask.end).toISOString().split('T')[0];
+                this._shadowRoot.getElementById('edit-task-progress').value = this.currentEditingTask.progress;
+                editContainer.classList.add('show');
+            }
+        }
+
+        _updateTask() {
+            if (this.currentEditingTask) {
+                const id = this._shadowRoot.getElementById('edit-task-id').value;
+                const name = this._shadowRoot.getElementById('edit-task-name').value;
+                const start = this._shadowRoot.getElementById('edit-task-start').value;
+                const end = this._shadowRoot.getElementById('edit-task-end').value;
+                const progress = this._shadowRoot.getElementById('edit-task-progress').value;
+
+                if (id && name && start && end) {
+                    const updatedTask = {
+                        id,
+                        name,
+                        start: new Date(start).toISOString(),
+                        end: new Date(end).toISOString(),
+                        progress: parseFloat(progress) || 0
+                    };
+
+                    // Update the task in the list
+                    const index = this.tasks.findIndex(task => task.id === this.currentEditingTask.id);
+                    if (index !== -1) {
+                        this.tasks[index] = updatedTask;
+                        console.log('Task updated:', updatedTask);
+                        this._renderChart();
+                        this._cancelEdit();
+                    } else {
+                        console.error('Task not found for update:', this.currentEditingTask);
+                    }
+                } else {
+                    console.error('Invalid task input for update:', { id, name, start, end, progress });
+                }
+            }
+        }
+
+        _deleteTask() {
+            if (this.currentEditingTask) {
+                // Remove the task from the list
+                this.tasks = this.tasks.filter(task => task.id !== this.currentEditingTask.id);
+                console.log('Task deleted:', this.currentEditingTask);
+                this._renderChart();
+                this._cancelEdit();
+            }
+        }
+        
+        _cancelEdit() {
+            const editContainer = this._shadowRoot.getElementById('task-edit-container');
+            editContainer.classList.remove('show');
+            this.currentEditingTask = null;
+        }
+
     }
 
     customElements.define('basic-gantt', GanttChartWidget);
