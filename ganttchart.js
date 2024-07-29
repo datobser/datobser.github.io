@@ -82,7 +82,7 @@
             <input type="checkbox" id="toggle-form-switch">
             <span class="slider round"></span>
         </label>
-        <span id="form-status">Show Form</span>
+        <span id="form-status">New Tasks</span>
         
         <div class="form-container">
             <input type="text" id="task-id" placeholder="ID" />
@@ -334,7 +334,6 @@
             const toggleButton = this._shadowRoot.getElementById('toggle-form-btn');
             if (formContainer.classList.contains('show')) {
                 formContainer.classList.remove('show');
-                toggleButton.textContent = 'Show Form';
             } else {
                 formContainer.classList.add('show');
                 toggleButton.textContent = 'Hide Form';
