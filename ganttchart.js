@@ -73,8 +73,8 @@
                 this.tasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
-                    const startDate = this._parseDate(row.dimensions_2.rawValue);
-                    const endDate = this._parseDate(row.dimensions_3.rawValue);
+                    const startDate = this._parseDate(row.dimensions_2);
+                    const endDate = this._parseDate(row.dimensions_3);
                     
                     if (!startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
