@@ -1,19 +1,29 @@
 (function() {
     let tmpl = document.createElement('template');
     tmpl.innerHTML = `
-        <style>
+         <style>
             :host {
                 display: block;
                 height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
             }
             #chart {
                 width: 100%;
                 height: 100%;
+                /* Optional: Add border or other styling to the chart */
+            }
+            #download-btn {
+                margin-top: 10px; /* Adjust spacing between chart and button */
+                padding: 8px 16px;
+                font-size: 16px;
+                cursor: pointer;
             }
         </style>
         <div id="chart"></div>
-        <button id="download-btn">Download CSV</button>
-        
+        <button id="download-btn">Download CSV</button>    
     `;
 
     class GanttChartWidget extends HTMLElement {
