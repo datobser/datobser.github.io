@@ -43,6 +43,7 @@
 
             // Add download button click event listener
             const downloadBtn = this._shadowRoot.getElementById('download-btn');
+            console.log('Download button:', downloadBtn); // Debugging line
             if (downloadBtn) {
                 downloadBtn.addEventListener('click', () => {
                     this._downloadCSV();
