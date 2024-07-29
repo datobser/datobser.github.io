@@ -108,8 +108,7 @@
 
         _parseDate(dateString) {
             // Überprüfen, ob das Format den Erwartungen entspricht
-            console.log("_parseDate bekommt: " +dateString);
-            const regex = /\[\w+\] & \[(\d{4}-\d{2}-\d{2})\]/;
+            const regex = /\.\&\[(\d{4}-\d{2}-\d{2})\]/;
     
             // Versuchen, das Datum aus dem String zu extrahieren
             const match = dateString.match(regex);
