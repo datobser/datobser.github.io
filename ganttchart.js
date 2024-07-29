@@ -108,7 +108,6 @@
 
         _parseDate(dateString) {
             // Überprüfen, ob das Format den Erwartungen entspricht
-            const match = dateString.match(/^\[.*\].\&\[(\d{4}-\d{2}-\d{2})\]$/);
             const match = dateString.match(/\[\w+\] & \[(\d{4}-\d{2}-\d{2})\]/);
 
             if (match) {
