@@ -66,16 +66,16 @@
             .slider.round:before {
                 border-radius: 50%;
             }
-            <div class="task-edit-container" id="task-edit-container">
-                <input type="text" id="edit-task-id" placeholder="ID" readonly />
-                <input type="text" id="edit-task-name" placeholder="Name" />
-                <input type="date" id="edit-task-start" placeholder="Start Date" />
-                <input type="date" id="edit-task-end" placeholder="End Date" />
-                <input type="number" id="edit-task-progress" placeholder="Progress" />
-                <button id="update-task-btn">Update Task</button>
-                <button id="delete-task-btn">Delete Task</button>
-                <button id="cancel-edit-btn">Cancel</button>
-            </div>
+            .task-edit-container {
+                display: none;
+                margin: 20px;
+                background: #f1f1f1;
+                padding: 10px;
+                border: 1px solid #ddd;
+            }
+            .task-edit-container.show {
+                display: block;
+            }
         </style>
 
         <label class="switch">
@@ -92,6 +92,17 @@
             <input type="number" id="task-progress" placeholder="Progress" />
             <button id="add-task-btn">Add Task</button>
         </div>
+        <div class="task-edit-container" id="task-edit-container">
+                <input type="text" id="edit-task-id" placeholder="ID" readonly />
+                <input type="text" id="edit-task-name" placeholder="Name" />
+                <input type="date" id="edit-task-start" placeholder="Start Date" />
+                <input type="date" id="edit-task-end" placeholder="End Date" />
+                <input type="number" id="edit-task-progress" placeholder="Progress" />
+                <button id="update-task-btn">Update Task</button>
+                <button id="delete-task-btn">Delete Task</button>
+                <button id="cancel-edit-btn">Cancel</button>
+        </div>
+        
         <button id="download-btn">Download CSV</button> 
         <div id="chart"></div>   
     `;
