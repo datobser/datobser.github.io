@@ -22,8 +22,8 @@
                 cursor: pointer;
             }
         </style>
-        <div id="chart"></div>
-        <button id="download-btn">Download CSV</button>    
+        <button id="download-btn">Download CSV</button> 
+        <div id="chart"></div>   
     `;
 
     class GanttChartWidget extends HTMLElement {
