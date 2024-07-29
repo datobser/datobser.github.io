@@ -16,6 +16,7 @@
             }
             #download-btn {
                 margin-top: 5px; 
+                margin-bottom: 5px;
                 padding: 8px 16px;
                 font-size: 16px;
                 cursor: pointer;
