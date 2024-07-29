@@ -169,33 +169,13 @@
                 console.error('Download button not found');
             }
 
-            const updateTaskBtn = this._shadowRoot.getElementById('update-task-btn');
-            if (updateTaskBtn) {
-                updateTaskBtn.addEventListener('click', () => {
-                    this._updateTask();
-                });
-            } else {
-                console.error('Update Task button not found');
-            }
+            // listeners for edit
+            this._addTaskBtn.addEventListener('click', () => this._addTask());
+            this._downloadBtn.addEventListener('click', () => this._downloadCSV());
+            this._updateTaskBtn.addEventListener('click', () => this._updateTask());
+            this._deleteTaskBtn.addEventListener('click', () => this._deleteTask());
+            this._cancelEditBtn.addEventListener('click', () => this._cancelEdit());
 
-            const deleteTaskBtn = this._shadowRoot.getElementById('delete-task-btn');
-            if (deleteTaskBtn) {
-                deleteTaskBtn.addEventListener('click', () => {
-                    this._deleteTask();
-                });
-            } else {
-                console.error('Delete Task button not found');
-            }
-
-            const cancelEditBtn = this._shadowRoot.getElementById('cancel-edit-btn');
-            if (cancelEditBtn) {
-                cancelEditBtn.addEventListener('click', () => {
-                    this._cancelEdit();
-                });
-            } else {
-                console.error('Cancel Edit button not found');
-            }
-        
         }
 
         // Gantt chart methods
@@ -289,7 +269,8 @@
                     view_modes: ['Quarter Day', 'Half Day', 'Day', 'Week', 'Month'],
                     view_mode: 'Month',
                     date_format: 'YYYY-MM-DD',
-                    popup_trigger: 'click'
+                    popup_trigger: 'click',
+                    onClick: (task) => this._onTaskClick(task)
                 });
                 console.log('Chart rendered');
             } else {
@@ -381,7 +362,7 @@
         _onTaskClick(task) {
             console.log('Task clicked:', task);
             this.currentEditingTask = task;
-
+        
             // Populate the edit form with the task details
             if (this.currentEditingTask) {
                 const editContainer = this._shadowRoot.getElementById('task-edit-container');
@@ -390,9 +371,10 @@
                 this._shadowRoot.getElementById('edit-task-start').value = new Date(this.currentEditingTask.start).toISOString().split('T')[0];
                 this._shadowRoot.getElementById('edit-task-end').value = new Date(this.currentEditingTask.end).toISOString().split('T')[0];
                 this._shadowRoot.getElementById('edit-task-progress').value = this.currentEditingTask.progress;
-                editContainer.classList.add('show');
+                editContainer.classList.add('show'); // Show the edit form
             }
         }
+
 
         _updateTask() {
             if (this.currentEditingTask) {
@@ -401,7 +383,7 @@
                 const start = this._shadowRoot.getElementById('edit-task-start').value;
                 const end = this._shadowRoot.getElementById('edit-task-end').value;
                 const progress = this._shadowRoot.getElementById('edit-task-progress').value;
-
+        
                 if (id && name && start && end) {
                     const updatedTask = {
                         id,
@@ -410,7 +392,7 @@
                         end: new Date(end).toISOString(),
                         progress: parseFloat(progress) || 0
                     };
-
+        
                     // Update the task in the list
                     const index = this.tasks.findIndex(task => task.id === this.currentEditingTask.id);
                     if (index !== -1) {
@@ -426,7 +408,7 @@
                 }
             }
         }
-
+        
         _deleteTask() {
             if (this.currentEditingTask) {
                 // Remove the task from the list
@@ -439,7 +421,7 @@
         
         _cancelEdit() {
             const editContainer = this._shadowRoot.getElementById('task-edit-container');
-            editContainer.classList.remove('show');
+            editContainer.classList.remove('show'); // Hide the edit form
             this.currentEditingTask = null;
         }
 
