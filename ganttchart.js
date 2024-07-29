@@ -202,7 +202,7 @@
                     
                     // Create the task object
                     const task = {
-                        id: row.dimensions_0.id,
+                        id: row.dimensions_0.id || `task-${index}`,
                         name: row.dimensions_1.label,
                         start: startDate,
                         end: endDate,
@@ -409,18 +409,36 @@
         _handleChartClick(event) {
             console.log('Chart clicked:', event);
             
-            // Find the closest task element
-            const taskElement = event.target.closest('.bar');
+            // Log the clicked element and its parents for debugging
+            let element = event.target;
+            let i = 0;
+            while (element && i < 5) {
+                console.log(`${i}: `, element);
+                element = element.parentElement;
+                i++;
+            }
+        
+            // Try to find the task element
+            const taskElement = event.target.closest('.bar-wrapper');
             if (taskElement) {
+                console.log('Task element found:', taskElement);
                 const taskId = taskElement.getAttribute('data-id');
                 console.log('Clicked task ID:', taskId);
                 
-                // Find the corresponding task in our tasks array
-                const clickedTask = this.tasks.find(task => task.id === taskId);
-                if (clickedTask) {
-                    console.log('Clicked task:', clickedTask);
-                    this._onTaskClick(clickedTask);
+                if (taskId) {
+                    // Find the corresponding task in our tasks array
+                    const clickedTask = this.tasks.find(task => task.id == taskId);
+                    if (clickedTask) {
+                        console.log('Clicked task:', clickedTask);
+                        this._onTaskClick(clickedTask);
+                    } else {
+                        console.log('Task not found in tasks array');
+                    }
+                } else {
+                    console.log('No task ID found on element');
                 }
+            } else {
+                console.log('No task element found');
             }
         }
     }
