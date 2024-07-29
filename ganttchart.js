@@ -72,20 +72,33 @@
                 console.log('Raw data:', dataBinding.data);
                 this.tasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
-                    return {
+                    
+                    const startDate = this._parseDate(row.dimensions_2.rawValue);
+                    const endDate = this._parseDate(row.dimensions_3.rawValue);
+                    
+                    if (!startDate || !endDate) {
+                        console.error(`Invalid dates for row ${index}:`, row);
+                        return null;
+                    }
+                    
+                    // Create the task object
+                    const task = {
                         id: row.dimensions_0.id,
                         name: row.dimensions_1.label,
-                        start: this._parseDate(row.dimensions_2.rawValue),
-                        end: this._parseDate(row.dimensions_3.rawValue),
+                        start: startDate,
+                        end: endDate,
                         progress: row.measures_0 ? row.measures_0.raw : 0
                     };
-                }).filter(task => {
+                    
+                    // Validate task properties
                     const isValid = task.id && task.name && task.start && task.end;
                     if (!isValid) {
-                        console.log('Invalid task filtered out:', task);
+                        console.error('Invalid task filtered out:', task);
                     }
-                    return isValid;
-                });
+                    
+                    return isValid ? task : null;
+                }).filter(task => task !== null); // Remove null entries
+
                 console.log('Processed tasks:', this.tasks);
                 this._renderChart();
             } else {
