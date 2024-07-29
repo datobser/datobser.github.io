@@ -254,9 +254,11 @@
                     on_click: (task) => this._onTaskClick(task)
                 });
                 console.log('Chart rendered');
+                chartElement.addEventListener('click', (event) => this._handleChartClick(event));
             } else {
                 console.log('Cannot render chart. Frappe Gantt ready:', this._frappeGanttReady, 'Number of tasks:', this.tasks.length);
             }
+            
         }
 
         _getCurrentTasks() {
@@ -404,6 +406,23 @@
             this.currentEditingTask = null;
         }
 
+        _handleChartClick(event) {
+            console.log('Chart clicked:', event);
+            
+            // Find the closest task element
+            const taskElement = event.target.closest('.bar');
+            if (taskElement) {
+                const taskId = taskElement.getAttribute('data-id');
+                console.log('Clicked task ID:', taskId);
+                
+                // Find the corresponding task in our tasks array
+                const clickedTask = this.tasks.find(task => task.id === taskId);
+                if (clickedTask) {
+                    console.log('Clicked task:', clickedTask);
+                    this._onTaskClick(clickedTask);
+                }
+            }
+        }
     }
 
     customElements.define('basic-gantt', GanttChartWidget);
