@@ -196,29 +196,17 @@ input:checked + .slider:before {
         }
     
         taskToCsv(task) {
-            // Convert the task data to the CSV format
             const version = 'public.Actual';
-            const date = '000000';
+            const date = '202401'; // You might want to make this dynamic
+            const endDate = new Date(task.start_date.getTime() + task.duration * 24 * 60 * 60 * 1000).toISOString().slice(0, 10).replace(/-/g, '');
+            const startDate = task.start_date.toISOString().slice(0, 10).replace(/-/g, '');
             const id = task.id;
             const label = task.text;
-            const startDate = task.start_date.toISOString().slice(0, 10);  // Convert the date to the format YYYYMMDD
-            const endDate = task.end_date.toISOString().slice(0, 10);  // Convert the date to the format YYYYMMDD
-            const open = 'X';
-            const progress = '0';
-    
-            console.log("New task was added: ", task);
-    
-            // Create the CSV string
-            const csvString = `${version},${date},${id},${label},${startDate},${endDate},${open},${progress}`;
-    
-            // Log the CSV string
-            console.log('CSV string:', csvString);
-            const csvData_raw = 'Version,Date,id,label,startDate,endDate,open,progress\n' + csvString;
-    
-            // Return the CSV string
-            //console.log('Data_raw:', csvData_raw);
-    
-            return csvData_raw;
+            const open = task.open ? 'X' : '';
+            const progress = task.progress;
+        
+            const csvString = `${version},${date},${endDate},${startDate},${id},${label},${open},${progress}`;
+            return 'Version,Date,endDate,startDate,id,label,open,progress\n' + csvString;
         }
     
         // GanttChart methods
@@ -250,35 +238,26 @@ input:checked + .slider:before {
         }
     
         _updateData(dataBinding) {
-            console.log('_updateData called', dataBinding);
             if (dataBinding && dataBinding.data) {
                 this.tasks = dataBinding.data.map((row, index) => {
-                    console.log('Processing row:', row);
-                    if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3) {
-                        const startDate = new Date(row.dimensions_2.id);
-                        const endDate = new Date(row.dimensions_3.id);
-    
-                        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                            console.error('Invalid date:', row.dimensions_2.id, row.dimensions_3.id);
-                            return null;
-                        }
-                        if (startDate > endDate) {
-                            console.error('Start date is after end date:', startDate, endDate);
-                            return null;
-                        }
-    
+                    if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3 && row.dimensions_4 && row.measures_0) {
+                        const startDate = new Date(row.dimensions_2.id); // startDate
+                        const endDate = new Date(row.dimensions_1.id);   // endDate
+                        const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        
                         return {
-                            id: row.dimensions_0.id,
-                            text: row.dimensions_1.id,
+                            id: row.dimensions_3.id,       // id
+                            text: row.dimensions_4.id,     // label
                             start_date: startDate,
-                            end_date: endDate,
-                            progress: row.measures_0 ? row.measures_0.raw : 0,
-                            open: row.dimensions_4 ? row.dimensions_4.id === 'X' : true
+                            duration: duration,
+                            progress: row.measures_0.raw,
+                            open: row.dimensions_5.id === 'X', // open
+                            parent: 0 // Assuming all tasks are top-level for now
                         };
                     }
                     return null;
                 }).filter(Boolean);
-    
+        
                 console.log('Processed tasks:', this.tasks);
                 this._renderChart();
             } else {
