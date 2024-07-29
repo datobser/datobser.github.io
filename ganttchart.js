@@ -13,10 +13,9 @@
             #chart {
                 width: 100%;
                 height: 100%;
-                /* Optional: Add border or other styling to the chart */
             }
             #download-btn {
-                margin-top: 10px; /* Adjust spacing between chart and button */
+                margin-top: 5px; 
                 padding: 8px 16px;
                 font-size: 16px;
                 cursor: pointer;
