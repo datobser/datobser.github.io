@@ -107,19 +107,17 @@
         }
 
         _parseDate(dateString) {
-            console.log('_parseDate called with:', dateString);
-            // Assuming dateString is in format 'YYYYMMDD'
-            if (dateString && dateString.length === 8) {
-                const year = dateString.substring(0, 4);
-                const month = dateString.substring(4, 6);
-                const day = dateString.substring(6, 8);
-                const parsedDate = new Date(`${year}-${month}-${day}`);
-                console.log('Parsed date:', parsedDate);
-                return parsedDate;
+            // Überprüfen, ob das Format den Erwartungen entspricht
+            const match = dateString.match(/^\[.*\].\&\[(\d{4}-\d{2}-\d{2})\]$/);
+            if (match) {
+                // Extrahiere das Datum und erstelle ein Date-Objekt
+                return new Date(match[1]);
+            } else {
+                console.error('Invalid date format:', dateString);
+                return null;
             }
-            console.log('Invalid date string');
-            return null;
         }
+
 
         _renderChart() {
             console.log('_renderChart called');
