@@ -231,8 +231,31 @@ input:checked + .slider:before {
             if ("myDataBinding" in changedProperties) {
                 const dataBinding = changedProperties.myDataBinding;
                 console.log('Data binding changed:', dataBinding);
+                
                 if (dataBinding && dataBinding.state === 'success') {
+                    console.log('Data binding successful. Detailed data:');
+                    if (dataBinding.data && dataBinding.data.length > 0) {
+                        console.log('First row of data:', JSON.stringify(dataBinding.data[0], null, 2));
+                        console.log('Total number of rows:', dataBinding.data.length);
+                        
+                        // Log the structure of the first row
+                        console.log('Data structure:');
+                        for (let key in dataBinding.data[0]) {
+                            console.log(`${key}:`, typeof dataBinding.data[0][key], dataBinding.data[0][key]);
+                        }
+                        
+                        // Log a few sample rows (e.g., first 3)
+                        console.log('Sample rows:');
+                        dataBinding.data.slice(0, 3).forEach((row, index) => {
+                            console.log(`Row ${index + 1}:`, JSON.stringify(row, null, 2));
+                        });
+                    } else {
+                        console.log('No data available in the binding');
+                    }
+                    
                     this._updateData(dataBinding);
+                } else {
+                    console.log('Data binding not successful or incomplete', dataBinding.state);
                 }
             }
         }
