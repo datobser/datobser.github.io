@@ -12,6 +12,8 @@
             }
         </style>
         <div id="chart"></div>
+        <button id="download-btn">Download CSV</button>
+        
     `;
 
     class GanttChartWidget extends HTMLElement {
@@ -38,6 +40,11 @@
                 this._renderChart();
             };
             this._shadowRoot.appendChild(frappeGanttScript);
+
+            // Add download button click event listener
+            this._shadowRoot.getElementById('download-btn').addEventListener('click', () => {
+                this._downloadCSV();
+            });
         }
 
         // Gantt chart methods
@@ -136,6 +143,41 @@
                 console.log('Chart rendered');
             } else {
                 console.log('Cannot render chart. Frappe Gantt ready:', this._frappeGanttReady, 'Number of tasks:', this.tasks.length);
+            }
+        }
+
+        _getCurrentTasks() {
+            return this.tasks; // Returns the current tasks array
+        }
+
+        _convertTasksToCSV(tasks) {
+            const header = ['ID', 'Name', 'Start', 'End', 'Progress'];
+            const rows = tasks.map(task => [
+                task.id,
+                task.name,
+                task.start,
+                task.end,
+                task.progress
+            ]);
+
+            // Convert header and rows into CSV string
+            const csvContent = [header.join(','), ...rows.map(row => row.join(','))].join('\n');
+            return csvContent;
+        }
+        
+        _downloadCSV() {
+            const currentTasks = this._getCurrentTasks();
+            const csvContent = this._convertTasksToCSV(currentTasks);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "gantt_tasks.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         }
     }
