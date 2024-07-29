@@ -66,13 +66,24 @@
                     return {
                         id: row.dimensions_0.id,
                         name: row.dimensions_1.label,
-                        start: new Date(row.dimensions_2.id),
-                        end: new Date(row.dimensions_3.id),
+                        start: this._parseDate(row.dimensions_2.rawValue),
+                        end: this._parseDate(row.dimensions_3.rawValue),
                         progress: row.measures_0 ? row.measures_0.raw : 0
                     };
                 }).filter(task => task.id && task.name && task.start && task.end);
                 this._renderChart();
             }
+        }
+
+        _parseDate(dateString) {
+            // Assuming dateString is in format 'YYYYMMDD'
+            if (dateString && dateString.length === 8) {
+                const year = dateString.substring(0, 4);
+                const month = dateString.substring(4, 6);
+                const day = dateString.substring(6, 8);
+                return new Date(`${year}-${month}-${day}`);
+            }
+            return null;
         }
 
         _renderChart() {
