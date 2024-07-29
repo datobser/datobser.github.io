@@ -241,16 +241,26 @@ input:checked + .slider:before {
             if (dataBinding && dataBinding.data) {
                 this.tasks = dataBinding.data.map((row, index) => {
                     if (row.dimensions_0 && row.dimensions_1 && row.dimensions_2 && row.dimensions_3 && row.dimensions_4 && row.measures_0) {
-                        const startDate = new Date(row.dimensions_2.id); // startDate
-                        const endDate = new Date(row.dimensions_1.id);   // endDate
+                        // Parse dates from string to Date objects
+                        const startDate = this._parseDate(row.dimensions_2.id); // startDate
+                        const endDate = this._parseDate(row.dimensions_1.id);   // endDate
+                        
+                        // Ensure both dates are valid
+                        if (!startDate || !endDate || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                            console.error('Invalid date for task:', row);
+                            return null;
+                        }
+        
+                        // Calculate duration in days
                         const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
         
                         return {
                             id: row.dimensions_3.id,       // id
                             text: row.dimensions_4.id,     // label
                             start_date: startDate,
+                            end_date: endDate,  // Include end_date
                             duration: duration,
-                            progress: row.measures_0.raw,
+                            progress: parseFloat(row.measures_0.raw) || 0,
                             open: row.dimensions_5.id === 'X', // open
                             parent: 0 // Assuming all tasks are top-level for now
                         };
@@ -264,6 +274,16 @@ input:checked + .slider:before {
                 console.error('Invalid data binding or no data available');
             }
         }
+
+// Helper method to parse date strings
+_parseDate(dateString) {
+    if (!dateString) return null;
+    // Assuming dateString is in format 'YYYYMMDD'
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    return new Date(year, month - 1, day);  // month is 0-indexed in JavaScript Date
+}
     
         _renderChart() {
             console.log('_renderChart called');
