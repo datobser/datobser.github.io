@@ -5,24 +5,75 @@
             :host {
                 display: block;
                 height: 100%;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
             }
             #chart {
                 width: 100%;
                 height: 100%;
             }
-            #download-btn {
-                margin-top: 5px; 
-                margin-bottom: 5px;
-                padding: 8px 16px;
-                font-size: 16px;
+            .form-container {
+                margin: 20px;
+                display: none; /* Initially hidden */
+            }
+            .form-container.show {
+                display: block; /* Shown when 'show' class is added */
+            }
+            input, button {
+                margin: 5px;
+            }
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 60px;
+                height: 34px;
+            }
+            .switch input { 
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .slider {
+                position: absolute;
                 cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ca2222;
+                transition: .4s;
+            }
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+            }
+            input:checked + .slider {
+                background-color: #2ab934;
+            }
+            input:focus + .slider {
+                box-shadow: 0 0 1px #2196F3;
+            }
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+            .slider.round {
+                border-radius: 34px;
+            }
+            .slider.round:before {
+                border-radius: 50%;
             }
         </style>
-        <button id="toggle-form-btn">Add Tasks</button>
+
+        <label class="switch">
+            <input type="checkbox" id="toggle-form-switch">
+            <span class="slider round"></span>
+        </label>
+        <span id="form-status">Show Form</span>
+        
         <div class="form-container">
             <input type="text" id="task-id" placeholder="ID" />
             <input type="text" id="task-name" placeholder="Name" />
@@ -30,7 +81,6 @@
             <input type="date" id="task-end" placeholder="End Date" />
             <input type="number" id="task-progress" placeholder="Progress" />
             <button id="add-task-btn">Add Task</button>
-            <button id="download-btn">Download CSV</button>
         </div>
         <button id="download-btn">Download CSV</button> 
         <div id="chart"></div>   
@@ -61,25 +111,23 @@
             };
             this._shadowRoot.appendChild(frappeGanttScript);
 
-            // Add download button click event listener
-            const downloadBtn = this._shadowRoot.getElementById('download-btn');
-            console.log('Download button:', downloadBtn); // Debugging line
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', () => {
-                    this._downloadCSV();
-                });
-            } else {
-                console.error('Download button not found');
-            }
+            // Add event listeners
+            const toggleSwitch = this._shadowRoot.getElementById('toggle-form-switch');
+            const formStatus = this._shadowRoot.getElementById('form-status');
+            const formContainer = this._shadowRoot.querySelector('.form-container');
 
-            // Add event listeners for task adding
-            const toggleFormBtn = this._shadowRoot.getElementById('toggle-form-btn');
-            if (toggleFormBtn) {
-                toggleFormBtn.addEventListener('click', () => {
-                    this._toggleForm();
+            if (toggleSwitch) {
+                toggleSwitch.addEventListener('change', () => {
+                    if (toggleSwitch.checked) {
+                        formContainer.classList.add('show');
+                        formStatus.textContent = 'Hide Form';
+                    } else {
+                        formContainer.classList.remove('show');
+                        formStatus.textContent = 'Show Form';
+                    }
                 });
             } else {
-                console.error('Toggle Form button not found');
+                console.error('Toggle switch not found');
             }
 
             const addTaskBtn = this._shadowRoot.getElementById('add-task-btn');
@@ -90,6 +138,16 @@
             } else {
                 console.error('Add Task button not found');
             }
+
+            const downloadBtn = this._shadowRoot.getElementById('download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    this._downloadCSV();
+                });
+            } else {
+                console.error('Download button not found');
+            }
+        
         }
 
         // Gantt chart methods
