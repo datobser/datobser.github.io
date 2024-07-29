@@ -336,7 +336,6 @@
                 formContainer.classList.remove('show');
             } else {
                 formContainer.classList.add('show');
-                toggleButton.textContent = 'Hide Form';
             }
         }
 
