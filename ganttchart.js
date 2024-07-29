@@ -22,6 +22,16 @@
                 cursor: pointer;
             }
         </style>
+        <button id="toggle-form-btn">Add Tasks</button>
+        <div class="form-container">
+            <input type="text" id="task-id" placeholder="ID" />
+            <input type="text" id="task-name" placeholder="Name" />
+            <input type="date" id="task-start" placeholder="Start Date" />
+            <input type="date" id="task-end" placeholder="End Date" />
+            <input type="number" id="task-progress" placeholder="Progress" />
+            <button id="add-task-btn">Add Task</button>
+            <button id="download-btn">Download CSV</button>
+        </div>
         <button id="download-btn">Download CSV</button> 
         <div id="chart"></div>   
     `;
@@ -60,6 +70,25 @@
                 });
             } else {
                 console.error('Download button not found');
+            }
+
+            // Add event listeners for task adding
+            const toggleFormBtn = this._shadowRoot.getElementById('toggle-form-btn');
+            if (toggleFormBtn) {
+                toggleFormBtn.addEventListener('click', () => {
+                    this._toggleForm();
+                });
+            } else {
+                console.error('Toggle Form button not found');
+            }
+
+            const addTaskBtn = this._shadowRoot.getElementById('add-task-btn');
+            if (addTaskBtn) {
+                addTaskBtn.addEventListener('click', () => {
+                    this._addTask();
+                });
+            } else {
+                console.error('Add Task button not found');
             }
         }
 
@@ -194,6 +223,50 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+            }
+        }
+
+        _addTask() {
+            const id = this._shadowRoot.getElementById('task-id').value.trim();
+            const name = this._shadowRoot.getElementById('task-name').value.trim();
+            const start = this._shadowRoot.getElementById('task-start').value;
+            const end = this._shadowRoot.getElementById('task-end').value;
+            const progress = parseFloat(this._shadowRoot.getElementById('task-progress').value) || 0;
+
+            if (id && name && start && end) {
+                const task = {
+                    id,
+                    name,
+                    start,
+                    end,
+                    progress
+                };
+
+                this.tasks.push(task);
+                this._renderChart();
+                this._clearForm();
+            } else {
+                console.error('Invalid task input');
+            }
+        }
+
+        _clearForm() {
+            this._shadowRoot.getElementById('task-id').value = '';
+            this._shadowRoot.getElementById('task-name').value = '';
+            this._shadowRoot.getElementById('task-start').value = '';
+            this._shadowRoot.getElementById('task-end').value = '';
+            this._shadowRoot.getElementById('task-progress').value = '';
+        }
+
+        _toggleForm() {
+            const formContainer = this._shadowRoot.querySelector('.form-container');
+            const toggleButton = this._shadowRoot.getElementById('toggle-form-btn');
+            if (formContainer.classList.contains('show')) {
+                formContainer.classList.remove('show');
+                toggleButton.textContent = 'Show Form';
+            } else {
+                formContainer.classList.add('show');
+                toggleButton.textContent = 'Hide Form';
             }
         }
     }
