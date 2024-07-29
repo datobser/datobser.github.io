@@ -42,9 +42,14 @@
             this._shadowRoot.appendChild(frappeGanttScript);
 
             // Add download button click event listener
-            this._shadowRoot.getElementById('download-btn').addEventListener('click', () => {
-                this._downloadCSV();
-            });
+            const downloadBtn = this._shadowRoot.getElementById('download-btn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    this._downloadCSV();
+                });
+            } else {
+                console.error('Download button not found');
+            }
         }
 
         // Gantt chart methods
