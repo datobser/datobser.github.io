@@ -59,6 +59,7 @@
       this._root.appendChild(openButton);
 
       if (this._props.isDialogOpen) {
+        console.log('Creating dialog elements');
         const dialog = document.createElement('div');
         dialog.className = 'dialog';
 
