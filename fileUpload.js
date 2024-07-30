@@ -183,6 +183,7 @@
     }
 
     setClientCredentials(clientId, clientSecret) {
+      console.log('Client credentials set');
       this._clientId = clientId;
       this._clientSecret = clientSecret;
     }
