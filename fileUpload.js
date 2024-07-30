@@ -1,3 +1,4 @@
+
 (function () {
   const template = document.createElement('template');
   template.innerHTML = `
@@ -34,7 +35,7 @@
       this._shadowRoot.appendChild(template.content.cloneNode(true));
       this._root = this._shadowRoot.getElementById('root');
       this._props = {
-        modelId: '',
+        modelId: 'C618580BEACC784739AA156935011E3',
         importType: '',
         mappings: {},
         defaultValues: {},
@@ -217,7 +218,7 @@
         this.showMessage('Please upload a file first');
         return;
       }
-      setModel('C618580BEACC784739AA156935011E3');
+
       if (!this._props.modelId) {
         console.error('No model ID has been set');
         this.showMessage('Model ID is not set');
