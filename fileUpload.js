@@ -35,7 +35,7 @@
       this._shadowRoot.appendChild(template.content.cloneNode(true));
       this._root = this._shadowRoot.getElementById('root');
       this._props = {
-        modelId: 'C618580BEACC784739AA156935011E3',
+        modelId: 'Coocob05ulj04oih3r0j6m9ga60',
         importType: '',
         mappings: {},
         defaultValues: {},
