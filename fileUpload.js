@@ -349,8 +349,8 @@
       const response = await fetch(url, {
         ...options,
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
+          'x-sap-sac-custom-auth': 'true',
           ...options.headers,
         },
       });
