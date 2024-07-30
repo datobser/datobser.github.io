@@ -92,6 +92,7 @@
         dialog.appendChild(fileInput);
         dialog.appendChild(importButton);
         dialog.appendChild(closeButton);
+        dialog.appendChild(submitButton);
 
         this._root.appendChild(backdrop);
         this._root.appendChild(dialog);
