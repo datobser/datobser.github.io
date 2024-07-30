@@ -333,7 +333,7 @@
     static instance = null;
 
     constructor(clientId, clientSecret) {
-      this.baseUrl = 'https://a2pp.authentication.eu10.hana.ondemand.com/api/v1/';
+      this.baseUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/api/v1/';
       this.oauthHandler = new OAuthHandler(clientId, clientSecret);
     }
 
@@ -423,8 +423,8 @@
 
   class OAuthHandler {
     constructor(clientId, clientSecret) {
-      this.clientId = '';
-      this.clientSecret = '';
+      this.clientId = 'sb-2ce9dd0e-27e0-4897-87e3-2b765bc0276c!b498618|client!b3650';
+      this.clientSecret = '125e7bc7-5075-471b-adbe-df8793284e36$B2-jpvtouP9h0UUG-UtK9DyKDmGhS-M2tZ8NcBDw900=';
       this.tokenUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/oauth/token';
       this.accessToken = null;
       this.tokenExpiry = null;
