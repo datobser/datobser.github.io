@@ -215,24 +215,22 @@
       console.log('Submit button clicked');
       if (!this._fileData) {
         console.error('No file has been uploaded');
-        this.showMessage('Please upload a file first');
         return;
       }
 
       if (!this._props.modelId) {
         console.error('No model ID has been set');
-        this.showMessage('Model ID is not set');
         return;
       }
 
       try {
-        this.showMessage('Starting import process...');
+        console.log('Starting import process...');
 
         // Initialize the API with client credentials
         const api = DataImportServiceApi.getInstance(this._clientId, this._clientSecret);
 
         // Step 1: Create Import Job
-        this.showMessage('Creating import job...');
+        console.log('Creating import job...');
         const job = await api.createImportJob(
           this._props.modelId,
           this._props.importType,
@@ -242,18 +240,18 @@
         );
 
         // Step 2: Post Data to Job
-        this.showMessage('Uploading data...');
+        console.log('Uploading data...');
         await api.postDataToJob(job.id, this._fileData);
 
         // Step 3: Validate Job
-        this.showMessage('Validating job...');
+        console.log'Validating job...');
         const validationResult = await api.validateJob(job.id);
         if (!validationResult.isValid) {
           throw new Error('Job validation failed');
         }
 
         // Step 4: Run Job
-        this.showMessage('Running import job...');
+        console.log('Running import job...');
         const result = await api.runJob(job.id);
 
         // Step 5: Check Job Status
@@ -261,11 +259,11 @@
         do {
           await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds
           jobStatus = await api.getJobStatus(job.id);
-          this.showMessage(`Job status: ${jobStatus.status}`);
+          console.log(`Job status: ${jobStatus.status}`);
         } while (jobStatus.status === 'RUNNING');
 
         if (jobStatus.status === 'COMPLETED') {
-          this.showMessage('Import completed successfully');
+          console.log('Import completed successfully');
           this.handleImportComplete(result);
         } else {
           throw new Error(`Job failed with status: ${jobStatus.status}`);
@@ -273,18 +271,8 @@
 
       } catch (error) {
         console.error('Import failed:', error);
-        this.showMessage(`Import failed: ${error.message}`);
+        console.log(`Import failed: ${error.message}`);
       }
-    }
-
-    showMessage(message) {
-      const messageElement = this._shadowRoot.getElementById('message');
-      if (!messageElement) {
-        const newMessageElement = document.createElement('p');
-        newMessageElement.id = 'message';
-        this._root.appendChild(newMessageElement);
-      }
-      messageElement.textContent = message;
     }
   }
 
