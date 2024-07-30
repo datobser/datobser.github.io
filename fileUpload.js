@@ -425,7 +425,7 @@
     constructor(clientId, clientSecret) {
       this.clientId = '';
       this.clientSecret = '';
-      this.tokenUrl = 'https://a2pp.authentication.eu10.hana.ondemand.com/oauth/token';
+      this.tokenUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/oauth/token';
       this.accessToken = null;
       this.tokenExpiry = null;
     }
