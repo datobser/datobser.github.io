@@ -437,13 +437,13 @@
     
         const credentials = btoa(`${this.clientId}:${this.clientSecret}`);
         
-        const response = await fetch(this.tokenUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Basic ${credentials}`
-          },
-          body: 'grant_type=client_credentials'
+        const response = await fetch('http://localhost:3000/proxy/token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Authorization': `Basic ${credentials}`
+            },
+            body: 'grant_type=client_credentials'
         });
     
         if (!response.ok) {
