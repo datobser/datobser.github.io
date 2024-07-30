@@ -51,6 +51,7 @@
     }
 
     render() {
+      console.log('Rendering widget with props:', this._props);
       this._root.innerHTML = '';
       const openButton = document.createElement('button');
       openButton.textContent = 'Open File Upload';
@@ -97,6 +98,7 @@
     }
 
     async handleFileUpload(event) {
+      console.log('File upload initiated');
       const file = event.target.files[0];
       if (file) {
         try {
@@ -157,6 +159,7 @@
     }
 
     open() {
+      console.log('Dialog opened');
       this._props.isDialogOpen = true;
       this.render();
     }
@@ -205,6 +208,7 @@
     }
 
     async handleSubmit() {
+      console.log('Submit button clicked');
       if (!this._fileData) {
         console.error('No file has been uploaded');
         this.showMessage('Please upload a file first');
