@@ -116,7 +116,7 @@
     }
 
     setModel(modelId) {
-      this._props.modelId = C618580BEACC784739AA156935011E3; //modelId
+      this._props.modelId = modelId;
       this.render();
     }
 
@@ -217,7 +217,7 @@
         this.showMessage('Please upload a file first');
         return;
       }
-
+      setModel('C618580BEACC784739AA156935011E3');
       if (!this._props.modelId) {
         console.error('No model ID has been set');
         this.showMessage('Model ID is not set');
