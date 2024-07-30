@@ -457,6 +457,6 @@
         this.tokenExpiry = Date.now() + (data.expires_in * 1000);
         return this.accessToken;
     }
-
+  }
 
 })();
