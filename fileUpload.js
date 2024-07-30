@@ -431,28 +431,32 @@
     }
 
     async getAccessToken() {
-      if (this.accessToken && this.tokenExpiry > Date.now()) {
+        if (this.accessToken && this.tokenExpiry > Date.now()) {
+          return this.accessToken;
+        }
+    
+        const credentials = btoa(`${this.clientId}:${this.clientSecret}`);
+        
+        const response = await fetch(this.tokenUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': `Basic ${credentials}`
+          },
+          body: 'grant_type=client_credentials'
+        });
+    
+        if (!response.ok) {
+          const responseText = await response.text();
+          console.error('Error response:', responseText);
+          throw new Error(`Failed to obtain access token: ${response.status} ${response.statusText}`);
+        }
+    
+        const data = await response.json();
+        this.accessToken = data.access_token;
+        this.tokenExpiry = Date.now() + (data.expires_in * 1000);
         return this.accessToken;
-      }
-
-      const response = await fetch(this.tokenUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `grant_type=client_credentials&client_id=${this.clientId}&client_secret=${this.clientSecret}`
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to obtain access token');
-      }
-
-      const data = await response.json();
-      this.accessToken = data.access_token;
-      this.tokenExpiry = Date.now() + (data.expires_in * 1000);
-      return this.accessToken;
     }
-  }
 
 
 })();
