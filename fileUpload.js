@@ -116,7 +116,7 @@
     }
 
     setModel(modelId) {
-      this._props.modelId = modelId;
+      this._props.modelId = C618580BEACC784739AA156935011E3; //modelId
       this.render();
     }
 
