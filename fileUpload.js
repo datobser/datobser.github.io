@@ -244,7 +244,7 @@
         await api.postDataToJob(job.id, this._fileData);
 
         // Step 3: Validate Job
-        console.log'Validating job...');
+        console.log('Validating job...');
         const validationResult = await api.validateJob(job.id);
         if (!validationResult.isValid) {
           throw new Error('Job validation failed');
