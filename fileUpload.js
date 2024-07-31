@@ -374,6 +374,7 @@
     
     async fetchJson(url, options = {}) {
         const token = await this.oauthHandler.getAccessToken();
+        console.log(token);
         const headers = {
           'Authorization': `Bearer ${token}`,
           'x-sap-sac-custom-auth': 'true',
