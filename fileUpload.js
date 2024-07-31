@@ -409,18 +409,24 @@
       return this.fetchJson(`${this.baseUrl}/models/${modelId}/metadata`);
     }
 
-    async createImportJob(modelId, importType, mappings, defaultValues, jobSettings) {
-      return this.fetchJson(`${this.baseUrl}/jobs`, {
-        method: 'POST',
-        body: JSON.stringify({
-          modelId,
-          importType,
-          mappings,
-          defaultValues,
-          jobSettings,
-        }),
-      });
+    async createImportJob(modelId, importType, mappings, defaultValues, jobSettings, csrfToken) {
+        const url = `${this.baseUrl}/models/${modelId}`;
+        
+        return this.fetchJson(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-csrf-token': 'oPM8bzXF3o0qi0Zo5I4l96'
+          },
+          body: JSON.stringify({
+            importType,
+            mappings,
+            defaultValues,
+            jobSettings,
+          }),
+        });
     }
+
 
     async postDataToJob(jobId, data) {
       return this.fetchJson(`${this.baseUrl}/jobs/${jobId}`, {
