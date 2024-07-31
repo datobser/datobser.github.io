@@ -167,7 +167,7 @@ class UploadWidget extends HTMLElement {
         console.log('Requesting CSRF token');
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/csrf",
+                url: "http://localhost:3000" + "/api/v1/csrf",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -193,7 +193,7 @@ class UploadWidget extends HTMLElement {
         const importType = "csv"; 
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/models/" + modelId,
+                url: "http://localhost:3000" + "/api/v1/dataimport/models/" + modelId,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -221,7 +221,7 @@ class UploadWidget extends HTMLElement {
         console.log('Uploading data for jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/" + jobId,
+                url: "http://localhost:3000" + "/api/v1/dataimport/jobs/" + jobId,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -245,7 +245,7 @@ class UploadWidget extends HTMLElement {
         console.log('Running job with jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/" + jobId + "/run",
+                url: "http://localhost:3000" + "/api/v1/dataimport/jobs/" + jobId + "/run",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
