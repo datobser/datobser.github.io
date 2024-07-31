@@ -230,12 +230,39 @@
 
         // Step 1: Create Import Job
         console.log('Creating import job...');
-        console.log('Creating import job...');
         console.log('Model ID:', this._props.modelId);
         console.log('Import Type:', this._props.importType);
         console.log('Mappings:', this._props.mappings);
         console.log('Default Values:', this._props.defaultValues);
         console.log('Job Settings:', this._props.jobSettings);
+
+        // Manuelles Setzen
+        const config = {
+          importType: 'CSV', // Angenommener Typ für CSV-Datenimport
+          mappings: {
+            version: 'Version', // Mapping der CSV-Spaltennamen auf SAP-Datenmodell-Attribute
+            date: 'Date',
+            name: 'Names',
+            value: 'Value'
+          },
+          defaultValues: {
+            // Wenn du Standardwerte setzen möchtest, kannst du sie hier einfügen
+            // Hier keine Standardwerte, daher leer
+          },
+          jobSettings: {
+            // Konfiguriere die Job-Einstellungen entsprechend den Anforderungen für den Import
+            batchSize: 1000, // Beispiel: Batch-Größe für den Import
+            errorHandling: 'log', // Beispiel: Fehlerbehandlung
+            overwriteExisting: false // Beispiel: Keine Überschreibung bestehender Daten
+          }
+        };
+        
+        // Weise die Werte den Variablen zu
+        this._props.importType = config.importType;
+        this._props.mappings = config.mappings;
+        this._props.defaultValues = config.defaultValues;
+        this._props.jobSettings = config.jobSettings;
+
                 
         const job = await api.createImportJob(
           this._props.modelId,
