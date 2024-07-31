@@ -115,15 +115,15 @@ class UploadWidget extends HTMLElement {
     _getAccessToken() {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: this.tokenUrl,
+                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com/oauth/token",
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
                 data: {
                     grant_type: "client_credentials",
-                    client_id: this.clientId,
-                    client_secret: this.clientSecret
+                    client_id: "sb-2ce9dd0e-27e0-4897-87e3-2b765bc0276c!b498618|client!b3650",
+                    client_secret: "125e7bc7-5075-471b-adbe-df8793284e36$B2-jpvtouP9h0UUG-UtK9DyKDmGhS-M2tZ8NcBDw900="
                 },
                 success: (response) => {
                     this._accessToken = response.access_token;
@@ -139,7 +139,7 @@ class UploadWidget extends HTMLElement {
     _getCsrfToken() {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: this.tenantUrl + "/api/v1/csrf",
+                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/csrf",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -157,10 +157,12 @@ class UploadWidget extends HTMLElement {
         });
     }
 
-    _createJob(modelId, importType) {
+    _createJob() {
+        const modelId = "Coocob05ulj04oih3r0j6m9ga60"; 
+        const importType = "csv"; 
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: this.tenantUrl + "/api/v1/dataimport/models/" + modelId,
+                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/models/" + modelId,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -185,7 +187,7 @@ class UploadWidget extends HTMLElement {
     _uploadData(jobId, data) {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: this.tenantUrl + "/api/v1/dataimport/jobs/" + jobId,
+                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/" + jobId,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -206,7 +208,7 @@ class UploadWidget extends HTMLElement {
     _runJob(jobId) {
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: this.tenantUrl + "/api/v1/dataimport/jobs/" + jobId + "/run",
+                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/" + jobId + "/run",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
