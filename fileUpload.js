@@ -169,6 +169,9 @@ class UploadWidget extends HTMLElement {
             $.ajax({
                 url: "http://localhost:3000/proxy/api/v1/csrf",
                 method: "GET",
+                xhrFields: {
+                    withCredentials: true
+                },
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
                     "x-csrf-token": "fetch",
