@@ -409,12 +409,13 @@
     async fetchJson(url, options = {}) {
         const token = await this.oauthHandler.getAccessToken();
         console.log(token);
+        console.log('CSRF Token:', options.headers['x-csrf-token']);
         const headers = {
           'Authorization': `Bearer ${token}`,
           'x-sap-sac-custom-auth': 'true',
           ...options.headers,
         };
-        console.log(this.csrfToken);
+    
         if (options.method && ['POST', 'PATCH', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
           console.log('if clause entered');
           if (!this.csrfToken) {
