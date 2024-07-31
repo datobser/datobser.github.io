@@ -332,7 +332,7 @@
     static instance = null;
 
     constructor(clientId, clientSecret) {
-      this.baseUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/api/v1/dataimport';
+      this.baseUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/api/v1';
       this.oauthHandler = new OAuthHandler();
       this.csrfToken = null;
     }
@@ -347,7 +347,7 @@
     async fetchCSRFToken() {
         const token = await this.oauthHandler.getAccessToken();
         try {
-          const response = await fetch(`${this.baseUrl}csrf`, {
+          const response = await fetch(`${this.baseUrl}/csrf`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
