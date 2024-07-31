@@ -167,7 +167,7 @@ class UploadWidget extends HTMLElement {
         console.log('Requesting CSRF token');
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "http://localhost:3000",
+                url: "http://localhost:3000/proxy/api/v1/csrf",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
