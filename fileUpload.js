@@ -346,21 +346,32 @@
     }
 
     async fetchCSRFToken() {
-      const token = await this.oauthHandler.getAccessToken();
-      const response = await fetch(`${this.baseUrl}csrf`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'x-sap-sac-custom-auth': 'true',
-          'x-csrf-token': 'fetch'
+        const token = await this.oauthHandler.getAccessToken();
+        try {
+          const response = await fetch(`${this.baseUrl}csrf`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'x-sap-sac-custom-auth': 'true',
+              'x-csrf-token': 'fetch'
+            }
+          });
+      
+          if (!response.ok) {
+            console.error('CSRF token fetch failed:', response.status, response.statusText);
+            const text = await response.text();
+            console.error('Response body:', text);
+            throw new Error(`Failed to obtain CSRF token: ${response.status} ${response.statusText}`);
+          }
+      
+          this.csrfToken = response.headers.get('x-csrf-token');
+          if (!this.csrfToken) {
+            console.warn('CSRF token not found in response headers');
+          }
+        } catch (error) {
+          console.error('Error fetching CSRF token:', error);
+          throw error;
         }
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Failed to obtain CSRF token: ${response.status} ${response.statusText}`);
-      }
-  
-      this.csrfToken = response.headers.get('x-csrf-token');
     }
     
     async fetchJson(url, options = {}) {
