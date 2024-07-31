@@ -410,6 +410,7 @@
     }
 
     async createImportJob(modelId, importType, mappings, defaultValues, jobSettings, csrfToken) {
+        console.log('createImportJob called');
         const url = `${this.baseUrl}/models/${modelId}`;
         
         return this.fetchJson(url, {
