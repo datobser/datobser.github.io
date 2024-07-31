@@ -418,11 +418,7 @@
     
         if (options.method && ['POST', 'PATCH', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
           console.log('if clause entered');
-          if (!this.csrfToken) {
-            await this.fetchCSRFToken();
-          }
-          headers['x-csrf-token'] = this.csrfToken;
-          //console.log(this.csrfToken);
+          headers['x-csrf-token'] = options.headers['x-csrf-token'];
         }
     
         const response = await fetch(url, {
