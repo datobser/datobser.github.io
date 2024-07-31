@@ -351,7 +351,7 @@
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
-              'x-csrf-token': 'fetch'
+              'x-csrf-token': 'oPM8bzXF3o0qi0Zo5I4l96'
             }
           });
       
