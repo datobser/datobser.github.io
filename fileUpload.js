@@ -407,29 +407,51 @@
     }
     
     async fetchJson(url, options = {}) {
-        const token = await this.oauthHandler.getAccessToken();
-        console.log(token);
-        console.log('CSRF Token:', options.headers['x-csrf-token']);
-        const headers = {
-          'Authorization': `Bearer ${token}`,
-          'x-sap-sac-custom-auth': 'true',
-          ...options.headers,
-        };
-    
-        if (options.method && ['POST', 'PATCH', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
-          console.log('if clause entered');
-          headers['x-csrf-token'] = options.headers['x-csrf-token'];
+        try {
+          const token = await this.oauthHandler.getAccessToken();
+          console.log('Access Token:', token);
+          console.log('CSRF Token:', options.headers['x-csrf-token']);
+      
+          const headers = {
+            'Authorization': `Bearer ${token}`,
+            'x-sap-sac-custom-auth': 'true',
+            ...options.headers,
+          };
+      
+          if (options.headers['x-csrf-token']) {
+            headers['x-csrf-token'] = options.headers['x-csrf-token'];
+          }
+      
+          if (options.body && typeof options.body === 'object') {
+            headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(options.body);
+          }
+      
+          console.log('Request URL:', url);
+          console.log('Request method:', options.method);
+          console.log('Request headers:', headers);
+          console.log('Request body:', options.body);
+      
+          const response = await fetch(url, {
+            ...options,
+            headers,
+          });
+      
+          console.log('Response status:', response.status);
+          console.log('Response headers:', response.headers);
+      
+          const responseText = await response.text();
+          console.log('Response body:', responseText);
+      
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
+          }
+      
+          return JSON.parse(responseText);
+        } catch (error) {
+          console.error('Error in fetchJson:', error);
+          throw error;
         }
-    
-        const response = await fetch(url, {
-          ...options,
-          headers,
-        });
-    
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
     }
 
     async getModels() {
