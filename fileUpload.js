@@ -1,4 +1,3 @@
-
 (function () {
   const template = document.createElement('template');
   template.innerHTML = `
@@ -333,7 +332,7 @@
     static instance = null;
 
     constructor(clientId, clientSecret) {
-      this.baseUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/api/v1/';
+      this.baseUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/api/v1/dataimport';
       this.oauthHandler = new OAuthHandler();
       this.csrfToken = null;
     }
