@@ -420,6 +420,7 @@
             await this.fetchCSRFToken();
           }
           headers['x-csrf-token'] = this.csrfToken;
+          console.log(this.csrfToken);
         }
     
         const response = await fetch(url, {
