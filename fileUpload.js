@@ -347,11 +347,10 @@
     async fetchCSRFToken() {
         const token = await this.oauthHandler.getAccessToken();
         try {
-          const response = await fetch(`${this.baseUrl}/csrf`, {
+          const response = await fetch(`${this.baseUrl}/dataimport/models`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`,
-              'x-sap-sac-custom-auth': 'true',
               'x-csrf-token': 'fetch'
             }
           });
@@ -400,7 +399,10 @@
     }
 
     async getModels() {
-      return this.fetchJson(`${this.baseUrl}/models`);
+      if (!this.csrfToken) {
+        return this.fetchCSRFToken();
+      }
+      return this.fetchJson(`${this.baseUrl}/dataimport/models`);
     }
 
     async getModelMetadata(modelId) {
