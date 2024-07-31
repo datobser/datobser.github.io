@@ -230,6 +230,13 @@
 
         // Step 1: Create Import Job
         console.log('Creating import job...');
+        console.log('Creating import job...');
+        console.log('Model ID:', this._props.modelId);
+        console.log('Import Type:', this._props.importType);
+        console.log('Mappings:', this._props.mappings);
+        console.log('Default Values:', this._props.defaultValues);
+        console.log('Job Settings:', this._props.jobSettings);
+                
         const job = await api.createImportJob(
           this._props.modelId,
           this._props.importType,
