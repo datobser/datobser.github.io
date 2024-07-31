@@ -334,7 +334,8 @@
 
     constructor(clientId, clientSecret) {
       this.baseUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/api/v1/';
-      this.oauthHandler = new OAuthHandler(clientId, clientSecret);
+      this.oauthHandler = new OAuthHandler();
+      this.csrfToken = null;
     }
 
     static getInstance(clientId, clientSecret) {
@@ -344,20 +345,48 @@
       return DataImportServiceApi.instance;
     }
 
-    async fetchJson(url, options = {}) {
+    async fetchCSRFToken() {
       const token = await this.oauthHandler.getAccessToken();
-      const response = await fetch(url, {
-        ...options,
+      const response = await fetch(`${this.baseUrl}csrf`, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'x-sap-sac-custom-auth': 'true',
-          ...options.headers,
-        },
+          'x-csrf-token': 'fetch'
+        }
       });
+  
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`Failed to obtain CSRF token: ${response.status} ${response.statusText}`);
       }
-      return response.json();
+  
+      this.csrfToken = response.headers.get('x-csrf-token');
+    }
+    
+    async fetchJson(url, options = {}) {
+        const token = await this.oauthHandler.getAccessToken();
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'x-sap-sac-custom-auth': 'true',
+          ...options.headers,
+        };
+    
+        if (options.method && ['POST', 'PATCH', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
+          if (!this.csrfToken) {
+            await this.fetchCSRFToken();
+          }
+          headers['x-csrf-token'] = this.csrfToken;
+        }
+    
+        const response = await fetch(url, {
+          ...options,
+          headers,
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
     }
 
     async getModels() {
@@ -422,7 +451,7 @@
   }
 
   class OAuthHandler {
-    constructor(clientId, clientSecret) {
+    constructor() {
       this.clientId = 'sb-2ce9dd0e-27e0-4897-87e3-2b765bc0276c!b498618|client!b3650';
       this.clientSecret = '125e7bc7-5075-471b-adbe-df8793284e36$B2-jpvtouP9h0UUG-UtK9DyKDmGhS-M2tZ8NcBDw900=';
       this.tokenUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/oauth/token';
@@ -437,13 +466,12 @@
     
         const credentials = btoa(`${this.clientId}:${this.clientSecret}`);
         
-        const response = await fetch('http://localhost:3000/proxy/token', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              'Authorization': `Basic ${credentials}`
-            },
-            body: 'grant_type=client_credentials'
+        const response = await fetch(this.tokenUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `grant_type=client_credentials&client_id=${this.clientId}&client_secret=${this.clientSecret}`
         });
     
         if (!response.ok) {
