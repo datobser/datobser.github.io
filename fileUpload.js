@@ -11,6 +11,7 @@ class UploadWidget extends HTMLElement {
 
         // Create UI elements
         this._createElements();
+        console.log('UploadWidget initialized');
     }
 
     static get observedAttributes() {
@@ -27,6 +28,7 @@ class UploadWidget extends HTMLElement {
 
     connectedCallback() {
         this._render();
+        console.log('UploadWidget connected to the DOM');
     }
 
     _createElements() {
@@ -43,6 +45,8 @@ class UploadWidget extends HTMLElement {
 
         this._fileInput.addEventListener('change', this._onFileChange.bind(this));
         this._uploadButton.addEventListener('click', this._onUploadPress.bind(this));
+
+        console.log('UI elements created');
     }
 
     _render() {
@@ -64,17 +68,23 @@ class UploadWidget extends HTMLElement {
         this.shadowRoot.appendChild(this._fileInput);
         this.shadowRoot.appendChild(this._uploadButton);
         this.shadowRoot.appendChild(this._progressBar);
+
+        console.log('UI elements rendered in shadow DOM');
     }
 
     _onFileChange(event) {
         const file = event.target.files[0];
+        console.log('File selected:', file);
+
         this._uploadButton.disabled = !file;
         if (file) {
             if (file.size > this.maxFileSize) {
+                console.log('File size exceeds limit');
                 this._onFileSizeExceed();
                 this._fileInput.value = '';
                 this._uploadButton.disabled = true;
             } else {
+                console.log('Reading file data');
                 this._readFileData(file);
             }
         }
@@ -84,35 +94,50 @@ class UploadWidget extends HTMLElement {
         const reader = new FileReader();
         reader.onload = (e) => {
             this._fileData = e.target.result;
+            console.log('File data read successfully');
         };
         reader.readAsText(file);
     }
 
     _onUploadPress() {
+        console.log('Upload button pressed');
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
 
         this._getAccessToken()
-            .then(() => this._getCsrfToken())
-            .then(() => this._createJob(this.modelId, "factData"))
+            .then(() => {
+                console.log('Access token obtained');
+                return this._getCsrfToken();
+            })
+            .then(() => {
+                console.log('CSRF token obtained');
+                return this._createJob(this.modelId, "factData");
+            })
             .then((jobId) => {
+                console.log('Job created with ID:', jobId);
                 this._jobId = jobId;
                 return this._uploadData(jobId, this._fileData);
             })
-            .then(() => this._runJob(this._jobId))
+            .then(() => {
+                console.log('Data uploaded successfully');
+                return this._runJob(this._jobId);
+            })
             .then((response) => {
+                console.log('Job run successfully:', response);
                 this._progressBar.value = 100;
                 this.dispatchEvent(new CustomEvent('uploadComplete', { detail: response }));
-                this._showMessage("Upload completed successfully");
+                
             })
             .catch((error) => {
+                console.error('Error during upload process:', error);
                 this._progressBar.style.display = 'none';
                 this.dispatchEvent(new CustomEvent('uploadError', { detail: error }));
-                this._showMessage("Upload failed: " + error, true);
+                
             });
     }
 
     _getAccessToken() {
+        console.log('Requesting access token');
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: "https://a2pp-1.authentication.eu10.hana.ondemand.com/oauth/token",
@@ -126,10 +151,12 @@ class UploadWidget extends HTMLElement {
                     client_secret: "125e7bc7-5075-471b-adbe-df8793284e36$B2-jpvtouP9h0UUG-UtK9DyKDmGhS-M2tZ8NcBDw900="
                 },
                 success: (response) => {
+                    console.log('Access token response:', response);
                     this._accessToken = response.access_token;
                     resolve();
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Access token request failed:', errorThrown);
                     reject(errorThrown);
                 }
             });
@@ -137,6 +164,7 @@ class UploadWidget extends HTMLElement {
     }
 
     _getCsrfToken() {
+        console.log('Requesting CSRF token');
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/csrf",
@@ -147,10 +175,12 @@ class UploadWidget extends HTMLElement {
                     "x-sap-sac-custom-auth": "true"
                 },
                 success: (data, textStatus, jqXHR) => {
+                    console.log('CSRF token response:', data);
                     this._csrfToken = jqXHR.getResponseHeader("x-csrf-token");
                     resolve();
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('CSRF token request failed:', errorThrown);
                     reject(errorThrown);
                 }
             });
@@ -158,6 +188,7 @@ class UploadWidget extends HTMLElement {
     }
 
     _createJob() {
+        console.log('Creating job with modelId:', this.modelId);
         const modelId = "Coocob05ulj04oih3r0j6m9ga60"; 
         const importType = "csv"; 
         return new Promise((resolve, reject) => {
@@ -175,9 +206,11 @@ class UploadWidget extends HTMLElement {
                     }
                 }),
                 success: (response) => {
+                    console.log('Job creation response:', response);
                     resolve(response.JobID);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Job creation request failed:', errorThrown);
                     reject(errorThrown);
                 }
             });
@@ -185,6 +218,7 @@ class UploadWidget extends HTMLElement {
     }
 
     _uploadData(jobId, data) {
+        console.log('Uploading data for jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/" + jobId,
@@ -196,9 +230,11 @@ class UploadWidget extends HTMLElement {
                 },
                 data: JSON.stringify({ "Data": data }),
                 success: (response) => {
+                    console.log('Data upload response:', response);
                     resolve(response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Data upload request failed:', errorThrown);
                     reject(errorThrown);
                 }
             });
@@ -206,6 +242,7 @@ class UploadWidget extends HTMLElement {
     }
 
     _runJob(jobId) {
+        console.log('Running job with jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/" + jobId + "/run",
@@ -216,9 +253,11 @@ class UploadWidget extends HTMLElement {
                     "Content-Type": "application/json"
                 },
                 success: (response) => {
+                    console.log('Job run response:', response);
                     resolve(response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Job run request failed:', errorThrown);
                     reject(errorThrown);
                 }
             });
@@ -226,20 +265,13 @@ class UploadWidget extends HTMLElement {
     }
 
     _onTypeMismatch() {
-        this._showMessage(`Invalid file type. Accepted types: ${this.acceptedFileTypes}`, true);
+        console.log('File type mismatch');
+        
     }
 
     _onFileSizeExceed() {
-        this._showMessage(`File size exceeds the maximum limit of ${this.maxFileSize / (1024 * 1024)}MB`, true);
-    }
-
-    _showMessage(message, isError = false) {
-        const messageElement = document.createElement('div');
-        messageElement.textContent = message;
-        messageElement.style.color = isError ? 'red' : 'green';
-        messageElement.style.marginTop = '10px';
-        this.shadowRoot.appendChild(messageElement);
-        setTimeout(() => this.shadowRoot.removeChild(messageElement), 5000);
+        console.log('File size exceeds limit');
+        
     }
 }
 
