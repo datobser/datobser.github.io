@@ -414,13 +414,14 @@
           'x-sap-sac-custom-auth': 'true',
           ...options.headers,
         };
-    
+        console.log(this.csrfToken);
         if (options.method && ['POST', 'PATCH', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
+          console.log('if clause entered');
           if (!this.csrfToken) {
             await this.fetchCSRFToken();
           }
           headers['x-csrf-token'] = this.csrfToken;
-          console.log(this.csrfToken);
+          //console.log(this.csrfToken);
         }
     
         const response = await fetch(url, {
