@@ -1,14 +1,12 @@
 (function () {
 
-
     let accessToken, csrfToken, jobUrl, validateJobURL, runJobURL;
-    //Attention!!!! modify this information, with URLs of your SAC tenant
-    /*const csrfTokenUrl = 'https://planifyit.eu10.hcs.cloud.sap/api/v1/csrf';
-    const clientId = 'sb-d36bd0cc-eaaf-4fa8-8897-5b069998a8d9!b13';
-    const clientSecret = '7f7889df-1504-49f2-9e38-e2de480d85a2$NDPTA7KjiS3YdGl0wDjw';
-    const tokenUrl = 'https://planifyit.authentication.eu10.hana.ondemand.com/oauth/token';
-    const apiEndpoint = 'https://planifyit.eu10.hcs.cloud.sap/api/v1/dataimport/models/Cdlg2a1kkbj139ea3kjvk86s05k/masterFactData';
-    */
+    const csrfTokenUrl = 'https://a2pp-1.eu10.hcs.cloud.sap/api/v1/csrf';
+    const clientId = 'sb-2ce9dd0e-27e0-4897-87e3-2b765bc0276c!b498618|client!b3650';
+    const clientSecret = '125e7bc7-5075-471b-adbe-df8793284e36$B2-jpvtouP9h0UUG-UtK9DyKDmGhS-M2tZ8NcBDw900=';
+    const tokenUrl = 'https://a2pp-1.authentication.eu10.hana.ondemand.com/oauth/token';
+    const apiEndpoint = 'https://a2pp-1.eu10.hcs.cloud.sap/api/v1/dataimport/models/Cl94sr05ultdetk3npm9hu6q83u/masterFactData';
+    
     const jobSettings = {
         "Mapping": {
             "Version___ID": "Version",
