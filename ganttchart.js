@@ -201,26 +201,29 @@
                 this.tasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
-                    const startDate = this._parseDate(row.dimensions_2.id);
-                    const endDate = this._parseDate(row.dimensions_3.id);
+                    const date = this._parseDate(row.dimensions_1.id);
+                    const startDate = this._parseDate(row.dimensions_4.id);
+                    const endDate = this._parseDate(row.dimensions_5.id);
                     
-                    if (!startDate || !endDate) {
+                    if (!date || !startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
                         return null;
                     }
                     
                     // Create the task object
                     const task = {
-                        id: row.dimensions_0.id || `task-${index}`,
-                        name: row.dimensions_1.label,
+                        version: row.dimensions_0.id,
+                        date: date,
+                        id: row.dimensions_2.id,
+                        name: row.dimensions_3.label,
                         start: startDate,
                         end: endDate,
                         progress: row.measures_0 ? row.measures_0.raw : 0,
-                        open: row.dimensions_4 ? row.dimensions_4.id === 'true' : true
+                        open: row.dimensions_6.id === 'true'
                     };
                     
                     // Validate task properties
-                    const isValid = task.id && task.name && task.start && task.end;
+                    const isValid = task.version && task.date && task.id && task.name && task.start && task.end;
                     if (!isValid) {
                         console.error('Invalid task filtered out:', task);
                     }
@@ -368,14 +371,16 @@
         }
 
         _convertTasksToCSV(tasks) {
-            const header = ['id', 'label', 'startDate', 'endDate', 'progress', 'open'];
+            const header = ['Version', 'Date', 'ID', 'Label', 'StartDate', 'EndDate', 'Open', 'Progress'];
             const rows = tasks.map(task => [
+                task.version,
+                task.date,
                 task.id,
                 task.name,
                 task.start,
                 task.end,
-                task.progress,
-                task.open || 'true'
+                task.open.toString(),
+                task.progress.toString()
             ]);
         
             const csvContent = [header.join(','), ...rows.map(row => row.join(','))].join('\n');
