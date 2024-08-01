@@ -191,6 +191,7 @@ class UploadWidget extends HTMLElement {
     _createJob() {
         console.log('Creating job with modelId:', this.modelId);
         const modelId = "Coocob05ulj04oih3r0j6m9ga60"; 
+        console.log('modelId set:'modelId);
         const importType = "csv"; 
         return new Promise((resolve, reject) => {
             $.ajax({
