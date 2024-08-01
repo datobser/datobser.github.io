@@ -11,10 +11,10 @@
         "Mapping": {
             "Version": "Version",
             "Date": "Date",
-            "ID": "ID",
-            "Label": "Label",
             "StartDate": "StartDate",
             "EndDate": "EndDate",
+            "ID": "ID",
+            "Label": "Label",
             "Open": "Open",
             "Progress": "Progress"
         },
