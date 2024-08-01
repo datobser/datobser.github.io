@@ -108,10 +108,12 @@ class UploadWidget extends HTMLElement {
 
         this._getAccessToken()
             .then(() => {
+                const accessToken = this._getAccessToken()
                 console.log('Access token obtained:', accessToken);
                 return this._getCsrfToken();
             })
             .then(() => {
+                const csrfToken = this._getCsrfToken();
                 console.log('CSRF token obtained:', csrfToken);
                 return this._createJob(this.modelId, "factData");
             })
