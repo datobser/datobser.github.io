@@ -9,14 +9,12 @@
     
     const jobSettings = {
         "Mapping": {
-            "Version___ID": "Version",
-            "Date___CALMONTH": "Date",
-            "id___ID": "id",
-            "label___ID": "label",
-            "startDate___ID": "startDate",
-            "endDate___ID": "endDate",
-            "open___ID": "open",
-            "progress": "progress"
+            "ID": "ID",
+            "Label": "Label",
+            "StartDate": "StartDate",
+            "EndDate": "EndDate",
+            "Open": "Open",
+            "Progress": "Progress"
         },
         "JobSettings": {
             "importMethod": "Update"
