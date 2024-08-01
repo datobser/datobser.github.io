@@ -99,26 +99,32 @@ class UploadWidget extends HTMLElement {
         reader.readAsText(file);
     }
 
-    _onUploadPress() {
+    onUploadPress() {
         console.log('Upload button pressed');
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
-
+    
         this._getAccessToken()
-            .then(() => {
+            .then((accessToken) => {
                 console.log('Access token obtained:', accessToken);
-                return this._getCsrfToken();
+                return this._getCsrfToken().then(csrfToken => {
+                    return { accessToken, csrfToken };
+                });
             })
-            .then(() => {
+            .then(({ accessToken, csrfToken }) => {
                 console.log('CSRF token obtained:', csrfToken);
-                return this._createJob(this.modelId, "factData");
+                return this._createJob(this.modelId, "factData").then(jobId => {
+                    return { accessToken, csrfToken, jobId };
+                });
             })
-            .then((jobId) => {
+            .then(({ accessToken, csrfToken, jobId }) => {
                 console.log('Job created with ID:', jobId);
                 this._jobId = jobId;
-                return this._uploadData(jobId, this._fileData);
+                return this._uploadData(jobId, this._fileData).then(() => {
+                    return { accessToken, csrfToken, jobId };
+                });
             })
-            .then(() => {
+            .then(({ accessToken, csrfToken, jobId }) => {
                 console.log('Data uploaded successfully');
                 return this._runJob(this._jobId);
             })
@@ -126,15 +132,14 @@ class UploadWidget extends HTMLElement {
                 console.log('Job run successfully:', response);
                 this._progressBar.value = 100;
                 this.dispatchEvent(new CustomEvent('uploadComplete', { detail: response }));
-                
             })
             .catch((error) => {
                 console.error('Error during upload process:', error);
                 this._progressBar.style.display = 'none';
                 this.dispatchEvent(new CustomEvent('uploadError', { detail: error }));
-                
             });
     }
+
 
     _getAccessToken() {
         console.log('Requesting access token');
