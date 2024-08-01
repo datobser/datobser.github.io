@@ -217,7 +217,8 @@ class UploadWidget extends HTMLElement {
                     resolve(response.JobID);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    const errorMessage = `Job creation request failed: ${textStatus} - ${errorThrown}`;
+                    const responseText = jqXHR.responseText; // Get the response text
+                    const errorMessage = `Job creation request failed: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
                     console.error(errorMessage);
                     reject(errorThrown);
                 }
