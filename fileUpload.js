@@ -200,7 +200,7 @@ class UploadWidget extends HTMLElement {
         const importType = "csv"; 
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/models/" + modelId + "/masterFactData",
+                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/models/" + modelId,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
