@@ -152,13 +152,13 @@ class UploadWidget extends HTMLElement {
                 },
                 data: {
                     grant_type: "client_credentials",
-                    client_id: "sb-2ce9dd0e-27e0-4897-87e3-2b765bc0276c!b498618|client!b3650",
-                    client_secret: "125e7bc7-5075-471b-adbe-df8793284e36$B2-jpvtouP9h0UUG-UtK9DyKDmGhS-M2tZ8NcBDw900="
+                    client_id: this.clientId,
+                    client_secret: this.clientSecret
                 },
                 success: (response) => {
                     console.log('Access token response:', response);
                     this._accessToken = response.access_token;
-                    resolve();
+                    resolve(this._accessToken); // Resolve with the access token
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
                     console.error('Access token request failed:', errorThrown);
@@ -167,7 +167,7 @@ class UploadWidget extends HTMLElement {
             });
         });
     }
-
+    
     _getCsrfToken() {
         console.log('Requesting CSRF token');
         return new Promise((resolve, reject) => {
@@ -182,7 +182,7 @@ class UploadWidget extends HTMLElement {
                 success: (data, textStatus, jqXHR) => {
                     console.log('CSRF token response:', data);
                     this._csrfToken = jqXHR.getResponseHeader("x-csrf-token");
-                    resolve();
+                    resolve(this._csrfToken); // Resolve with the CSRF token
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
                     console.error('CSRF token request failed:', errorThrown);
@@ -192,6 +192,7 @@ class UploadWidget extends HTMLElement {
         });
     }
 
+    
     _createJob() {
         console.log('Creating job with modelId:', this.modelId);
         const modelId = "Coocob05ulj04oih3r0j6m9ga60"; 
