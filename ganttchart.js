@@ -202,8 +202,8 @@
                     console.log(`Processing row ${index}:`, row);
                     
                     const date = this._parseDate(row.dimensions_1.id);
-                    const startDate = this._parseDate(row.dimensions_4.id);
-                    const endDate = this._parseDate(row.dimensions_5.id);
+                    const startDate = this._parseDate(row.dimensions_2.id);
+                    const endDate = this._parseDate(row.dimensions_3.id);
                     
                     if (!date || !startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
@@ -214,12 +214,12 @@
                     const task = {
                         version: row.dimensions_0.id,
                         date: date,
-                        id: row.dimensions_2.id,
-                        name: row.dimensions_3.label,
                         start: startDate,
                         end: endDate,
-                        progress: row.measures_0 ? row.measures_0.raw : 0,
-                        open: row.dimensions_6.id === 'true'
+                        id: row.dimensions_4.id,
+                        name: row.dimensions_5.label,
+                        open: row.dimensions_6.id === 'true',
+                        progress: row.measures_0 ? row.measures_0.raw : 0
                     };
                     
                     // Validate task properties
