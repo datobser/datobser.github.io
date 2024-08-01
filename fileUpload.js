@@ -152,8 +152,8 @@ class UploadWidget extends HTMLElement {
                 },
                 data: {
                     grant_type: "client_credentials",
-                    client_id: this.clientId,
-                    client_secret: this.clientSecret
+                    client_id: "sb-2ce9dd0e-27e0-4897-87e3-2b765bc0276c!b498618|client!b3650",
+                    client_secret: "125e7bc7-5075-471b-adbe-df8793284e36$B2-jpvtouP9h0UUG-UtK9DyKDmGhS-M2tZ8NcBDw900="
                 },
                 success: (response) => {
                     console.log('Access token response:', response);
