@@ -197,30 +197,37 @@ class UploadWidget extends HTMLElement {
         console.log('Creating job with modelId:', this.modelId);
         const modelId = "Coocob05ulj04oih3r0j6m9ga60"; 
         console.log('modelId set:', modelId);
-        const importType = "csv";
-        console.log(importType);
+        const importType = "csv"; 
+    
         return new Promise((resolve, reject) => {
-            $.ajax({
-                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/models/" + modelId,
+            fetch("https://a2pp-1.eu10.hcs.cloud.sap/api/v1/dataimport/models/" + modelId, {
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
                     "x-csrf-token": this._csrfToken,
                     "Content-Type": "application/json"
                 },
-                data: JSON.stringify({
-                    "importType": importType // Direkt im Body und nicht innerhalb von JobSettings
-                }),
-                success: (response) => {
-                    console.log('Job creation response:', response);
-                    resolve(response.JobID);
-                },
-                error: (jqXHR, textStatus, errorThrown) => {
-                    const responseText = jqXHR.responseText;
-                    const errorMessage = `Job creation request failed: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
-                    console.error(errorMessage);
-                    reject(errorThrown);
+                body: JSON.stringify({
+                    "importType": importType
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        const errorMessage = `Job creation request failed: ${response.statusText}. Response: ${text}`;
+                        console.error(errorMessage);
+                        return Promise.reject(new Error(errorMessage));
+                    });
                 }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Job creation response:', data);
+                resolve(data.JobID);
+            })
+            .catch(error => {
+                console.error('Job creation request failed:', error);
+                reject(error);
             });
         });
     }
