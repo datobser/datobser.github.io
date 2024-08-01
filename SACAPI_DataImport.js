@@ -107,47 +107,48 @@
             .catch(error => console.error('Error:', error));
     }
     window.createJob = createJob;
-    function uploadData(csvData, messagesElement) {
-        console.log('uploadData is triggered');
-        if (!accessToken || !csrfToken || !jobUrl) {
-            console.log('Access token, CSRF token, or job URL is not set');
+    function createJob(messagesElement) {
+        if (!accessToken || !csrfToken) {
+            console.log('Access token or CSRF token is not set');
             return;
         }
-        // Log the values of accessToken, csrfToken, and jobUrl
-        console.log('accessToken:', accessToken);
-        console.log('csrfToken:', csrfToken);
-        console.log('jobUrl:', jobUrl);
-        console.log('csvData:', csvData);
-        return fetch(jobUrl, {
+    
+        console.log('Creating job with the following settings:', JSON.stringify(jobSettings, null, 2));
+    
+        return fetch(apiEndpoint, {
             method: 'POST',
             headers: {
-                'Content-Type': 'text/csv',
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
                 'x-csrf-token': csrfToken,
                 'x-sap-sac-custom-auth': 'true'
             },
-            body: csvData
+            body: JSON.stringify(jobSettings)
         })
-            .then(response => {
-                console.log(response);  // Log the raw response object.
-                return response.json();
-            })
-            .then(data => {
-                console.log(data);
-                validateJobURL = data.validateJobURL;
-                runJobURL = data.runJobURL;
-                console.log('Validate job URL:', validateJobURL);
-                console.log('Run job URL:', runJobURL);
-                if (messagesElement) {
-                    messagesElement.textContent = '';  // Clear the messages
-                    messagesElement.textContent += 'Validate job URL: ' + validateJobURL + '\n';
-                    messagesElement.textContent += 'Run job URL: ' + runJobURL + '\n';
-                }
-
-            })
-            .catch(error => console.error('Error:', error));
+        .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            return response.text();
+        })
+        .then(text => {
+            console.log('Response body:', text);
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('Failed to parse response as JSON:', e);
+                throw new Error('Invalid JSON response');
+            }
+        })
+        .then(data => {
+            jobUrl = data.jobURL;
+            console.log('Job URL:', jobUrl);
+            if (messagesElement) {
+                messagesElement.textContent = '';
+                messagesElement.textContent += 'Job URL: ' + jobUrl + '\n';
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
-    window.uploadData = uploadData;
 
     function validateJob(messagesElement) {
         if (!accessToken || !csrfToken || !validateJobURL) {
