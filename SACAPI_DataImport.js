@@ -44,9 +44,9 @@
 
             .catch(error => console.error('Error:', error));
     }
-
     window.getAccessToken = getAccessToken;
 
+    
     function getCsrfToken(messagesElement) {
         if (!accessToken) {
             console.log('Access token is not set');
@@ -72,8 +72,8 @@
             })
             .catch(error => console.error('Error:', error));
     }
-
     window.getCsrfToken = getCsrfToken;
+    
 
     function createJob(messagesElement) {
         if (!accessToken || !csrfToken) {
@@ -107,49 +107,51 @@
             .catch(error => console.error('Error:', error));
     }
     window.createJob = createJob;
-    function createJob(messagesElement) {
-        if (!accessToken || !csrfToken) {
-            console.log('Access token or CSRF token is not set');
+
+    
+    function uploadData(csvData, messagesElement) {
+        console.log('uploadData is triggered');
+        if (!accessToken || !csrfToken || !jobUrl) {
+            console.log('Access token, CSRF token, or job URL is not set');
             return;
         }
-    
-        console.log('Creating job with the following settings:', JSON.stringify(jobSettings, null, 2));
-    
-        return fetch(apiEndpoint, {
+        // Log the values of accessToken, csrfToken, and jobUrl
+        console.log('accessToken:', accessToken);
+        console.log('csrfToken:', csrfToken);
+        console.log('jobUrl:', jobUrl);
+        console.log('csvData:', csvData);
+        return fetch(jobUrl, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'text/csv',
                 'Authorization': `Bearer ${accessToken}`,
                 'x-csrf-token': csrfToken,
                 'x-sap-sac-custom-auth': 'true'
             },
-            body: JSON.stringify(jobSettings)
+            body: csvData
         })
-        .then(response => {
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-            return response.text();
-        })
-        .then(text => {
-            console.log('Response body:', text);
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('Failed to parse response as JSON:', e);
-                throw new Error('Invalid JSON response');
-            }
-        })
-        .then(data => {
-            jobUrl = data.jobURL;
-            console.log('Job URL:', jobUrl);
-            if (messagesElement) {
-                messagesElement.textContent = '';
-                messagesElement.textContent += 'Job URL: ' + jobUrl + '\n';
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+            .then(response => {
+                console.log(response);  // Log the raw response object.
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                validateJobURL = data.validateJobURL;
+                runJobURL = data.runJobURL;
+                console.log('Validate job URL:', validateJobURL);
+                console.log('Run job URL:', runJobURL);
+                if (messagesElement) {
+                    messagesElement.textContent = '';  // Clear the messages
+                    messagesElement.textContent += 'Validate job URL: ' + validateJobURL + '\n';
+                    messagesElement.textContent += 'Run job URL: ' + runJobURL + '\n';
+                }
 
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    window.uploadData = uploadData;
+
+    
     function validateJob(messagesElement) {
         if (!accessToken || !csrfToken || !validateJobURL) {
             console.log('Access token, CSRF token, or validate job URL is not set');
@@ -196,6 +198,8 @@
             .catch(error => console.error('Error:', error));
     }
     window.validateJob = validateJob;
+
+    
     function runJob(messagesElement) {
         if (!accessToken || !csrfToken || !runJobURL) {
             console.log('Access token, CSRF token, or run job URL is not set');
