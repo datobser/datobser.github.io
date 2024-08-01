@@ -371,14 +371,14 @@
         }
 
         _convertTasksToCSV(tasks) {
-            const header = ['Version', 'Date', 'ID', 'Label', 'StartDate', 'EndDate', 'Open', 'Progress'];
+            const header = ['Version', 'Date', 'StartDate', 'EndDate', 'ID', 'Label', 'Open', 'Progress'];
             const rows = tasks.map(task => [
                 task.version,
                 task.date,
-                task.id,
-                task.name,
                 task.start,
                 task.end,
+                task.id,
+                task.name,
                 task.open.toString(),
                 task.progress.toString()
             ]);
