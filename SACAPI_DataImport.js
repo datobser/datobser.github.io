@@ -9,6 +9,8 @@
     
     const jobSettings = {
         "Mapping": {
+            "Version": "Version",
+            "Date": "Date",
             "ID": "ID",
             "Label": "Label",
             "StartDate": "StartDate",
