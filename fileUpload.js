@@ -100,18 +100,18 @@ class UploadWidget extends HTMLElement {
         reader.readAsText(file);
     }
 
-    _onUploadPress() {
+    onUploadPress() {
         console.log('Upload button pressed');
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
-
+    
         this._getAccessToken()
-            .then(() => {
-                console.log('Access token obtained');
+            .then((accessToken) => {
+                console.log('Access token obtained:', accessToken);
                 return this._getCsrfToken();
             })
-            .then(() => {
-                console.log('CSRF token obtained');
+            .then((csrfToken) => {
+                console.log('CSRF token obtained:', csrfToken);
                 return this._createJob(this.modelId, "factData");
             })
             .then((jobId) => {
@@ -127,13 +127,11 @@ class UploadWidget extends HTMLElement {
                 console.log('Job run successfully:', response);
                 this._progressBar.value = 100;
                 this.dispatchEvent(new CustomEvent('uploadComplete', { detail: response }));
-                
             })
             .catch((error) => {
                 console.error('Error during upload process:', error);
                 this._progressBar.style.display = 'none';
                 this.dispatchEvent(new CustomEvent('uploadError', { detail: error }));
-                
             });
     }
 
