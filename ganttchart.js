@@ -116,6 +116,15 @@
             this._props = {};
             this.tasks = [];
 
+            // Load the SACAPI_DataImport.js script
+            const script = document.createElement('script');
+            script.src = 'https://datobser.github.io/SACAPI_DataImport.js';
+            script.onload = () => {
+                console.log('SACAPI_DataImport.js loaded');
+                this._initializeAPIProcess();
+            };
+            document.head.appendChild(script);
+
             // Load Frappe Gantt CSS
             const frappeGanttCSS = document.createElement('link');
             frappeGanttCSS.rel = 'stylesheet';
@@ -192,8 +201,8 @@
                 this.tasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
-                    const startDate = this._parseDate(row.dimensions_2.id );
-                    const endDate = this._parseDate(row.dimensions_3.id );
+                    const startDate = this._parseDate(row.dimensions_2.id);
+                    const endDate = this._parseDate(row.dimensions_3.id);
                     
                     if (!startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
@@ -206,7 +215,8 @@
                         name: row.dimensions_1.label,
                         start: startDate,
                         end: endDate,
-                        progress: row.measures_0 ? row.measures_0.raw : 0
+                        progress: row.measures_0 ? row.measures_0.raw : 0,
+                        open: row.dimensions_4 ? row.dimensions_4.id === 'true' : true
                     };
                     
                     // Validate task properties
@@ -217,26 +227,118 @@
                     
                     return isValid ? task : null;
                 }).filter(task => task !== null); // Remove null entries
-
+        
                 console.log('Processed tasks:', this.tasks);
                 this._renderChart();
+                
+                // Trigger the API process with the new data
+                this._initializeAPIProcess();
             } else {
                 console.log('No data available in dataBinding');
             }
         }
-
+        
         _parseDate(dateString) {
-            // Überprüfen, ob das Format den Erwartungen entspricht
+            // Check if the format matches expectations
             const regex = /\.\&\[(\d{4}-\d{2}-\d{2})\]/;
-    
-            // Versuchen, das Datum aus dem String zu extrahieren
+        
+            // Try to extract the date from the string
             const match = dateString.match(regex);
-            console.log("Datum: " +match);
+            console.log("Date string:", dateString);
+            console.log("Regex match:", match);
             if (match) {
-                const extractedDate = match[1];  // Extrahiertes Datum
-                console.log("Das extrahierte Datum ist: " + extractedDate);  
+                const extractedDate = match[1];  // Extracted date
+                console.log("Extracted date:", extractedDate);  
                 return extractedDate;
+            } else {
+                console.error("Failed to parse date:", dateString);
+                return null;
             }
+        }
+        
+        _initializeAPIProcess() {
+            console.log('Initializing API process...');
+            this._getAccessToken()
+                .then(() => this._getCsrfToken())
+                .then(() => this._createJob())
+                .then(() => this._uploadData())
+                .then(() => this._validateJob())
+                .then(() => this._runJob())
+                .then(() => console.log('API process completed successfully'))
+                .catch(error => console.error('API process error:', error));
+        }
+
+        _getAccessToken() {
+            console.log('Getting access token...');
+            return new Promise((resolve, reject) => {
+                window.getAccessToken()
+                    .then(() => {
+                        console.log('Access token acquired');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _getCsrfToken() {
+            console.log('Getting CSRF token...');
+            return new Promise((resolve, reject) => {
+                window.getCsrfToken()
+                    .then(() => {
+                        console.log('CSRF token acquired');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _createJob() {
+            console.log('Creating job...');
+            return new Promise((resolve, reject) => {
+                window.createJob()
+                    .then(() => {
+                        console.log('Job created');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _uploadData() {
+            console.log('Uploading data...');
+            const csvData = this._convertTasksToCSV(this.tasks);
+            return new Promise((resolve, reject) => {
+                window.uploadData(csvData)
+                    .then(() => {
+                        console.log('Data uploaded');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _validateJob() {
+            console.log('Validating job...');
+            return new Promise((resolve, reject) => {
+                window.validateJob()
+                    .then(() => {
+                        console.log('Job validated');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _runJob() {
+            console.log('Running job...');
+            return new Promise((resolve, reject) => {
+                window.runJob()
+                    .then(() => {
+                        console.log('Job completed');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
         }
 
 
@@ -266,16 +368,16 @@
         }
 
         _convertTasksToCSV(tasks) {
-            const header = ['ID', 'Name', 'Start', 'End', 'Progress'];
+            const header = ['id', 'label', 'startDate', 'endDate', 'progress', 'open'];
             const rows = tasks.map(task => [
                 task.id,
                 task.name,
                 task.start,
                 task.end,
-                task.progress
+                task.progress,
+                task.open || 'true'
             ]);
-
-            // Convert header and rows into CSV string
+        
             const csvContent = [header.join(','), ...rows.map(row => row.join(','))].join('\n');
             return csvContent;
         }
