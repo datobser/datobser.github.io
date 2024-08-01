@@ -99,7 +99,7 @@ class UploadWidget extends HTMLElement {
         reader.readAsText(file);
     }
 
-    onUploadPress() {
+    _onUploadPress() {
         console.log('Upload button pressed');
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
