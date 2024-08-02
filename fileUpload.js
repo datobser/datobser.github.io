@@ -231,11 +231,11 @@ class UploadWidget extends HTMLElement {
         });
     }
 
-    _uploadData(jobId, data) {
-        console.log('Uploading data for jobId:', jobId);
+    _uploadData() {
+        console.log('Uploading data for jobId:', this.jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/" + jobId,
+                url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/" + this.jobId,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
