@@ -165,7 +165,8 @@
                 'Authorization': `Bearer ${accessToken}`,
                 'x-csrf-token': csrfToken,
                 'x-sap-sac-custom-auth': 'true'
-            }
+            },
+            body: JSON.stringify(jobSettings)
         })
             .then(response => response.json())
             .then(data => {
