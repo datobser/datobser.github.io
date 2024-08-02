@@ -23,6 +23,14 @@
         }
     };
 
+    const fetchWithTimeout = (url, options, timeout = 30000) => {
+      return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timed out')), timeout)
+        )
+      ]);
+    };
 
     function getAccessToken(messagesElement) {
         return fetch(tokenUrl, {
@@ -158,9 +166,16 @@
             return Promise.reject('Missing required tokens or URL');
         }
     
-        console.log('Job Settings:', jobSettings);  // Log the job settings
+        console.log('Job Settings:', jobSettings);
+        console.log('Sending request to:', validateJobURL);
+        console.log('With headers:', {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken.substring(0, 10)}...`,
+            'x-csrf-token': csrfToken,
+            'x-sap-sac-custom-auth': 'true'
+        });
     
-        return fetch(validateJobURL, {
+        return fetchWithTimeout(validateJobURL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -169,17 +184,21 @@
                 'x-sap-sac-custom-auth': 'true'
             },
             body: JSON.stringify(jobSettings)
+        }, 60000)
+        .catch(networkError => {
+            console.error('Network error:', networkError);
+            throw networkError;
         })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.text();  // Get the raw text instead of parsing JSON
+            return response.text();
         })
         .then(text => {
-            console.log('Raw response:', text);  // Log the raw response
+            console.log('Raw response:', text);
             try {
-                return JSON.parse(text);  // Try to parse the JSON
+                return JSON.parse(text);
             } catch (e) {
                 console.error('Failed to parse JSON:', e);
                 throw new Error('Invalid JSON in response');
@@ -195,8 +214,7 @@
                     messagesElement.textContent += 'Invalid rows URL: ' + invalidRowsURL + '\n';
                 }
     
-                // Fetch the invalid rows
-                return fetch(invalidRowsURL, {
+                return fetchWithTimeout(invalidRowsURL, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -204,7 +222,7 @@
                         'x-csrf-token': csrfToken,
                         'x-sap-sac-custom-auth': 'true'
                     }
-                })
+                }, 60000)
                 .then(response => response.json())
                 .then(data => {
                     console.log('Invalid rows:', data);
