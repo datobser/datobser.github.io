@@ -267,8 +267,14 @@
                 .then(() => this._uploadData())
                 .then(() => this._validateJob())
                 .then(() => this._runJob())
-                .then(() => console.log('API process completed successfully'))
-                .catch(error => console.error('API process error:', error));
+                .then(jobStatus => {
+                    console.log('Final job status:', jobStatus);
+                    console.log('API process completed successfully');
+                })
+                .catch(error => {
+                    console.error('API process error:', error);
+                    // Handle the error appropriately
+                });
         }
 
         _getAccessToken() {
