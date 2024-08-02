@@ -117,7 +117,7 @@ class UploadWidget extends HTMLElement {
         console.log('Upload button pressed');
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
-    
+        console.log('Model metadata:',_getModelMetadata());
         this._getAccessToken()
             .then((accessToken) => {
                 console.log('Access token obtained:', accessToken);
@@ -273,7 +273,7 @@ class UploadWidget extends HTMLElement {
         });
     }
 
-    _runJob(jobId) {
+    _runJob() {
         console.log('Running job with jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -292,6 +292,29 @@ class UploadWidget extends HTMLElement {
                     const responseText = jqXHR.responseText;
                     const errorMessage = `Job run request failed: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
                     console.error(errorMessage);
+                }
+            });
+        });
+    }
+
+    _getModelMetadata() {
+        console.log('Retrieving model metadata');
+        const modelId = "Coocob05ulj04oih3r0j6m9ga60";
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/models/" + modelId + "/metadata`,
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + this._accessToken,
+                    "x-csrf-token": this._csrfToken
+                },
+                success: (response) => {
+                    console.log('Model metadata:', response);
+                    resolve(response);
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Failed to retrieve model metadata:', errorThrown);
+                    reject(errorThrown);
                 }
             });
         });
