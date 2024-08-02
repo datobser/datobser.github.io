@@ -251,6 +251,7 @@
         }
         
         _parseDate(dateString) {
+            console.log(dateString);
             // Überprüfen, ob das Format den Erwartungen entspricht
             const regex = /\.\&\[(\d{4}-\d{2}-\d{2})\]/;
     
