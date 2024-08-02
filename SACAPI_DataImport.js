@@ -184,11 +184,7 @@
                 'x-sap-sac-custom-auth': 'true'
             },
             body: JSON.stringify(jobSettings)
-        }, 60000)
-        .catch(networkError => {
-            console.error('Network error:', networkError);
-            throw networkError;
-        })
+        }, 120000)  // Increased timeout to 2 minutes
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -207,79 +203,80 @@
         .then(data => {
             console.log('Job validation response:', data);
             if (data.failedNumberRows > 0) {
-                let invalidRowsURL = data.invalidRowsURL;
-                console.log('Invalid rows URL:', invalidRowsURL);
-                if (messagesElement) {
-                    messagesElement.textContent = '';
-                    messagesElement.textContent += 'Invalid rows URL: ' + invalidRowsURL + '\n';
-                }
-    
-                return fetchWithTimeout(invalidRowsURL, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`,
-                        'x-csrf-token': csrfToken,
-                        'x-sap-sac-custom-auth': 'true'
-                    }
-                }, 60000)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Invalid rows:', data);
-                });
+                // Handle failed rows...
             }
+            return data;  // Return the data for the next then block
         })
         .catch(error => {
             console.error('Validation Error:', error);
             if (messagesElement) {
                 messagesElement.textContent = 'Validation Error: ' + error.message;
             }
+            throw error;  // Rethrow the error to stop the chain
         });
     }
     window.validateJob = validateJob;
-
     
     function runJob(messagesElement) {
         if (!accessToken || !csrfToken || !runJobURL) {
             console.log('Access token, CSRF token, or run job URL is not set');
-            return;
+            return Promise.reject('Missing required tokens or URL');
         }
-
-        return fetch(runJobURL, {
+    
+        return fetchWithTimeout(runJobURL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'text/csv',
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
                 'x-csrf-token': csrfToken,
                 'x-sap-sac-custom-auth': 'true'
             }
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Job run response:', data);
-                jobStatusURL = data.jobStatusURL;
-                console.log('Job status URL:', jobStatusURL);
-                if (messagesElement) {
-                    messagesElement.textContent = '';  // Clear the messages
-                    messagesElement.textContent += 'Invalid rows URL: ' + jobStatusURL + '\n';
+        }, 120000)
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 412) {
+                    throw new Error('Precondition Failed: Job validation may have failed');
                 }
-
-                // Fetch the job status
-                return fetch(jobStatusURL, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                        'x-csrf-token': csrfToken,
-                        'x-sap-sac-custom-auth': 'true'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Job status:', data);
-                    })
-                    .catch(error => console.error('Error:', error));
-            })
-            .catch(error => console.error('Error:', error));
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Job run response:', data);
+            if (data.jobStatusURL) {
+                return checkJobStatus(data.jobStatusURL);
+            } else {
+                throw new Error('No job status URL provided');
+            }
+        })
+        .catch(error => {
+            console.error('Job Run Error:', error);
+            if (messagesElement) {
+                messagesElement.textContent = 'Job Run Error: ' + error.message;
+            }
+            throw error;
+        });
+    }
+    
+    function checkJobStatus(statusURL) {
+        return fetchWithTimeout(statusURL, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'x-csrf-token': csrfToken,
+                'x-sap-sac-custom-auth': 'true'
+            }
+        }, 60000)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Job status:', data);
+            return data;
+        });
     }
     window.runJob = runJob;
 
