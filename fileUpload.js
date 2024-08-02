@@ -93,12 +93,25 @@ class UploadWidget extends HTMLElement {
 
     _readFileData(file) {
         const reader = new FileReader();
+    
         reader.onload = (e) => {
-            this._fileData = e.target.result;
-            console.log('File data read successfully');
+            const arrayBuffer = e.target.result;
+    
+            // Create a Blob from the ArrayBuffer with the MIME type for .xlsx files
+            this._fileData = new Blob([arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
+            console.log('File data read and converted to Blob successfully');
         };
-        reader.readAsText(file);
+    
+        reader.onerror = (error) => {
+            console.error('Error reading file:', error);
+        };
+    
+        // Use readAsArrayBuffer to handle binary files properly
+        reader.readAsArrayBuffer(file);
     }
+
+
 
     _onUploadPress() {
         console.log('Upload button pressed');
