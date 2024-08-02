@@ -123,6 +123,7 @@
             console.log('Access token, CSRF token, or job URL is not set');
             return;
         }
+        console.log('CSV Data (first 500 chars):', csvData.substring(0, 500));
         // Log the values of accessToken, csrfToken, and jobUrl
         console.log('accessToken:', accessToken);
         console.log('csrfToken:', csrfToken);
