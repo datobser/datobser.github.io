@@ -254,10 +254,16 @@
             console.log('Parsing date:', dateString);
             // Check if the date string is in the format [Date].[YQM].[All].[(all)]
             if (dateString.includes('[Date]') || dateString.includes('[EndDate]') || dateString.includes('[StartDate]')) {
-                console.log("Detected date placeholder. Using current date as a placeholder.");
-                // Return current date as a placeholder
-                const today = new Date();
-                return today.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+                console.log('Parsing date:', dateString);
+                const parts = dateString.split('.')
+                    .map(part => part.replace(/[\[\]]/g, ''))
+                    .filter(part => part !== 'All' && part !== '(all)');
+                
+                return {
+                    type: parts[0], // Date, StartDate, or EndDate
+                    granularity: parts[1] || 'YQM', // YQM or more specific if provided
+                    value: parts[2] || 'All' // Specific value or 'All'
+                };
             }
             
             // If it's not a placeholder, try to parse it as before
