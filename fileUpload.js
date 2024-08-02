@@ -238,6 +238,7 @@ class UploadWidget extends HTMLElement {
                 reject(new Error('No data available to upload'));
                 return;
             }
+            console.log(this._fileData);
             $.ajax({
                 url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/jobs/dee7e875-23b2-4211-aeed-7a0c197551a5",
                 method: "POST",
@@ -263,7 +264,7 @@ class UploadWidget extends HTMLElement {
         console.log('Running job with jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/jobs/" + jobId + "/run",
+                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/jobs/dee7e875-23b2-4211-aeed-7a0c197551a5" + "/run",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
