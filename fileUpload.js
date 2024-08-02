@@ -226,8 +226,11 @@ class UploadWidget extends HTMLElement {
                 data: JSON.stringify({
                     importType: importType,
                     jobSettings: {
-                        importMethod: "Update", // You can change this as needed
-                        executeWithFailedRows: false
+                        importMethod: "Update", 
+                        dimensionScope: [],
+                        dateFormats: {},
+                        executeWithFailedRows: false,
+                        ignoreAdditionalColumns: false
                     }
                 }),
                 success: (response) => {
