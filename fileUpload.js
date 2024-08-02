@@ -210,7 +210,11 @@ class UploadWidget extends HTMLElement {
                     "Content-Type": "application/json"
                 },
                 data: JSON.stringify({
-                    "importType": importType // Direkt im Body und nicht innerhalb von JobSettings
+                    importType: importType,
+                    jobSettings: {
+                        importMethod: "Update", // You can change this as needed
+                        executeWithFailedRows: false
+                    }
                 }),
                 success: (response) => {
                     console.log('Job creation response:', response);
