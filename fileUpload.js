@@ -218,6 +218,7 @@ class UploadWidget extends HTMLElement {
                 }),
                 success: (response) => {
                     console.log('Job creation response:', response);
+                    this._jobId = response.JobID;
                     resolve(response.JobID);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
