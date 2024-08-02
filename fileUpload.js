@@ -117,7 +117,8 @@ class UploadWidget extends HTMLElement {
         console.log('Upload button pressed');
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
-        console.log('Model metadata:',_getModelMetadata());
+        const metadata =_getModelMetadata();
+        console.log('Model metadata:',metadata);
         this._getAccessToken()
             .then((accessToken) => {
                 console.log('Access token obtained:', accessToken);
