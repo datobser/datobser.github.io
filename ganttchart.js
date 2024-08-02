@@ -251,31 +251,16 @@
         }
         
         _parseDate(dateString) {
-            console.log('Parsing date:', dateString);
-            // Check if the date string is in the format [Date].[YQM].[All].[(all)]
-            if (dateString.includes('[Date]') || dateString.includes('[EndDate]') || dateString.includes('[StartDate]')) {
-                console.log('Parsing date:', dateString);
-                const parts = dateString.split('.')
-                    .map(part => part.replace(/[\[\]]/g, ''))
-                    .filter(part => part !== 'All' && part !== '(all)');
-                
-                return {
-                    type: parts[0], // Date, StartDate, or EndDate
-                    granularity: parts[1] || 'YQM', // YQM or more specific if provided
-                    value: parts[2] || 'All' // Specific value or 'All'
-                };
-            }
-            
-            // If it's not a placeholder, try to parse it as before
+            // Überprüfen, ob das Format den Erwartungen entspricht
             const regex = /\.\&\[(\d{4}-\d{2}-\d{2})\]/;
+    
+            // Versuchen, das Datum aus dem String zu extrahieren
             const match = dateString.match(regex);
+            console.log("Datum: " +match);
             if (match) {
-                const extractedDate = match[1];
-                console.log("Extracted date:", extractedDate);
+                const extractedDate = match[1];  // Extrahiertes Datum
+                console.log("Das extrahierte Datum ist: " + extractedDate);  
                 return extractedDate;
-            } else {
-                console.error("Failed to parse date:", dateString);
-                return null;
             }
         }
         
