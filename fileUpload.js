@@ -234,6 +234,10 @@ class UploadWidget extends HTMLElement {
     _uploadData() {
         console.log('Uploading data for jobId: dee7e875-23b2-4211-aeed-7a0c197551a5');
         return new Promise((resolve, reject) => {
+            if (!this._fileData) {
+                reject(new Error('No data available to upload'));
+                return;
+            }
             $.ajax({
                 url: "https://a2pp-1.authentication.eu10.hana.ondemand.com" + "/api/v1/dataimport/jobs/dee7e875-23b2-4211-aeed-7a0c197551a5",
                 method: "POST",
@@ -242,7 +246,7 @@ class UploadWidget extends HTMLElement {
                     "x-csrf-token": this._csrfToken,
                     "Content-Type": "application/json"
                 },
-                data: JSON.stringify({ "Data": data }),
+                data: JSON.stringify({ "Data": this._fileData}),
                 success: (response) => {
                     console.log('Data upload response:', response);
                     resolve(response);
