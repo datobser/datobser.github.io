@@ -267,7 +267,7 @@
             
             // The last part should be the actual date
             const datePart = parts[parts.length - 1];
-            console.log('Date Part',datePart);
+            console.log('Date Part:',datePart);
             
             // Parse the date
             const date = new Date(datePart);
