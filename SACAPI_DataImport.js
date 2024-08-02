@@ -196,7 +196,15 @@
                         .catch(error => console.error('Error:', error));
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+              console.error('Raw Error:', error); // Log the raw error object
+              if (error instanceof SyntaxError) {
+                console.error('Syntax Error:', error.message);
+              } else {
+                console.error('Other Error:', error);
+              }
+            });
+
     }
     window.validateJob = validateJob;
 
