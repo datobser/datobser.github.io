@@ -155,9 +155,11 @@
     function validateJob(messagesElement) {
         if (!accessToken || !csrfToken || !validateJobURL) {
             console.log('Access token, CSRF token, or validate job URL is not set');
-            return;
+            return Promise.reject('Missing required tokens or URL');
         }
-
+    
+        console.log('Job Settings:', jobSettings);  // Log the job settings
+    
         return fetch(validateJobURL, {
             method: 'POST',
             headers: {
@@ -168,43 +170,53 @@
             },
             body: JSON.stringify(jobSettings)
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Job validation response:', data);
-                if (data.failedNumberRows > 0) {
-                    invalidRowsURL = data.invalidRowsURL;
-                    console.log('Invalid rows URL:', invalidRowsURL);
-                    if (messagesElement) {
-                        messagesElement.textContent = '';  // Clear the messages
-                        messagesElement.textContent += 'Invalid rows URL: ' + invalidRowsURL + '\n';
-                    }
-
-                    // Fetch the invalid rows
-                    return fetch(invalidRowsURL, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${accessToken}`,
-                            'x-csrf-token': csrfToken,
-                            'x-sap-sac-custom-auth': 'true'
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Invalid rows:', data);
-                        })
-                        .catch(error => console.error('Error:', error));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();  // Get the raw text instead of parsing JSON
+        })
+        .then(text => {
+            console.log('Raw response:', text);  // Log the raw response
+            try {
+                return JSON.parse(text);  // Try to parse the JSON
+            } catch (e) {
+                console.error('Failed to parse JSON:', e);
+                throw new Error('Invalid JSON in response');
+            }
+        })
+        .then(data => {
+            console.log('Job validation response:', data);
+            if (data.failedNumberRows > 0) {
+                let invalidRowsURL = data.invalidRowsURL;
+                console.log('Invalid rows URL:', invalidRowsURL);
+                if (messagesElement) {
+                    messagesElement.textContent = '';
+                    messagesElement.textContent += 'Invalid rows URL: ' + invalidRowsURL + '\n';
                 }
-            })
-            .catch(error => {
-              console.error('Raw Error:', error); // Log the raw error object
-              if (error instanceof SyntaxError) {
-                console.error('Syntax Error:', error.message);
-              } else {
-                console.error('Other Error:', error);
-              }
-            });
-
+    
+                // Fetch the invalid rows
+                return fetch(invalidRowsURL, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`,
+                        'x-csrf-token': csrfToken,
+                        'x-sap-sac-custom-auth': 'true'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Invalid rows:', data);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Validation Error:', error);
+            if (messagesElement) {
+                messagesElement.textContent = 'Validation Error: ' + error.message;
+            }
+        });
     }
     window.validateJob = validateJob;
 
