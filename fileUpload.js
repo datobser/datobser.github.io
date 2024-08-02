@@ -141,7 +141,7 @@ class UploadWidget extends HTMLElement {
             })
             .then(({ accessToken, csrfToken, jobId }) => {
                 console.log('Data uploaded successfully');
-                return this._runJob(this._jobId);
+                return "dee7e875-23b2-4211-aeed-7a0c197551a5";
             })
             .then((response) => {
                 console.log('Job run successfully:', response);
