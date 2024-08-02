@@ -1,3 +1,4 @@
+
 (function() {
     let tmpl = document.createElement('template');
     tmpl.innerHTML = `
@@ -202,9 +203,9 @@
                 const processedTasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
-                    const date = this._parseDate(row.dimensions_5.id);
+                    const date = this._parseDate(row.dimensions_0.id);
                     const endDate = this._parseDate(row.dimensions_1.id);
-                    const startDate = this._parseDate(row.dimensions_0.id);
+                    const startDate = this._parseDate(row.dimensions_5.id);
                     
                     if (!date || !startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
