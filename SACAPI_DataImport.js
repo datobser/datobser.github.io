@@ -23,7 +23,7 @@
         }
     };
 
-    const fetchWithTimeout = (url, options, timeout = 30000) => {
+    const fetchWithTimeout = (url, options, timeout = 60000) => {
       return Promise.race([
         fetch(url, options),
         new Promise((_, reject) => 
