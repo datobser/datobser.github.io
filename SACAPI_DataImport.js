@@ -117,7 +117,7 @@
     window.createJob = createJob;
 
     
-    function uploadData(csvData, messagesElement) {
+    function uploadData(csvData) {
         console.log('uploadData is triggered');
         if (!accessToken || !csrfToken || !jobUrl) {
             console.log('Access token, CSRF token, or job URL is not set');
@@ -139,21 +139,15 @@
             body: csvData
         })
             .then(response => {
-                console.log(response);  // Log the raw response object.
+                console.log('Response:', response);  // Log the raw response object.
                 return response.json();
             })
             .then(data => {
-                console.log(data);
+                console.log('Data:',data);
                 validateJobURL = data.validateJobURL;
                 runJobURL = data.runJobURL;
                 console.log('Validate job URL:', validateJobURL);
                 console.log('Run job URL:', runJobURL);
-                if (messagesElement) {
-                    messagesElement.textContent = '';  // Clear the messages
-                    messagesElement.textContent += 'Validate job URL: ' + validateJobURL + '\n';
-                    messagesElement.textContent += 'Run job URL: ' + runJobURL + '\n';
-                }
-
             })
             .catch(error => console.error('Error:', error));
     }
