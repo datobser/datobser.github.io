@@ -160,7 +160,6 @@
             return Promise.reject('Missing required tokens or URL');
         }
     
-        console.log('Job Settings:', jobSettings);
         console.log('Sending request to:', validateJobURL);
         console.log('With headers:', {
             'Content-Type': 'application/json',
@@ -176,12 +175,12 @@
                 'Authorization': `Bearer ${accessToken}`,
                 'x-csrf-token': csrfToken,
                 'x-sap-sac-custom-auth': 'true'
-            },
-            body: JSON.stringify(jobSettings)
-        }, 120000)  // Increased timeout to 2 minutes
+            }
+            // Removed body: JSON.stringify(jobSettings)
+        }, 180000)  // Increased timeout to 3 minutes
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw response;  // Throw the entire response object for more details
             }
             return response.text();
         })
@@ -197,14 +196,24 @@
         .then(data => {
             console.log('Job validation response:', data);
             if (data.failedNumberRows > 0) {
+                console.warn(`${data.failedNumberRows} rows failed validation`);
                 // Handle failed rows...
             }
             return data;  // Return the data for the next then block
         })
         .catch(error => {
             console.error('Validation Error:', error);
-            if (messagesElement) {
-                messagesElement.textContent = 'Validation Error: ' + error.message;
+            if (error.text) {  // If it's a response object
+                return error.text().then(text => {
+                    console.error('Error response body:', text);
+                    if (messagesElement) {
+                        messagesElement.textContent = 'Validation Error: ' + text;
+                    }
+                });
+            } else {
+                if (messagesElement) {
+                    messagesElement.textContent = 'Validation Error: ' + error.message;
+                }
             }
             throw error;  // Rethrow the error to stop the chain
         });
