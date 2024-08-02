@@ -198,7 +198,8 @@
             console.log('_updateData called');
             if (dataBinding && dataBinding.data) {
                 console.log('Raw data:', dataBinding.data);
-                this.tasks = dataBinding.data.map((row, index) => {
+                
+                const processedTasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
                     const date = this._parseDate(row.dimensions_1.id);
@@ -226,16 +227,23 @@
                     const isValid = task.version && task.date && task.id && task.name && task.start && task.end;
                     if (!isValid) {
                         console.error('Invalid task filtered out:', task);
+                        return null;
                     }
                     
-                    return isValid ? task : null;
+                    console.log('Processed task:', task);
+                    return task;
                 }).filter(task => task !== null); // Remove null entries
         
-                console.log('Processed tasks:', this.tasks);
-                this._renderChart();
+                console.log('All processed tasks:', processedTasks);
                 
-                // Trigger the API process with the new data
-                this._initializeAPIProcess();
+                if (processedTasks.length > 0) {
+                    this.tasks = processedTasks;
+                    console.log('this.tasks updated:', this.tasks);
+                    this._renderChart();
+                    this._initializeAPIProcess();
+                } else {
+                    console.error('No valid tasks were processed');
+                }
             } else {
                 console.log('No data available in dataBinding');
             }
