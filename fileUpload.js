@@ -202,7 +202,7 @@ class UploadWidget extends HTMLElement {
         console.log(importType);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/models/" + modelId,
+                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/models/" + modelId + "/factData",
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
