@@ -4,7 +4,7 @@ class UploadWidget extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         
         // Initialize properties
-        this.tenantUrl = 'https://a2pp-1.eu10.hcs.cloud.sap';
+        this._tenantUrl = 'https://a2pp-1.eu10.hcs.cloud.sap';
         this._accessToken = null;
         this._csrfToken = null;
         this._modelId = 'Coocob05ulj04oih3r0j6m9ga60';
@@ -22,7 +22,7 @@ class UploadWidget extends HTMLElement {
     }
 
     get modelId() { return this.getAttribute('model-id') || this._modelId; }
-    get tenantUrl() { return this.getAttribute('tenant-url')|| this.tenantUrl; }
+    get tenantUrl() { return this._tenantUrl; }
     get clientId() { return this.getAttribute('client-id'); }
     get clientSecret() { return this.getAttribute('client-secret'); }
     get tokenUrl() { return this.getAttribute('token-url'); }
