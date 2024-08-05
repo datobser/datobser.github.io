@@ -159,7 +159,7 @@ class UploadWidget extends HTMLElement {
                 console.log('Job run successfully:', response);
                 this._progressBar.value = 100;
                 this.dispatchEvent(new CustomEvent('uploadComplete', { detail: response }));
-                return this._pollJobStatus(dee7e875-23b2-4211-aeed-7a0c197551a5);
+                return this._pollJobStatus('dee7e875-23b2-4211-aeed-7a0c197551a5');
             })
             .then((finalJobStatus) => {
                 console.log('Final job status:', finalJobStatus);
