@@ -331,7 +331,7 @@ class UploadWidget extends HTMLElement {
                 this._getJobStatus(jobId)
                     .then(status => {
                         console.log(`Job status (attempt ${attempts + 1}):`, status);
-                        this._updateProgressBar(status);
+                        //this._updateProgressBar(status);
 
                         if (status.jobStatus === 'COMPLETED') {
                             resolve(status);
