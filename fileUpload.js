@@ -329,8 +329,9 @@ class UploadWidget extends HTMLElement {
                     resolve(response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Failed to retrieve model metadata:', errorThrown);
-                    reject(errorThrown);
+                    const responseText = jqXHR.responseText;
+                    const errorMessage = `Failed to retrieve model metadata: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
+                    console.error(errorMessage);
                 }
             });
         });
