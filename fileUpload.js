@@ -241,7 +241,6 @@ class UploadWidget extends HTMLElement {
             });
         });
     }
-
     
     _createJob(modelId, importType) {
         console.log('Creating job for modelId:', modelId);
