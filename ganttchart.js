@@ -209,9 +209,9 @@
                     const endDateString = row.dimensions_2.id;
                     
                     // Parse the dates
-                    const date = this.parseDate(dateString);
-                    const startDate = this.parseDate(startDateString);
-                    const endDate = this.parseDate(endDateString);
+                    const date = this._parseDate(dateString);
+                    const startDate = this._parseDate(startDateString);
+                    const endDate = this._parseDate(endDateString);
                     
                     if (!date || !startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
