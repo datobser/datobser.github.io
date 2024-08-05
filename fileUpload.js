@@ -143,21 +143,27 @@ class UploadWidget extends HTMLElement {
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
 
-        this._getModelMetadata()
-            .then(() => this._getAccessToken())
+        this._getAccessToken()
             .then((accessToken) => {
                 console.log('Access token obtained:', accessToken);
+                // Get CSRF token after obtaining access token
                 return this._getCsrfToken().then(csrfToken => {
                     return { accessToken, csrfToken };
                 });
             })
             .then(({ accessToken, csrfToken }) => {
                 console.log('CSRF token obtained:', csrfToken);
+                // Get model metadata
+                return this._getModelMetadata().then(() => ({ accessToken, csrfToken }));
+            })
+            .then(() => {
+                // Create job
                 return this._createJob(this._modelId, "factData");
             })
             .then((jobId) => {
                 console.log('Job created with ID:', jobId);
                 this._jobId = jobId;
+                // Upload data
                 return this._uploadData(jobId, this._fileData);
             })
             .then((uploadResponse) => {
@@ -165,6 +171,7 @@ class UploadWidget extends HTMLElement {
                 if (uploadResponse.status !== 'success') {
                     throw new Error(`Data upload failed: ${uploadResponse.message}`);
                 }
+                // Run job
                 return this._runJob(this._jobId);
             })
             .then((runJobResponse) => {
@@ -172,6 +179,7 @@ class UploadWidget extends HTMLElement {
                 if (runJobResponse.status !== 'success') {
                     throw new Error(`Job execution failed: ${runJobResponse.message}`);
                 }
+                // Poll job status
                 return this._pollJobStatus(this._jobId);
             })
             .then((finalJobStatus) => {
@@ -188,6 +196,7 @@ class UploadWidget extends HTMLElement {
                 this._progressBar.style.display = 'none';
                 this.dispatchEvent(new CustomEvent('uploadError', { detail: error.message }));
             });
+        
     }
 
 
