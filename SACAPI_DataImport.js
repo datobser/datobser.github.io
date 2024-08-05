@@ -19,7 +19,7 @@
             "Progress": "Progress"
         },
         "JobSettings": {
-            "importMethod": "Update"
+            "importMethod": "Update",
             "dateFormats": { 
                 "Date": "YYYY-MM-DD", 
                 "StartDate": "YYYY-MM-DD" 
