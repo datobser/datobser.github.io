@@ -92,13 +92,7 @@
         </label>
         <span id="form-status">New Tasks</span>
         
-        <div class="form-container">
-            <label class="switch">
-                <input type="checkbox" id="toggle-form-switch">
-                <span class="slider"></span>
-            </label>
-            <span id="form-status">New Tasks</span>
-            
+        <div class="form-container">    
             <input type="text" id="task-id" placeholder="ID" />
             <input type="text" id="task-name" placeholder="Name" />
             <input type="date" id="task-start" />
