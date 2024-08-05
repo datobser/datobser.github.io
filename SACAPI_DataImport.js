@@ -20,6 +20,11 @@
         },
         "JobSettings": {
             "importMethod": "Update"
+            "dateFormats": { 
+                "Date": "YYYY-MM-DD", 
+                "StartDate": "YYYY-MM-DD" 
+                "EndDate": "YYYY-MM-DD"
+             }
         }
     };
 
