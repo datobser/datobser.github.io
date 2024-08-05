@@ -1,4 +1,3 @@
-
 class UploadWidget extends HTMLElement {
     constructor() {
         super();
@@ -7,8 +6,10 @@ class UploadWidget extends HTMLElement {
         // Initialize properties
         this._accessToken = null;
         this._csrfToken = null;
+        this._modelId = null;
         this._jobId = null;
         this._fileData = null;
+        this._fileType = null;
 
         // Create UI elements
         this._createElements();
@@ -29,7 +30,8 @@ class UploadWidget extends HTMLElement {
 
     connectedCallback() {
         this._render();
-        console.log('UploadWidget connected to the DOM');
+        this._modelId = this.modelId; // Get modelId from data binding
+        console.log('UploadWidget connected to the DOM. model-id:', this._modelId);
     }
 
     _createElements() {
@@ -86,6 +88,7 @@ class UploadWidget extends HTMLElement {
                 this._uploadButton.disabled = true;
             } else {
                 console.log('Reading file data');
+                this._fileType = file.name.split('.').pop().toLowerCase();
                 this._readFileData(file);
             }
         }
@@ -93,23 +96,32 @@ class UploadWidget extends HTMLElement {
 
     _readFileData(file) {
         const reader = new FileReader();
-    
+
         reader.onload = (e) => {
-            const arrayBuffer = e.target.result;
-    
-            // Create a Blob from the ArrayBuffer with the MIME type for .xlsx files
-            this._fileData = new Blob([arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    
-            console.log('File data read and converted to Blob successfully');
+            const result = e.target.result;
+
+            if (this._fileType === 'xlsx') {
+                // Convert ArrayBuffer to Blob for .xlsx files
+                this._fileData = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            } else if (this._fileType === 'csv') {
+                // Convert text to Blob for .csv files
+                this._fileData = new Blob([result], { type: 'text/csv' });
+            }
+
+            console.log(`File data read and converted to Blob successfully (${this._fileType})`);
         };
-    
+
         reader.onerror = (error) => {
             console.error('Error reading file:', error);
         };
-    
-        // Use readAsArrayBuffer to handle binary files properly
-        reader.readAsArrayBuffer(file);
+
+        if (this._fileType === 'xlsx') {
+            reader.readAsArrayBuffer(file);
+        } else if (this._fileType === 'csv') {
+            reader.readAsText(file);
+        }
     }
+
 
 
 
