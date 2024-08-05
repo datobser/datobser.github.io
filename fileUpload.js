@@ -272,6 +272,8 @@ class UploadWidget extends HTMLElement {
 
     _uploadData() {
         console.log('Uploading data for jobId: 03711ca7-2023-4cb6-a497-22f6ec2af4bb');
+        console.log('_fileData:',this._fileData);
+        
         return new Promise((resolve, reject) => {
             if (!this._fileData) {
                 reject(new Error('No data available to upload'));
