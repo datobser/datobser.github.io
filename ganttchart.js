@@ -203,11 +203,15 @@
                 const processedTasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
-                    const date = this._parseDate(row.dimensions_0.id);
-                    const startDate = this._parseDate(row.dimensions_2.id);
-                    const endDate = this._parseDate(row.dimensions_3.id);
-
-                console.log('Parsed date:', date, 'startDate:', startDate, 'endDate:', endDate);
+                    // Extract the actual date strings
+                    const dateString = row.dimensions_0.id;
+                    const startDateString = row.dimensions_5.id;
+                    const endDateString = row.dimensions_2.id;
+                    
+                    // Parse the dates
+                    const date = this.parseDate(dateString);
+                    const startDate = this.parseDate(startDateString);
+                    const endDate = this.parseDate(endDateString);
                     
                     if (!date || !startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
