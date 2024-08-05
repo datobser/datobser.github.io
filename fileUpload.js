@@ -6,7 +6,7 @@ class UploadWidget extends HTMLElement {
         // Initialize properties
         this._accessToken = null;
         this._csrfToken = null;
-        this._modelId = null;
+        this._modelId = 'Coocob05ulj04oih3r0j6m9ga60';
         this._jobId = null;
         this._fileData = null;
         this._fileType = null;
@@ -127,11 +127,23 @@ class UploadWidget extends HTMLElement {
 
     _onUploadPress() {
         console.log('Upload button pressed');
+        if (!this._modelId) {
+            console.error('Model ID is not set. Cannot proceed with upload.');
+            this.dispatchEvent(new CustomEvent('uploadError', { detail: 'Model ID is not set' }));
+            return;
+        }
+
+        if (!this._fileData) {
+            console.error('No file selected. Cannot proceed with upload.');
+            this.dispatchEvent(new CustomEvent('uploadError', { detail: 'No file selected' }));
+            return;
+        }
+
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
-        const metadata =this._getModelMetadata();
-        console.log('Model metadata:',metadata);
-        this._getAccessToken()
+
+        this._getModelMetadata()
+            .then(() => this._getAccessToken())
             .then((accessToken) => {
                 console.log('Access token obtained:', accessToken);
                 return this._getCsrfToken().then(csrfToken => {
@@ -140,26 +152,26 @@ class UploadWidget extends HTMLElement {
             })
             .then(({ accessToken, csrfToken }) => {
                 console.log('CSRF token obtained:', csrfToken);
-                return this._createJob(this.modelId, "factData").then(jobId => {
-                    return { accessToken, csrfToken, jobId };
-                });
+                return this._createJob(this._modelId, "factData");
             })
-            .then(({ accessToken, csrfToken, jobId }) => {
+            .then((jobId) => {
                 console.log('Job created with ID:', jobId);
                 this._jobId = jobId;
-                return this._uploadData(jobId, this._fileData).then(() => {
-                    return { accessToken, csrfToken, jobId };
-                });
+                return this._uploadData(jobId, this._fileData);
             })
-            .then(({ accessToken, csrfToken, jobId }) => {
-                console.log('Data uploaded successfully');
-                return "dee7e875-23b2-4211-aeed-7a0c197551a5";
+            .then((uploadResponse) => {
+                console.log('Data upload response:', uploadResponse);
+                if (uploadResponse.status !== 'success') {
+                    throw new Error(`Data upload failed: ${uploadResponse.message}`);
+                }
+                return this._runJob(this._jobId);
             })
-            .then((response) => {
-                console.log('Job run successfully:', response);
-                this._progressBar.value = 100;
-                this.dispatchEvent(new CustomEvent('uploadComplete', { detail: response }));
-                return this._pollJobStatus('dee7e875-23b2-4211-aeed-7a0c197551a5');
+            .then((runJobResponse) => {
+                console.log('Job run response:', runJobResponse);
+                if (runJobResponse.status !== 'success') {
+                    throw new Error(`Job execution failed: ${runJobResponse.message}`);
+                }
+                return this._pollJobStatus(this._jobId);
             })
             .then((finalJobStatus) => {
                 console.log('Final job status:', finalJobStatus);
@@ -167,13 +179,13 @@ class UploadWidget extends HTMLElement {
                     this._progressBar.value = 100;
                     this.dispatchEvent(new CustomEvent('uploadComplete', { detail: finalJobStatus }));
                 } else {
-                    throw new Error(`Job failed: ${finalJobStatus.jobStatusDescription}`);
+                    throw new Error(`Job did not complete successfully: ${finalJobStatus.jobStatusDescription}`);
                 }
             })
             .catch((error) => {
                 console.error('Error during upload process:', error);
                 this._progressBar.style.display = 'none';
-                this.dispatchEvent(new CustomEvent('uploadError', { detail: error }));
+                this.dispatchEvent(new CustomEvent('uploadError', { detail: error.message }));
             });
     }
 
@@ -230,15 +242,11 @@ class UploadWidget extends HTMLElement {
     }
 
     
-    _createJob() {
-        console.log('Creating job with modelId:', this.modelId);
-        const modelId = "Coocob05ulj04oih3r0j6m9ga60"; 
-        console.log('modelId set:', modelId);
-        const importType = "factData";
-        console.log(importType);
+    _createJob(modelId, importType) {
+        console.log('Creating job for modelId:', modelId);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/models/" + modelId + "/factData",
+                url: `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -248,7 +256,7 @@ class UploadWidget extends HTMLElement {
                 data: JSON.stringify({
                     importType: importType,
                     jobSettings: {
-                        importMethod: "Update", 
+                        importMethod: "Update",
                         dimensionScope: [],
                         dateFormats: {},
                         executeWithFailedRows: false,
@@ -257,55 +265,99 @@ class UploadWidget extends HTMLElement {
                 }),
                 success: (response) => {
                     console.log('Job creation response:', response);
-                    this._jobId = response.JobID;
-                    resolve(response.JobID);
+                    if (response.jobStatus === 'READY_FOR_DATA') {
+                        resolve(response.jobPropertiesURL.split('/').pop()); // Extract jobId from URL
+                    } else {
+                        reject(new Error(`Unexpected job status after creation: ${response.jobStatus}`));
+                    }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    const responseText = jqXHR.responseText;
-                    const errorMessage = `Job creation request failed: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
-                    console.error(errorMessage);
-                    reject(errorThrown);
+                    console.error('Job creation request failed:', errorThrown);
+                    reject(new Error(`Failed to create job: ${errorThrown}`));
                 }
             });
         });
     }
 
-    _uploadData() {
-        console.log('Uploading data for jobId: 03711ca7-2023-4cb6-a497-22f6ec2af4bb');
-        console.log('_fileData:',this._fileData);
-        
+    _uploadData(jobId) {
+        console.log('Uploading data for jobId:', jobId);
         return new Promise((resolve, reject) => {
             if (!this._fileData) {
                 reject(new Error('No data available to upload'));
                 return;
             }
-            console.log(this._fileData);
+
+            const formData = new FormData();
+            formData.append('file', this._fileData, `data.${this._fileType}`);
+
             $.ajax({
-                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/jobs/03711ca7-2023-4cb6-a497-22f6ec2af4bb",
+                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}`,
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + this._accessToken,
+                    "x-csrf-token": this._csrfToken
+                },
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: (response) => {
+                    console.log('Data upload response:', response);
+                    if (response.jobStatus === 'READY_FOR_WRITE') {
+                        resolve({ status: 'success', message: 'Data uploaded successfully', response });
+                    } else {
+                        reject(new Error(`Unexpected job status after data upload: ${response.jobStatus}`));
+                    }
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Data upload request failed:', errorThrown);
+                    reject(new Error(`Data upload failed: ${errorThrown}`));
+                }
+            });
+        });
+    }
+
+    _createJob(modelId, importType) {
+        console.log('Creating job for modelId:', modelId);
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
                     "x-csrf-token": this._csrfToken,
                     "Content-Type": "application/json"
                 },
-                data: JSON.stringify({ "Data": this._fileData}),
+                data: JSON.stringify({
+                    importType: importType,
+                    jobSettings: {
+                        importMethod: "Update",
+                        dimensionScope: [],
+                        dateFormats: {},
+                        executeWithFailedRows: false,
+                        ignoreAdditionalColumns: false
+                    }
+                }),
                 success: (response) => {
-                    console.log('Data upload response:', response);
-                    resolve(response);
+                    console.log('Job creation response:', response);
+                    if (response.jobStatus === 'READY_FOR_DATA') {
+                        resolve(response.jobPropertiesURL.split('/').pop()); // Extract jobId from URL
+                    } else {
+                        reject(new Error(`Unexpected job status after creation: ${response.jobStatus}`));
+                    }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Data upload request failed:', errorThrown);
-                    reject(errorThrown);
+                    console.error('Job creation request failed:', errorThrown);
+                    reject(new Error(`Failed to create job: ${errorThrown}`));
                 }
             });
         });
     }
 
-    _runJob() {
+    _runJob(jobId) {
         console.log('Running job with jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/jobs/dee7e875-23b2-4211-aeed-7a0c197551a5" + "/run",
+                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}/run`,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -314,12 +366,11 @@ class UploadWidget extends HTMLElement {
                 },
                 success: (response) => {
                     console.log('Job run response:', response);
-                    resolve(response);
+                    resolve({ status: 'success', message: 'Job execution initiated', response });
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    const responseText = jqXHR.responseText;
-                    const errorMessage = `Job run request failed: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
-                    console.error(errorMessage);
+                    console.error('Job run request failed:', errorThrown);
+                    reject(new Error(`Failed to run job: ${errorThrown}`));
                 }
             });
         });
