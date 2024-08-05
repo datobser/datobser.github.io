@@ -20,7 +20,8 @@ class UploadWidget extends HTMLElement {
         return ['model-id', 'tenant-url', 'client-id', 'client-secret', 'token-url', 'accepted-file-types', 'max-file-size'];
     }
 
-    get modelId() { return this.getAttribute('model-id'); }
+    get modelId() { return this.getAttribute('model-id') || this._modelId; }
+    get tenantUrl() { return this.getAttribute('tenant-url'); }
     get tenantUrl() { return this.getAttribute('tenant-url'); }
     get clientId() { return this.getAttribute('client-id'); }
     get clientSecret() { return this.getAttribute('client-secret'); }
