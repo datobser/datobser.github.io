@@ -153,10 +153,6 @@ class UploadWidget extends HTMLElement {
             })
             .then(({ accessToken, csrfToken }) => {
                 console.log('CSRF token obtained:', csrfToken);
-                // Get model metadata
-                return this._getModelMetadata().then(() => ({ accessToken, csrfToken }));
-            })
-            .then(() => {
                 // Create job
                 return this._createJob(this._modelId, "factData");
             })
