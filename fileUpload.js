@@ -159,6 +159,16 @@ class UploadWidget extends HTMLElement {
                 console.log('Job run successfully:', response);
                 this._progressBar.value = 100;
                 this.dispatchEvent(new CustomEvent('uploadComplete', { detail: response }));
+                return this._pollJobStatus(dee7e875-23b2-4211-aeed-7a0c197551a5);
+            })
+            .then((finalJobStatus) => {
+                console.log('Final job status:', finalJobStatus);
+                if (finalJobStatus.jobStatus === 'COMPLETED') {
+                    this._progressBar.value = 100;
+                    this.dispatchEvent(new CustomEvent('uploadComplete', { detail: finalJobStatus }));
+                } else {
+                    throw new Error(`Job failed: ${finalJobStatus.jobStatusDescription}`);
+                }
             })
             .catch((error) => {
                 console.error('Error during upload process:', error);
@@ -308,6 +318,56 @@ class UploadWidget extends HTMLElement {
                     const responseText = jqXHR.responseText;
                     const errorMessage = `Job run request failed: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
                     console.error(errorMessage);
+                }
+            });
+        });
+    }
+
+    _pollJobStatus(jobId, maxAttempts = 30, interval = 5000) {
+        return new Promise((resolve, reject) => {
+            let attempts = 0;
+
+            const checkStatus = () => {
+                this._getJobStatus(jobId)
+                    .then(status => {
+                        console.log(`Job status (attempt ${attempts + 1}):`, status);
+                        this._updateProgressBar(status);
+
+                        if (status.jobStatus === 'COMPLETED') {
+                            resolve(status);
+                        } else if (status.jobStatus === 'FAILED') {
+                            reject(new Error(`Job failed: ${status.jobStatusDescription}`));
+                        } else if (attempts < maxAttempts) {
+                            attempts++;
+                            setTimeout(checkStatus, interval);
+                        } else {
+                            reject(new Error('Max attempts reached. Job did not complete in time.'));
+                        }
+                    })
+                    .catch(reject);
+            };
+
+            checkStatus();
+        });
+    }
+
+    _getJobStatus() {
+        console.log('Getting job status for jobId:', jobId);
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: "/api/v1/dataimport/jobs/dee7e875-23b2-4211-aeed-7a0c197551a5" + "/status",
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + this._accessToken,
+                    "x-csrf-token": this._csrfToken
+                },
+                success: (response) => {
+                    console.log('Job status response:', response);
+                    resolve(response);
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Job status request failed:', errorThrown);
+                    reject(new Error(`Failed to get job status: ${errorThrown}`));
                 }
             });
         });
