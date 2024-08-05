@@ -428,11 +428,15 @@ class UploadWidget extends HTMLElement {
     }
 
     _getModelMetadata() {
-        console.log('Retrieving model metadata');
-        const modelId = "Coocob05ulj04oih3r0j6m9ga60";
+        console.log('Retrieving model metadata for model ID:', this._modelId);
         return new Promise((resolve, reject) => {
+            if (!this._modelId) {
+                reject(new Error('Model ID is not set. Cannot retrieve metadata.'));
+                return;
+            }
+
             $.ajax({
-                url: `https://a2pp-1.eu10.hcs.cloud.sap" + "/api/v1/dataimport/models/" + modelId + "/metadata`,
+                url: `${this.tenantUrl}/api/v1/dataimport/models/${this._modelId}/metadata`,
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -446,6 +450,7 @@ class UploadWidget extends HTMLElement {
                     const responseText = jqXHR.responseText;
                     const errorMessage = `Failed to retrieve model metadata: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
                     console.error(errorMessage);
+                    reject(new Error(errorMessage));
                 }
             });
         });
