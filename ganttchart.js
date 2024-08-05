@@ -376,9 +376,10 @@
 
         _convertTasksToCSV(tasks) {
             const header = ['Version', 'Date', 'StartDate', 'EndDate', 'ID', 'Label', 'Open', 'Progress'];
+            const today = new Date().toISOString().split('T')[0];
             const rows = tasks.map(task => [
-                task.version,
-                task.date,
+                'public.Actual',
+                today,
                 task.start,
                 task.end,
                 task.id,
