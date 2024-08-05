@@ -77,8 +77,15 @@
             .task-edit-container.show {
                 display: block;
             }
+            #edit-task-open {
+                margin-left: 10px;
+            }
+            label[for="edit-task-open"] {
+                display: inline-block;
+                margin-top: 10px;
+            }
         </style>
-
+    
         <label class="switch">
             <input type="checkbox" id="toggle-form-switch">
             <span class="slider round"></span>
@@ -94,16 +101,16 @@
             <button id="add-task-btn">Add Task</button>
         </div>
         <div class="task-edit-container" id="task-edit-container">
-                <input type="text" id="edit-task-id" placeholder="ID" readonly />
-                <input type="text" id="edit-task-name" placeholder="Name" />
-                <input type="date" id="edit-task-start" placeholder="Start Date" />
-                <input type="date" id="edit-task-end" placeholder="End Date" />
-                <input type="number" id="edit-task-progress" placeholder="Progress" />
-                <label for="edit-task-open">Open</label>
-                <input type="checkbox" id="edit-task-open" />
-                <button id="update-task-btn">Update Task</button>
-                <button id="delete-task-btn">Delete Task</button>
-                <button id="cancel-edit-btn">Cancel</button>
+            <input type="text" id="edit-task-id" placeholder="ID" readonly />
+            <input type="text" id="edit-task-name" placeholder="Name" />
+            <input type="date" id="edit-task-start" placeholder="Start Date" />
+            <input type="date" id="edit-task-end" placeholder="End Date" />
+            <input type="number" id="edit-task-progress" placeholder="Progress" />
+            <label for="edit-task-open">Open</label>
+            <input type="checkbox" id="edit-task-open" />
+            <button id="update-task-btn">Update Task</button>
+            <button id="delete-task-btn">Delete Task</button>
+            <button id="cancel-edit-btn">Cancel</button>
         </div>
         
         <button id="download-btn">Download CSV</button> 
