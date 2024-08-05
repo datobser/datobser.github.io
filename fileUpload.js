@@ -347,19 +347,32 @@ class UploadWidget extends HTMLElement {
                     }
                 }),
                 success: (response) => {
-                    console.log('Job creation response:', response);
-                    if (response.jobStatus === 'READY_FOR_DATA') {
-                        resolve(response.jobPropertiesURL.split('/').pop()); // Extract jobId from URL
+                    console.log('Job creation response received:', response);
+                    if (response && response.jobStatus) {
+                        if (response.jobStatus === 'READY_FOR_DATA') {
+                            const jobId = response.jobPropertiesURL ? response.jobPropertiesURL.split('/').pop() : null;
+                            if (jobId) {
+                                console.log(`Job created successfully with ID: ${jobId}`);
+                                resolve(jobId);
+                            } else {
+                                console.error('Job ID could not be extracted from response:', response);
+                                reject(new Error('Job ID not found in response'));
+                            }
+                        } else {
+                            console.warn(`Unexpected job status after creation: ${response.jobStatus}`);
+                            reject(new Error(`Unexpected job status after creation: ${response.jobStatus}`));
+                        }
                     } else {
-                        reject(new Error(`Unexpected job status after creation: ${response.jobStatus}`));
+                        console.error('Invalid job creation response:', response);
+                        reject(new Error('Invalid job creation response'));
                     }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    const responseText = jqXHR.responseText;
-                    const errorMessage = `Failed to create job: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
-                    console.error(errorMessage);
-                    reject(new Error(errorMessage));
+                    console.error('Job creation request failed:', textStatus, errorThrown);
+                    console.error('Error details:', jqXHR.responseText);
+                    reject(new Error(`Failed to create job: ${errorThrown}`));
                 }
+
             });
         });
     }
