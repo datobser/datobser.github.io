@@ -277,8 +277,10 @@ class UploadWidget extends HTMLElement {
                     }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Job creation request failed:', errorThrown);
-                    reject(new Error(`Failed to create job: ${errorThrown}`));
+                    const responseText = jqXHR.responseText;
+                    const errorMessage = `Job creation request failed: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
+                    console.error(errorMessage);
+                    reject(new Error(errorMessage));
                 }
             });
         });
