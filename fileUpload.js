@@ -429,6 +429,7 @@ class UploadWidget extends HTMLElement {
 
     _getModelMetadata() {
         console.log('Retrieving model metadata for model ID:', this._modelId);
+        console.log('csrfToken:', this._csrfToken);
         return new Promise((resolve, reject) => {
             if (!this._modelId) {
                 reject(new Error('Model ID is not set. Cannot retrieve metadata.'));
