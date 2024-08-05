@@ -202,11 +202,6 @@
                 
                 const processedTasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
-                            
-                    if (!date || !startDate || !endDate) {
-                        console.error(`Invalid dates for row ${index}:`, row);
-                        return null;
-                    }
                     
                     // Create the task object
                     const task = {
