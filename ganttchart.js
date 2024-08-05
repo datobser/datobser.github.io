@@ -429,7 +429,6 @@
                 this.tasks.push(task);
                 this._renderChart();
                 this._clearForm();
-                this._updateSAPDataModel(task);
             } else {
                 console.error('Invalid task input');
             }
