@@ -348,23 +348,12 @@ class UploadWidget extends HTMLElement {
                 }),
                 success: (response) => {
                     console.log('Job creation response received:', response);
-                    if (response && response.jobStatus) {
-                        if (response.jobStatus === 'READY_FOR_DATA') {
-                            const jobId = response.jobPropertiesURL ? response.jobPropertiesURL.split('/').pop() : null;
-                            if (jobId) {
-                                console.log(`Job created successfully with ID: ${jobId}`);
-                                resolve(jobId);
-                            } else {
-                                console.error('Job ID could not be extracted from response:', response);
-                                reject(new Error('Job ID not found in response'));
-                            }
-                        } else {
-                            console.warn(`Unexpected job status after creation: ${response.jobStatus}`);
-                            reject(new Error(`Unexpected job status after creation: ${response.jobStatus}`));
-                        }
+                    if (response && response.jobID) {
+                        console.log(`Job created successfully with ID: ${response.jobID}`);
+                        resolve(response.jobID);
                     } else {
                         console.error('Invalid job creation response:', response);
-                        reject(new Error('Invalid job creation response'));
+                        reject(new Error('Invalid job creation response: jobID not found'));
                     }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
