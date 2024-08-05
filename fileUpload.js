@@ -318,7 +318,7 @@ class UploadWidget extends HTMLElement {
                 processData: false,
                 contentType: false,
                 data: formData,
-                timeout: 300000, // 5 minutes timeout
+                timeout: 60000, // 1 minute timeout
                 xhr: () => {
                     const xhr = new window.XMLHttpRequest();
                     xhr.upload.addEventListener("progress", (evt) => {
