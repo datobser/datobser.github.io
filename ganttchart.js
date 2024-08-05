@@ -203,16 +203,16 @@
                 const processedTasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
-                    // Extract the actual date strings
-                    const dateString = row.dimensions_0.id;
-                    const startDateString = row.dimensions_5.id;
-                    const endDateString = row.dimensions_2.id;
+                    // Extract the date strings
+                    const dateString = this.extractDateFromHierarchy(row.dimensions_0);
+                    const startDateString = this.extractDateFromHierarchy(row.dimensions_5);
+                    const endDateString = this.extractDateFromHierarchy(row.dimensions_1);
                     
                     // Parse the dates
-                    const date = this._parseDate(dateString);
-                    const startDate = this._parseDate(startDateString);
-                    const endDate = this._parseDate(endDateString);
-                    
+                    const date = this.parseDate(dateString);
+                    const startDate = this.parseDate(startDateString);
+                    const endDate = this.parseDate(endDateString);
+                            
                     if (!date || !startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
                         return null;
@@ -254,6 +254,18 @@
             } else {
                 console.log('No data available in dataBinding');
             }
+        }
+
+        extractDateFromHierarchy(dimension) {
+            // Start from the lowest level and work up
+            for (let i = 5; i >= 0; i--) {
+                const levelKey = `level${i}`;
+                if (dimension[levelKey] && dimension[levelKey].id) {
+                    return dimension[levelKey].id;
+                }
+            }
+            // If no valid date found in hierarchy, return the top-level id
+            return dimension.id;
         }
         
         _parseDate(dateString) {
