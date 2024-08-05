@@ -287,18 +287,29 @@ class UploadWidget extends HTMLElement {
     }
 
     _uploadData(jobId) {
-        console.log('Uploading data for jobId:', jobId);
+        console.log('Starting data upload process for jobId:', jobId);
         return new Promise((resolve, reject) => {
             if (!this._fileData) {
+                console.error('No file data available for upload');
                 reject(new Error('No data available to upload'));
                 return;
             }
 
+            console.log('Preparing FormData for upload');
             const formData = new FormData();
             formData.append('file', this._fileData, `data.${this._fileType}`);
+            
+            console.log('File details:', {
+                name: this._fileData.name,
+                type: this._fileData.type,
+                size: this._fileData.size + ' bytes'
+            });
+
+            const url = `${this._tenantUrl}/api/v1/dataimport/jobs/${jobId}`;
+            console.log('Uploading data to URL:', url);
 
             $.ajax({
-                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}`,
+                url: url,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -307,22 +318,45 @@ class UploadWidget extends HTMLElement {
                 processData: false,
                 contentType: false,
                 data: formData,
+                timeout: 300000, // 5 minutes timeout
+                xhr: () => {
+                    const xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", (evt) => {
+                        if (evt.lengthComputable) {
+                            const percentComplete = (evt.loaded / evt.total) * 100;
+                            console.log(`Upload progress: ${percentComplete.toFixed(2)}%`);
+                        }
+                    }, false);
+                    return xhr;
+                },
                 success: (response) => {
-                    console.log('Data upload response:', response);
-                    if (response.jobStatus === 'READY_FOR_WRITE') {
-                        resolve({ status: 'success', message: 'Data uploaded successfully', response });
+                    console.log('Data upload response received:', response);
+                    if (response && response.jobStatus) {
+                        if (response.jobStatus === 'READY_FOR_WRITE') {
+                            console.log('Data uploaded successfully, job is ready for write');
+                            resolve({ status: 'success', message: 'Data uploaded successfully', response });
+                        } else {
+                            console.warn(`Unexpected job status after data upload: ${response.jobStatus}`);
+                            reject(new Error(`Unexpected job status after data upload: ${response.jobStatus}`));
+                        }
                     } else {
-                        reject(new Error(`Unexpected job status after data upload: ${response.jobStatus}`));
+                        console.error('Invalid data upload response:', response);
+                        reject(new Error('Invalid data upload response: jobStatus not found'));
                     }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Data upload request failed:', errorThrown);
-                    reject(new Error(`Data upload failed: ${errorThrown}`));
+                    console.error('Data upload request failed:', textStatus, errorThrown);
+                    console.error('Error details:', jqXHR.responseText);
+                    if (textStatus === 'timeout') {
+                        reject(new Error('Data upload request timed out'));
+                    } else {
+                        reject(new Error(`Data upload failed: ${errorThrown}`));
+                    }
                 }
             });
         });
     }
-
+    
     _createJob(modelId, importType) {
         console.log('Creating job for modelId:', modelId);
         const url = `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`;
