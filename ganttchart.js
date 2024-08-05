@@ -106,8 +106,10 @@
             <input type="date" id="edit-task-start" placeholder="Start Date" />
             <input type="date" id="edit-task-end" placeholder="End Date" />
             <input type="number" id="edit-task-progress" placeholder="Progress" />
-            <label for="edit-task-open">Open</label>
-            <input type="checkbox" id="edit-task-open" />
+            <div class="checkbox-container">
+                <label for="edit-task-open">Open</label>
+                <input type="checkbox" id="edit-task-open" />
+            </div>
             <button id="update-task-btn">Update Task</button>
             <button id="delete-task-btn">Delete Task</button>
             <button id="cancel-edit-btn">Cancel</button>
