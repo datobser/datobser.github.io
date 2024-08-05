@@ -355,7 +355,7 @@ class UploadWidget extends HTMLElement {
         console.log('Getting job status for jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "/api/v1/dataimport/jobs/dee7e875-23b2-4211-aeed-7a0c197551a5" + "/status",
+                url: "/api/v1/dataimport/jobs/9d286dd9-4d1b-4f49-b829-d6be72aae943" + "/status",
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
