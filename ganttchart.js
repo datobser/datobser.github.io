@@ -99,6 +99,8 @@
                 <input type="date" id="edit-task-start" placeholder="Start Date" />
                 <input type="date" id="edit-task-end" placeholder="End Date" />
                 <input type="number" id="edit-task-progress" placeholder="Progress" />
+                <label for="edit-task-open">Open</label>
+                <input type="checkbox" id="edit-task-open" />
                 <button id="update-task-btn">Update Task</button>
                 <button id="delete-task-btn">Delete Task</button>
                 <button id="cancel-edit-btn">Cancel</button>
@@ -398,6 +400,7 @@
             const start = this._shadowRoot.getElementById('task-start').value;
             const end = this._shadowRoot.getElementById('task-end').value;
             const progress = parseFloat(this._shadowRoot.getElementById('task-progress').value) || 0;
+            const open = this._shadowRoot.getElementById('task-open').checked;
 
             if (id && name && start && end) {
                 const task = {
@@ -405,7 +408,8 @@
                     name,
                     start,
                     end,
-                    progress
+                    progress,
+                    open
                 };
 
                 this.tasks.push(task);
