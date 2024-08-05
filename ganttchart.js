@@ -249,40 +249,40 @@
             } else {
                 console.log('No data available in dataBinding');
             }
-        }
-        
-        _parseDate(dateString) {
-            console.log('Parsing date string:', dateString);
+
+            _parseDate(dateString) {
+                console.log('Parsing date string:', dateString);
+                
+                // Check if dateString is undefined or null
+                if (!dateString) {
+                    console.error('Date string is undefined or null');
+                    return null;
+                }
             
-            // Check if dateString is undefined or null
-            if (!dateString) {
-                console.error('Date string is undefined or null');
-                return null;
+                // Remove the square brackets and everything inside them
+                const cleanedDateString = dateString.replace(/\[.*?\]/g, '');
+                
+                // Split the cleaned string by dots
+                const parts = cleanedDateString.split('.');
+                
+                // The last part should be the actual date
+                const datePart = parts[parts.length - 1];
+                console.log('Date Part:',datePart);
+                
+                // Parse the date
+                const date = new Date(datePart);
+                
+                if (isNaN(date.getTime())) {
+                    console.error('Invalid date:', dateString);
+                    return null;
+                }
+                
+                // Format the date as YYYY-MM-DD
+                const formattedDate = date.toISOString().split('T')[0];
+                console.log('Parsed and formatted date:', formattedDate);
+                
+                return formattedDate;
             }
-        
-            // Remove the square brackets and everything inside them
-            const cleanedDateString = dateString.replace(/\[.*?\]/g, '');
-            
-            // Split the cleaned string by dots
-            const parts = cleanedDateString.split('.');
-            
-            // The last part should be the actual date
-            const datePart = parts[parts.length - 1];
-            console.log('Date Part:',datePart);
-            
-            // Parse the date
-            const date = new Date(datePart);
-            
-            if (isNaN(date.getTime())) {
-                console.error('Invalid date:', dateString);
-                return null;
-            }
-            
-            // Format the date as YYYY-MM-DD
-            const formattedDate = date.toISOString().split('T')[0];
-            console.log('Parsed and formatted date:', formattedDate);
-            
-            return formattedDate;
         }
         
         _initializeAPIProcess() {
