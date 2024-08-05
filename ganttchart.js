@@ -93,13 +93,24 @@
         <span id="form-status">New Tasks</span>
         
         <div class="form-container">
+            <label class="switch">
+                <input type="checkbox" id="toggle-form-switch">
+                <span class="slider"></span>
+            </label>
+            <span id="form-status">New Tasks</span>
+            
             <input type="text" id="task-id" placeholder="ID" />
             <input type="text" id="task-name" placeholder="Name" />
-            <input type="date" id="task-start" placeholder="Start Date" />
-            <input type="date" id="task-end" placeholder="End Date" />
-            <input type="number" id="task-progress" placeholder="Progress" />
+            <input type="date" id="task-start" />
+            <input type="date" id="task-end" />
+            <input type="number" id="task-progress" placeholder="Progress" min="0" max="100" />
+            <div class="checkbox-container">
+                <label for="task-open">Open</label>
+                <input type="checkbox" id="task-open" />
+            </div>
             <button id="add-task-btn">Add Task</button>
         </div>
+
         <div class="task-edit-container" id="task-edit-container">
             <input type="text" id="edit-task-id" placeholder="ID" readonly />
             <input type="text" id="edit-task-name" placeholder="Name" />
@@ -160,15 +171,15 @@
         }
 
         _initializeElements() {
-        this._toggleSwitch = this._shadowRoot.getElementById('toggle-form-switch');
-        this._formStatus = this._shadowRoot.getElementById('form-status');
-        this._formContainer = this._shadowRoot.querySelector('.form-container');
-        this._addTaskBtn = this._shadowRoot.getElementById('add-task-btn');
-        this._downloadBtn = this._shadowRoot.getElementById('download-btn');
-        this._updateTaskBtn = this._shadowRoot.getElementById('update-task-btn');
-        this._deleteTaskBtn = this._shadowRoot.getElementById('delete-task-btn');
-        this._cancelEditBtn = this._shadowRoot.getElementById('cancel-edit-btn');
-        this._taskEditContainer = this._shadowRoot.getElementById('task-edit-container');
+            this._toggleSwitch = this._shadowRoot.getElementById('toggle-form-switch');
+            this._formStatus = this._shadowRoot.getElementById('form-status');
+            this._formContainer = this._shadowRoot.querySelector('.form-container');
+            this._addTaskBtn = this._shadowRoot.getElementById('add-task-btn');
+            this._downloadBtn = this._shadowRoot.getElementById('download-btn');
+            this._updateTaskBtn = this._shadowRoot.getElementById('update-task-btn');
+            this._deleteTaskBtn = this._shadowRoot.getElementById('delete-task-btn');
+            this._cancelEditBtn = this._shadowRoot.getElementById('cancel-edit-btn');
+            this._taskEditContainer = this._shadowRoot.getElementById('task-edit-container');
         }
     
         _addEventListeners() {
@@ -424,6 +435,7 @@
                 this.tasks.push(task);
                 this._renderChart();
                 this._clearForm();
+                this._updateSAPDataModel(task);
             } else {
                 console.error('Invalid task input');
             }
@@ -435,6 +447,7 @@
             this._shadowRoot.getElementById('task-start').value = '';
             this._shadowRoot.getElementById('task-end').value = '';
             this._shadowRoot.getElementById('task-progress').value = '';
+            this._shadowRoot.getElementById('task-open').checked = false;
         }
 
         _toggleForm() {
