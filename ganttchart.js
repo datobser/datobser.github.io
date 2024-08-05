@@ -255,35 +255,19 @@
         _parseDate(dateString) {
             console.log('Parsing date string:', dateString);
             
-            // Check if dateString is undefined or null
-            if (!dateString) {
-                console.error('Date string is undefined or null');
+            // Remove any brackets and prefixes
+            dateString = dateString.replace(/^\[Date\]\.|\[StartDate\]\.|\[EndDate\]\.|\[YQM\]\.|\[ALL\]\.|\[(all)\]/, '');
+            
+            // Check if the date is in the format YYYYMMDD
+            if (/^\d{8}$/.test(dateString)) {
+                const year = dateString.substr(0, 4);
+                const month = dateString.substr(4, 2);
+                const day = dateString.substr(6, 2);
+                return new Date(year, month - 1, day);
+            } else {
+                console.error('Invalid date format:', dateString);
                 return null;
             }
-        
-            // Remove the square brackets and everything inside them
-            const cleanedDateString = dateString.replace(/\[.*?\]/g, '');
-            
-            // Split the cleaned string by dots
-            const parts = cleanedDateString.split('.');
-            
-            // The last part should be the actual date
-            const datePart = parts[parts.length - 1];
-            console.log('Date Part:',datePart);
-            
-            // Parse the date
-            const date = new Date(datePart);
-            
-            if (isNaN(date.getTime())) {
-                console.error('Invalid date:', dateString);
-                return null;
-            }
-            
-            // Format the date as YYYY-MM-DD
-            const formattedDate = date.toISOString().split('T')[0];
-            console.log('Parsed and formatted date:', formattedDate);
-            
-            return formattedDate;
         }
         
         _initializeAPIProcess() {
