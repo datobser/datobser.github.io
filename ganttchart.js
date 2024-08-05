@@ -202,16 +202,6 @@
                 
                 const processedTasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
-                    
-                    // Extract the date strings
-                    const dateString = this.extractDateFromHierarchy(row.dimensions_0);
-                    const startDateString = this.extractDateFromHierarchy(row.dimensions_5);
-                    const endDateString = this.extractDateFromHierarchy(row.dimensions_1);
-                    
-                    // Parse the dates
-                    const date = this._parseDate(dateString);
-                    const startDate = this._parseDate(startDateString);
-                    const endDate = this._parseDate(endDateString);
                             
                     if (!date || !startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
@@ -221,9 +211,9 @@
                     // Create the task object
                     const task = {
                         version: row.dimensions_6.id,
-                        date: date,
-                        start: startDate,
-                        end: endDate,
+                        date: row.dimensions_0.id,
+                        start: row.dimensions_5.id,
+                        end: row.dimensions_1.id,
                         id: row.dimensions_2.id,
                         name: row.dimensions_3.label,
                         open: row.dimensions_4.id === 'true',
@@ -253,36 +243,6 @@
                 }
             } else {
                 console.log('No data available in dataBinding');
-            }
-        }
-
-        extractDateFromHierarchy(dimension) {
-            // Start from the lowest level and work up
-            for (let i = 5; i >= 0; i--) {
-                const levelKey = `level${i}`;
-                if (dimension[levelKey] && dimension[levelKey].id) {
-                    return dimension[levelKey].id;
-                }
-            }
-            // If no valid date found in hierarchy, return the top-level id
-            return dimension.id;
-        }
-        
-        _parseDate(dateString) {
-            console.log('Parsing date string:', dateString);
-            
-            // Remove any brackets and prefixes
-            dateString = dateString.replace(/^\[Date\]\.|\[StartDate\]\.|\[EndDate\]\.|\[YQM\]\.|\[ALL\]\.|\[(all)\]/, '');
-            
-            // Check if the date is in the format YYYYMMDD
-            if (/^\d{8}$/.test(dateString)) {
-                const year = dateString.substr(0, 4);
-                const month = dateString.substr(4, 2);
-                const day = dateString.substr(6, 2);
-                return new Date(year, month - 1, day);
-            } else {
-                console.error('Invalid date format:', dateString);
-                return null;
             }
         }
         
