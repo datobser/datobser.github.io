@@ -1,4 +1,3 @@
-
 (function() {
     let tmpl = document.createElement('template');
     tmpl.innerHTML = `
@@ -251,26 +250,37 @@
         }
         
         _parseDate(dateString) {
-            console.log('Parsing date:', dateString);
-            // Check if the date string is in the format [Date].[YQM].[All].[(all)]
-            if (dateString.includes('[Date]') || dateString.includes('[EndDate]') || dateString.includes('[StartDate]')) {
-                console.log("Detected date placeholder. Using current date as a placeholder.");
-                // Return current date as a placeholder
-                const today = new Date();
-                return today.toISOString().split('T')[0]; // Returns YYYY-MM-DD
-            }
+            console.log('Parsing date string:', dateString);
             
-            // If it's not a placeholder, try to parse it as before
-            const regex = /\.\&\[(\d{4}-\d{2}-\d{2})\]/;
-            const match = dateString.match(regex);
-            if (match) {
-                const extractedDate = match[1];
-                console.log("Extracted date:", extractedDate);
-                return extractedDate;
-            } else {
-                console.error("Failed to parse date:", dateString);
+            // Check if dateString is undefined or null
+            if (!dateString) {
+                console.error('Date string is undefined or null');
                 return null;
             }
+        
+            // Remove the square brackets and everything inside them
+            const cleanedDateString = dateString.replace(/\[.*?\]/g, '');
+            
+            // Split the cleaned string by dots
+            const parts = cleanedDateString.split('.');
+            
+            // The last part should be the actual date
+            const datePart = parts[parts.length - 1];
+            console.log('Date Part:',datePart);
+            
+            // Parse the date
+            const date = new Date(datePart);
+            
+            if (isNaN(date.getTime())) {
+                console.error('Invalid date:', dateString);
+                return null;
+            }
+            
+            // Format the date as YYYY-MM-DD
+            const formattedDate = date.toISOString().split('T')[0];
+            console.log('Parsed and formatted date:', formattedDate);
+            
+            return formattedDate;
         }
         
         _initializeAPIProcess() {
