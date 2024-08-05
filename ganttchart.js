@@ -1,4 +1,3 @@
-
 (function() {
     let tmpl = document.createElement('template');
     tmpl.innerHTML = `
@@ -203,9 +202,9 @@
                 const processedTasks = dataBinding.data.map((row, index) => {
                     console.log(`Processing row ${index}:`, row);
                     
-                    const date = this._parseDate(row.dimensions_0.id);
-                    const endDate = this._parseDate(row.dimensions_1.id);
-                    const startDate = this._parseDate(row.dimensions_5.id);
+                    const date = this._parseDate(row.dimensions_1.id);
+                    const startDate = this._parseDate(row.dimensions_2.id);
+                    const endDate = this._parseDate(row.dimensions_3.id);
                     
                     if (!date || !startDate || !endDate) {
                         console.error(`Invalid dates for row ${index}:`, row);
@@ -214,13 +213,13 @@
                     
                     // Create the task object
                     const task = {
-                        version: row.dimensions_6.id,
+                        version: row.dimensions_0.id,
                         date: date,
                         start: startDate,
                         end: endDate,
-                        id: row.dimensions_2.id,
-                        name: row.dimensions_3.label,
-                        open: row.dimensions_4.id === 'true',
+                        id: row.dimensions_4.id,
+                        name: row.dimensions_5.label,
+                        open: row.dimensions_6.id === 'true',
                         progress: row.measures_0 ? row.measures_0.raw : 0
                     };
                     
@@ -251,37 +250,21 @@
         }
         
         _parseDate(dateString) {
-            console.log('Parsing date string:', dateString);
-            
-            // Check if dateString is undefined or null
-            if (!dateString) {
-                console.error('Date string is undefined or null');
-                return null;
-            }
+            // Check if the format matches expectations
+            const regex = /\.\&\[(\d{4}-\d{2}-\d{2})\]/;
         
-            // Remove the square brackets and everything inside them
-            const cleanedDateString = dateString.replace(/\[.*?\]/g, '');
-            
-            // Split the cleaned string by dots
-            const parts = cleanedDateString.split('.');
-            
-            // The last part should be the actual date
-            const datePart = parts[parts.length - 1];
-            console.log('Date Part:',datePart);
-            
-            // Parse the date
-            const date = new Date(datePart);
-            
-            if (isNaN(date.getTime())) {
-                console.error('Invalid date:', dateString);
+            // Try to extract the date from the string
+            const match = dateString.match(regex);
+            console.log("Date string:", dateString);
+            console.log("Regex match:", match);
+            if (match) {
+                const extractedDate = match[1];  // Extracted date
+                console.log("Extracted date:", extractedDate);  
+                return extractedDate;
+            } else {
+                console.error("Failed to parse date:", dateString);
                 return null;
             }
-            
-            // Format the date as YYYY-MM-DD
-            const formattedDate = date.toISOString().split('T')[0];
-            console.log('Parsed and formatted date:', formattedDate);
-            
-            return formattedDate;
         }
         
         _initializeAPIProcess() {
