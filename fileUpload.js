@@ -184,7 +184,7 @@ class UploadWidget extends HTMLElement {
             console.log('Excel file successfully converted to CSV');
             console.log(csvContent);
             return csvContent;
-            }
+            
         } catch (error) {
             console.error('Error during Excel to CSV conversion:', error);
             return null;
