@@ -172,7 +172,7 @@ class UploadWidget extends HTMLElement {
             })
             .then((uploadResponse) => {
                 console.log('Data upload response:', uploadResponse);
-                if (uploadResponse.status !== '201') {
+                if (uploadResponse.status !== 'success') {
                     throw new Error(`Data upload failed: ${uploadResponse.message}`);
                 }
                 // Run job
