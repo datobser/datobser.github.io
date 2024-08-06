@@ -103,7 +103,7 @@ class UploadWidget extends HTMLElement {
     
             if (this._fileType === 'xlsx') {
                 // Convert ArrayBuffer to Blob for .xlsx files
-                this._fileData = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                this._fileData = this._convertExcelToCSV(result);
             } else if (this._fileType === 'csv') {
                 // For CSV, we can use the text directly
                 this._fileData = result;
@@ -131,9 +131,19 @@ class UploadWidget extends HTMLElement {
         }
     }
 
+    _convertExcelToCSV(data) {
+        // We'll use the SheetJS library for Excel to CSV conversion
+        // Make sure to include the SheetJS library in your project
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const csv = XLSX.utils.sheet_to_csv(worksheet);
+        
+        this._fileData = csv;
+        console.log('Excel file converted to CSV');
+    }
 
-
-
+    
     _onUploadPress() {
         console.log('Upload button pressed');
         if (!this._modelId) {
