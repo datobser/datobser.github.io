@@ -247,41 +247,6 @@ class UploadWidget extends HTMLElement {
         });
     }
     
-
-    _uploadData(jobId) {
-        console.log(`Starting data upload process for jobId: ${jobId}`);
-        return new Promise((resolve, reject) => {
-            if (!this._fileData) {
-                console.error('No file data available for upload');
-                reject(new Error('No data available to upload'));
-                return;
-            }
-    
-            console.log('Preparing data for upload');
-            const url = `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}`;
-            console.log(`Upload URL: ${url}`);
-    
-            $.ajax({
-                url: url,
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${this._accessToken}`,
-                    "x-csrf-token": this._csrfToken,
-                    "Content-Type": "application/json"
-                },
-                data: JSON.stringify({ "Data": this._fileData }),
-                success: (response) => {
-                    console.log('uploadData response received:', response);
-                },
-                error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Job creation request failed:', textStatus, errorThrown);
-                    console.error('Error details:', jqXHR.responseText);
-                    reject(new Error(`Failed to create job: ${errorThrown}`));
-                }
-            });
-        });
-    }
-    
     _createJob(modelId, importType) {
         console.log('Creating job for modelId:', modelId);
         const url = `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`;
@@ -322,6 +287,41 @@ class UploadWidget extends HTMLElement {
                     reject(new Error(`Failed to create job: ${errorThrown}`));
                 }
 
+            });
+        });
+    }
+
+    _uploadData(jobId) {
+        console.log(`Starting data upload process for jobId: ${jobId}`);
+        return new Promise((resolve, reject) => {
+            if (!this._fileData) {
+                console.error('No file data available for upload');
+                reject(new Error('No data available to upload'));
+                return;
+            }
+    
+            console.log('Preparing data for upload');
+            const url = `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}`;
+            console.log(`Upload URL: ${url}`);
+    
+            $.ajax({
+                url: url,
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${this._accessToken}`,
+                    "x-csrf-token": this._csrfToken,
+                    "Content-Type": "application/json"
+                },
+                data: JSON.stringify({ "Data": this._fileData }),
+                success: (response) => {
+                    console.log('uploadData response received:', response);
+                    resolve(response);
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Job creation request failed:', textStatus, errorThrown);
+                    console.error('Error details:', jqXHR.responseText);
+                    reject(new Error(`Failed to create job: ${errorThrown}`));
+                }
             });
         });
     }
