@@ -180,14 +180,10 @@ class UploadWidget extends HTMLElement {
                     csvContent += cellValue + (C === range.e.c ? '\n' : ',');
                 }
             }
-
-            if (this._isEmptyOrSeparatorOnlyCSV(csvContent)) {
-                console.warn('The Excel file could not be converted properly. The resulting CSV is empty.');
-                return null;
-            } else {
-                console.log('Excel file successfully converted to CSV');
-                console.log(csvContent);
-                return csvContent;
+                
+            console.log('Excel file successfully converted to CSV');
+            console.log(csvContent);
+            return csvContent;
             }
         } catch (error) {
             console.error('Error during Excel to CSV conversion:', error);
