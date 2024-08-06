@@ -310,7 +310,7 @@ class UploadWidget extends HTMLElement {
                 headers: {
                     "Authorization": `Bearer ${this._accessToken}`,
                     "x-csrf-token": this._csrfToken,
-                    "Content-Type": "application/json"
+                    "Content-Type": "text/csv"
                 },
                 data: JSON.stringify({ "Data": this._fileData }),
                 success: (response) => {
