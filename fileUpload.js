@@ -172,23 +172,23 @@ class UploadWidget extends HTMLElement {
 
 
     
-    _onUploadPress() {
+   _onUploadPress() {
         console.log('Upload button pressed');
         if (!this._modelId) {
             console.error('Model ID is not set. Cannot proceed with upload.');
             this.dispatchEvent(new CustomEvent('uploadError', { detail: 'Model ID is not set' }));
             return;
         }
-
+    
         if (!this._fileData) {
             console.error('No file selected. Cannot proceed with upload.');
             this.dispatchEvent(new CustomEvent('uploadError', { detail: 'No file selected' }));
             return;
         }
-
+    
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
-
+    
         this._getAccessToken()
             .then((accessToken) => {
                 console.log('Access token obtained:', accessToken);
@@ -238,7 +238,6 @@ class UploadWidget extends HTMLElement {
                 this._progressBar.style.display = 'none';
                 this.dispatchEvent(new CustomEvent('uploadError', { detail: error.message }));
             });
-        
     }
 
 
