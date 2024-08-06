@@ -164,7 +164,7 @@ class UploadWidget extends HTMLElement {
             })
             .then((uploadResponse) => {
                 console.log('Data upload response:', uploadResponse);
-                if (uploadResponse.status !== 'success') {
+                if (uploadResponse.status !== '201') {
                     throw new Error(`Data upload failed: ${uploadResponse.message}`);
                 }
                 // Run job
@@ -315,7 +315,7 @@ class UploadWidget extends HTMLElement {
                 data: JSON.stringify({ "Data": this._fileData }),
                 success: (response) => {
                     console.log('uploadData response received:', response);
-                    if (response.status === 'success') {
+                    if (response.status === '201') {
                         resolve(response);
                     } else {
                         reject(new Error(`Data upload failed: ${response.message || 'Unknown error'}`));
