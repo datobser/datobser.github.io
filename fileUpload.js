@@ -375,6 +375,8 @@ class UploadWidget extends HTMLElement {
                                 reject(new Error(`Failed to run job and retrieve invalid rows: ${error.message}`));
                             });
                     } else {
+                        console.error('Data upload request failed:', textStatus, errorThrown);
+                        console.error('Error details:', jqXHR.responseText);
                         reject(new Error(`Failed to run job: ${errorThrown}`));
                     }
                 }
