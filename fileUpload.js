@@ -247,44 +247,6 @@ class UploadWidget extends HTMLElement {
         });
     }
     
-    _createJob(modelId, importType) {
-        console.log('Creating job for modelId:', modelId);
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`,
-                method: "POST",
-                headers: {
-                    "Authorization": "Bearer " + this._accessToken,
-                    "x-csrf-token": this._csrfToken,
-                    "Content-Type": "application/json"
-                },
-                data: JSON.stringify({
-                    importType: importType,
-                    jobSettings: {
-                        importMethod: "Update",
-                        dimensionScope: [],
-                        dateFormats: {},
-                        executeWithFailedRows: false,
-                        ignoreAdditionalColumns: false
-                    }
-                }),
-                success: (response) => {
-                    console.log('Job creation response:', response);
-                    if (response.jobStatus === 'READY_FOR_DATA') {
-                        resolve(response.jobPropertiesURL.split('/').pop()); // Extract jobId from URL
-                    } else {
-                        reject(new Error(`Unexpected job status after creation: ${response.jobStatus}`));
-                    }
-                },
-                error: (jqXHR, textStatus, errorThrown) => {
-                    const responseText = jqXHR.responseText;
-                    const errorMessage = `Job creation request failed: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
-                    console.error(errorMessage);
-                    reject(new Error(errorMessage));
-                }
-            });
-        });
-    }
 
     _uploadData(jobId) {
         console.log(`Starting data upload process for jobId: ${jobId}`);
