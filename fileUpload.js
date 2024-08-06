@@ -7,7 +7,7 @@ class UploadWidget extends HTMLElement {
         this._tenantUrl = 'https://a2pp-1.eu10.hcs.cloud.sap';
         this._accessToken = null;
         this._csrfToken = null;
-        this._modelId = 'Coocob05ulj04oih3r0j6m9ga60';
+        this._modelId = 'Ckh98b05ul4k484ria777k5h32';
         this._jobId = null;
         this._fileData = null;
         this._fileType = null;
