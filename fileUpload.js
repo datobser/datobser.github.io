@@ -315,10 +315,16 @@ class UploadWidget extends HTMLElement {
                 data: JSON.stringify({ "Data": this._fileData }),
                 success: (response) => {
                     console.log('uploadData response received:', response);
-                    if (response.status === '201') {
-                        resolve(response);
+                    if (response.upsertedNumberRows > 0 && response.failedNumberRows === 0) {
+                        resolve({
+                            status: 'success',
+                            message: 'Data uploaded successfully',
+                            response: response
+                        });
+                    } else if (response.failedNumberRows > 0) {
+                        reject(new Error(`Data upload failed: ${response.failedRows.map(row => row.reason).join(', ')}`));
                     } else {
-                        reject(new Error(`Data upload failed: ${response.message || 'Unknown error'}`));
+                        reject(new Error('Unexpected response format'));
                     }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
@@ -329,6 +335,7 @@ class UploadWidget extends HTMLElement {
             });
         });
     }
+
 
     _runJob(jobId) {
         console.log('Running job with jobId:', jobId);
