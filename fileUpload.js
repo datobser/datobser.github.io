@@ -385,27 +385,40 @@ class UploadWidget extends HTMLElement {
     _pollJobStatus(jobId, maxAttempts = 10, interval = 5000) {
         return new Promise((resolve, reject) => {
             let attempts = 0;
-
+            let isFinished = false;
+            let timeoutId = null;
+    
             const checkStatus = () => {
+                if (isFinished) return; // Stop if we've already finished
+    
                 this._getJobStatus(jobId)
                     .then(status => {
                         console.log(`Job status (attempt ${attempts + 1}):`, status);
                         //this._updateProgressBar(status);
-
+    
                         if (status.jobStatus === 'COMPLETED') {
+                            isFinished = true;
+                            clearTimeout(timeoutId);
                             resolve(status);
                         } else if (status.jobStatus === 'FAILED') {
+                            isFinished = true;
+                            clearTimeout(timeoutId);
                             reject(new Error(`Job failed: ${status.jobStatusDescription}`));
                         } else if (attempts < maxAttempts) {
                             attempts++;
-                            setTimeout(checkStatus, interval);
+                            timeoutId = setTimeout(checkStatus, interval);
                         } else {
+                            isFinished = true;
                             reject(new Error('Max attempts reached. Job did not complete in time.'));
                         }
                     })
-                    .catch(reject);
+                    .catch(error => {
+                        isFinished = true;
+                        clearTimeout(timeoutId);
+                        reject(error);
+                    });
             };
-
+    
             checkStatus();
         });
     }
