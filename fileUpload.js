@@ -129,6 +129,7 @@ class UploadWidget extends HTMLElement {
             if (this._fileType === 'xlsx') {
                 // Convert ArrayBuffer to Blob for .xlsx files
                 this._fileData = this._convertExcelToCSV(result);
+                this._fileType = '.csv';
             } else if (this._fileType === 'csv') {
                 // For CSV, we can use the text directly
                 this._fileData = result;
