@@ -156,6 +156,8 @@ class UploadWidget extends HTMLElement {
     }
 
     _convertExcelToCSV(data) {
+        console.log('entered convertExceltoCSV with:');
+        console.log(data);
         // Read the Excel file
         const workbook = XLSX.read(data, { type: 'array' });
     
