@@ -150,24 +150,25 @@ class UploadWidget extends HTMLElement {
             console.error('Error reading file:', error);
         };
     
-        if (this._fileType === 'xlsx') {
-            reader.readAsArrayBuffer(file);
-        } else {
-            reader.readAsText(file);
-        }
+        reader.readAsText(file);
+
     }
 
     _convertExcelToCSV(data) {
-        // We'll use the SheetJS library for Excel to CSV conversion
-        // Make sure to include the SheetJS library in your project
+        // Read the Excel file
         const workbook = XLSX.read(data, { type: 'array' });
+    
+        // Get the first sheet
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
+    
+        // Convert the sheet to CSV
         const csv = XLSX.utils.sheet_to_csv(worksheet);
         
-        this._fileData = csv;
-        console.log('Excel file converted to CSV');
+        // Return the CSV data
+        return csv;
     }
+
 
     
     _onUploadPress() {
