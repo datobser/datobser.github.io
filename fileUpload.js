@@ -382,7 +382,7 @@ class UploadWidget extends HTMLElement {
         });
     }
 
-    _pollJobStatus(jobId, maxAttempts = 30, interval = 5000) {
+    _pollJobStatus(jobId, maxAttempts = 10, interval = 5000) {
         return new Promise((resolve, reject) => {
             let attempts = 0;
 
@@ -410,11 +410,11 @@ class UploadWidget extends HTMLElement {
         });
     }
 
-    _getJobStatus() {
-        console.log('Getting job status for jobId: 9d286dd9-4d1b-4f49-b829-d6be72aae943');
+    _getJobStatus(jobId) {
+        console.log(`Getting job status for jobId: ${jobId}`);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: "/api/v1/dataimport/jobs/9d286dd9-4d1b-4f49-b829-d6be72aae943" + "/status",
+                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}/status`,
                 method: "GET",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -431,6 +431,7 @@ class UploadWidget extends HTMLElement {
             });
         });
     }
+
 
     _getModelMetadata() {
         console.log('Retrieving model metadata for model ID:', this._modelId);
