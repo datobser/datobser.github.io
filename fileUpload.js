@@ -97,28 +97,36 @@ class UploadWidget extends HTMLElement {
 
     _readFileData(file) {
         const reader = new FileReader();
-
+    
         reader.onload = (e) => {
             const result = e.target.result;
-
+    
             if (this._fileType === 'xlsx') {
                 // Convert ArrayBuffer to Blob for .xlsx files
                 this._fileData = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             } else if (this._fileType === 'csv') {
-                // Convert text to Blob for .csv files
-                this._fileData = new Blob([result], { type: 'text/csv' });
+                // For CSV, we can use the text directly
+                this._fileData = result;
+            } else if (this._fileType === 'json') {
+                // For JSON, parse the result
+                try {
+                    this._fileData = JSON.parse(result);
+                } catch (error) {
+                    console.error('Error parsing JSON:', error);
+                    this._fileData = null;
+                }
             }
-
-            console.log(`File data read and converted to Blob successfully (${this._fileType})`);
+    
+            console.log(`File data read and prepared successfully (${this._fileType})`);
         };
-
+    
         reader.onerror = (error) => {
             console.error('Error reading file:', error);
         };
-
+    
         if (this._fileType === 'xlsx') {
             reader.readAsArrayBuffer(file);
-        } else if (this._fileType === 'csv') {
+        } else {
             reader.readAsText(file);
         }
     }
