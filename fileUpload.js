@@ -155,42 +155,34 @@ class UploadWidget extends HTMLElement {
 
     }
 
-    _convertExcelToCSV(data) {
-        console.log('entered convertExceltoCSV with:');
+    function _convertExcelToCSV(data) {
+        console.log('Entered convertExcelToCSV with:');
         console.log(data);
+    
         if (!window.XLSX) {
             console.error('SheetJS library not loaded');
             return null;
         }
-
+    
         try {
+            // Read the Excel data
             const workbook = XLSX.read(data, { type: 'array' });
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
+    
+            // Convert the worksheet to CSV
+            const csvContent = XLSX.utils.sheet_to_csv(worksheet);
             
-            // Attempt to read cell values directly
-            const range = XLSX.utils.decode_range(worksheet['!ref']);
-            let csvContent = '';
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    const cellAddress = { c: C, r: R };
-                    const cellRef = XLSX.utils.encode_cell(cellAddress);
-                    const cell = worksheet[cellRef];
-                    const cellValue = cell ? cell.v : '';
-                    csvContent += cellValue + (C === range.e.c ? '\n' : ',');
-                }
-            }
-                
             console.log('Excel file successfully converted to CSV');
             console.log(csvContent);
             return csvContent;
-            
+    
         } catch (error) {
             console.error('Error during Excel to CSV conversion:', error);
             return null;
         }
-        
     }
+
 
 
     
