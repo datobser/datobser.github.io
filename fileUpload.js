@@ -270,68 +270,13 @@ class UploadWidget extends HTMLElement {
                     "Content-Type": "application/json"
                 },
                 data: JSON.stringify({ "Data": this._fileData }),
-                timeout: 120000, // 2 minutes timeout
-                xhr: () => {
-                    const xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener("progress", (evt) => {
-                        if (evt.lengthComputable) {
-                            const percentComplete = (evt.loaded / evt.total) * 100;
-                            console.log(`Upload progress: ${percentComplete.toFixed(2)}%`);
-                            this._progressBar.value = percentComplete;
-                        }
-                    }, false);
-                    return xhr;
-                },
                 success: (response) => {
-                    console.log('Data upload response received:', response);
-                    if (response && response.jobStatus) {
-                        switch (response.jobStatus) {
-                            case 'READY_FOR_WRITE':
-                                console.log('Data uploaded successfully, job is ready for write');
-                                resolve({ status: 'success', message: 'Data uploaded successfully', response });
-                                break;
-                            case 'COMPLETED':
-                                console.log('Job completed successfully');
-                                resolve({ status: 'success', message: 'Job completed successfully', response });
-                                break;
-                            case 'FAILED':
-                                console.error('Job failed:', response.jobStatusDescription);
-                                reject(new Error(`Job failed: ${response.jobStatusDescription}`));
-                                break;
-                            default:
-                                console.warn(`Unexpected job status after data upload: ${response.jobStatus}`);
-                                resolve({ status: 'warning', message: `Unexpected job status: ${response.jobStatus}`, response });
-                        }
-                    } else {
-                        console.error('Invalid data upload response:', response);
-                        reject(new Error('Invalid data upload response: jobStatus not found'));
-                    }
+                    console.log('uploadData response received:', response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Data upload request failed:', textStatus, errorThrown);
+                    console.error('Job creation request failed:', textStatus, errorThrown);
                     console.error('Error details:', jqXHR.responseText);
-                    let errorMessage;
-                    switch (jqXHR.status) {
-                        case 400:
-                            errorMessage = 'Bad Request: The server cannot process the request due to a client error.';
-                            break;
-                        case 403:
-                            errorMessage = 'Unauthorized: You do not have permission to upload data.';
-                            break;
-                        case 404:
-                            errorMessage = 'Not Found: The specified job or endpoint could not be found.';
-                            break;
-                        case 500:
-                            errorMessage = 'Internal Server Error: An unexpected condition was encountered by the server.';
-                            break;
-                        default:
-                            errorMessage = `HTTP Error ${jqXHR.status}: ${jqXHR.statusText}`;
-                    }
-                    if (textStatus === 'timeout') {
-                        errorMessage = 'Data upload request timed out';
-                    }
-                    console.error(errorMessage);
-                    reject(new Error(errorMessage));
+                    reject(new Error(`Failed to create job: ${errorThrown}`));
                 }
             });
         });
