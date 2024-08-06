@@ -312,33 +312,36 @@ class UploadWidget extends HTMLElement {
             const url = `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}`;
             console.log(`Upload URL: ${url}`);
     
+            // Log the data being sent
+            console.log('Data being sent:', this._fileData);
+    
             $.ajax({
                 url: url,
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${this._accessToken}`,
                     "x-csrf-token": this._csrfToken,
-                    "Content-Type": "text/csv"
+                    "Content-Type": this._fileType === 'csv' ? "text/csv" : "application/json"
                 },
-                data: JSON.stringify({ "Data": this._fileData }),
+                data: this._fileType === 'csv' ? this._fileData : JSON.stringify({ "Data": this._fileData }),
                 success: (response) => {
                     console.log('uploadData response received:', response);
-                    if (response.upsertedNumberRows > 0 && response.failedNumberRows === 0) {
+                    if (response.upsertedNumberRows !== undefined) {
                         resolve({
                             status: 'success',
                             message: 'Data uploaded successfully',
                             response: response
                         });
-                    } else if (response.failedNumberRows > 0) {
-                        reject(new Error(`Data upload failed: ${response.failedRows.map(row => row.reason).join(', ')}`));
+                    } else if (response.error) {
+                        reject(new Error(`Data upload failed: ${response.error.message}`));
                     } else {
                         reject(new Error('Unexpected response format'));
                     }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Job creation request failed:', textStatus, errorThrown);
+                    console.error('Data upload request failed:', textStatus, errorThrown);
                     console.error('Error details:', jqXHR.responseText);
-                    reject(new Error(`Failed to create job: ${errorThrown}`));
+                    reject(new Error(`Failed to upload data: ${errorThrown}`));
                 }
             });
         });
