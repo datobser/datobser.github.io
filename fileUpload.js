@@ -348,7 +348,7 @@ class UploadWidget extends HTMLElement {
     }
 
 
-    _runJob(jobId) {
+   _runJob(jobId) {
         console.log('Running job with jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -364,9 +364,19 @@ class UploadWidget extends HTMLElement {
                     resolve({ status: 'success', message: 'Job execution initiated', response });
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.log('Job run failed:', textStatus, errorThrown);
-                    console.log('Error details:', jqXHR.responseText);
-                    reject(new Error(`Failed to upload data: ${errorThrown}`));
+                    console.error('Job run request failed:', errorThrown);
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.error && jqXHR.responseJSON.error.message.includes("Every row in temporary storage is invalid")) {
+                        this._getInvalidRows(jobId)
+                            .then(invalidRows => {
+                                console.error('All rows are invalid. Invalid rows:', invalidRows);
+                                reject(new Error(`All rows are invalid. Please check the data and try again.`));
+                            })
+                            .catch(error => {
+                                reject(new Error(`Failed to run job and retrieve invalid rows: ${error.message}`));
+                            });
+                    } else {
+                        reject(new Error(`Failed to run job: ${errorThrown}`));
+                    }
                 }
             });
         });
@@ -447,6 +457,28 @@ class UploadWidget extends HTMLElement {
                     const errorMessage = `Failed to retrieve model metadata: ${textStatus} - ${errorThrown}. Response: ${responseText}`;
                     console.error(errorMessage);
                     reject(new Error(errorMessage));
+                }
+            });
+        });
+    }
+
+    _getInvalidRows(jobId) {
+        console.log('Retrieving invalid rows for jobId:', jobId);
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}/invalidRows`,
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + this._accessToken,
+                    "x-csrf-token": this._csrfToken
+                },
+                success: (response) => {
+                    console.log('Invalid rows:', response);
+                    resolve(response);
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Failed to retrieve invalid rows:', errorThrown);
+                    reject(new Error(`Failed to retrieve invalid rows: ${errorThrown}`));
                 }
             });
         });
