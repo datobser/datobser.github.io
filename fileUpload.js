@@ -364,8 +364,9 @@ class UploadWidget extends HTMLElement {
                     resolve({ status: 'success', message: 'Job execution initiated', response });
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Job run request failed:', errorThrown);
-                    reject(new Error(`Failed to run job: ${errorThrown}`));
+                    console.log('Job run failed:', textStatus, errorThrown);
+                    console.log('Error details:', jqXHR.responseText);
+                    reject(new Error(`Failed to upload data: ${errorThrown}`));
                 }
             });
         });
