@@ -164,6 +164,7 @@ class UploadWidget extends HTMLElement {
     
         // Convert the sheet to CSV
         const csv = XLSX.utils.sheet_to_csv(worksheet);
+        console.log('Convert result:', csv)`);
         
         // Return the CSV data
         return csv;
