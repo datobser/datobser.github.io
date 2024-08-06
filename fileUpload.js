@@ -315,7 +315,11 @@ class UploadWidget extends HTMLElement {
                 data: JSON.stringify({ "Data": this._fileData }),
                 success: (response) => {
                     console.log('uploadData response received:', response);
-                    resolve(response);
+                    if (response.status === 'success') {
+                        resolve(response);
+                    } else {
+                        reject(new Error(`Data upload failed: ${response.message || 'Unknown error'}`));
+                    }
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
                     console.error('Job creation request failed:', textStatus, errorThrown);
