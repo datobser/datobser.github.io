@@ -50,7 +50,32 @@ class UploadWidget extends HTMLElement {
         this._fileInput.addEventListener('change', this._onFileChange.bind(this));
         this._uploadButton.addEventListener('click', this._onUploadPress.bind(this));
 
+        this._createSheetJSLibrary();
+
         console.log('UI elements created');
+    }
+
+    _createSheetJSLibrary() {
+        return new Promise((resolve, reject) => {
+            if (window.XLSX) {
+                console.log('SheetJS library already loaded');
+                resolve();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+            script.async = true;
+            script.onload = () => {
+                console.log('SheetJS library loaded successfully');
+                resolve();
+            };
+            script.onerror = () => {
+                console.error('Failed to load SheetJS library');
+                reject(new Error('Failed to load SheetJS library'));
+            };
+            document.head.appendChild(script);
+        });
     }
 
     _render() {
