@@ -287,44 +287,35 @@ class UploadWidget extends HTMLElement {
     }
 
     _uploadData(jobId) {
-        console.log('Starting data upload process for jobId:', jobId);
+        console.log(`Starting data upload process for jobId: ${jobId}`);
         return new Promise((resolve, reject) => {
             if (!this._fileData) {
                 console.error('No file data available for upload');
                 reject(new Error('No data available to upload'));
                 return;
             }
-
-            console.log('Preparing FormData for upload');
-            const formData = new FormData();
-            formData.append('file', this._fileData, `data.${this._fileType}`);
-            
-            console.log('File details:', {
-                name: this._fileData.name,
-                type: this._fileData.type,
-                size: this._fileData.size + ' bytes'
-            });
-
-            const url = `${this._tenantUrl}/api/v1/dataimport/jobs/${jobId}`;
-            console.log('Uploading data to URL:', url);
-
+    
+            console.log('Preparing data for upload');
+            const url = `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}`;
+            console.log(`Upload URL: ${url}`);
+    
             $.ajax({
                 url: url,
                 method: "POST",
                 headers: {
-                    "Authorization": "Bearer " + this._accessToken,
-                    "x-csrf-token": this._csrfToken
+                    "Authorization": `Bearer ${this._accessToken}`,
+                    "x-csrf-token": this._csrfToken,
+                    "Content-Type": "application/json"
                 },
-                processData: false,
-                contentType: false,
-                data: formData,
-                timeout: 60000, // 1 minute timeout
+                data: JSON.stringify({ "Data": this._fileData }),
+                timeout: 120000, // 2 minutes timeout
                 xhr: () => {
                     const xhr = new window.XMLHttpRequest();
                     xhr.upload.addEventListener("progress", (evt) => {
                         if (evt.lengthComputable) {
                             const percentComplete = (evt.loaded / evt.total) * 100;
                             console.log(`Upload progress: ${percentComplete.toFixed(2)}%`);
+                            this._progressBar.value = percentComplete;
                         }
                     }, false);
                     return xhr;
@@ -332,12 +323,22 @@ class UploadWidget extends HTMLElement {
                 success: (response) => {
                     console.log('Data upload response received:', response);
                     if (response && response.jobStatus) {
-                        if (response.jobStatus === 'READY_FOR_WRITE') {
-                            console.log('Data uploaded successfully, job is ready for write');
-                            resolve({ status: 'success', message: 'Data uploaded successfully', response });
-                        } else {
-                            console.warn(`Unexpected job status after data upload: ${response.jobStatus}`);
-                            reject(new Error(`Unexpected job status after data upload: ${response.jobStatus}`));
+                        switch (response.jobStatus) {
+                            case 'READY_FOR_WRITE':
+                                console.log('Data uploaded successfully, job is ready for write');
+                                resolve({ status: 'success', message: 'Data uploaded successfully', response });
+                                break;
+                            case 'COMPLETED':
+                                console.log('Job completed successfully');
+                                resolve({ status: 'success', message: 'Job completed successfully', response });
+                                break;
+                            case 'FAILED':
+                                console.error('Job failed:', response.jobStatusDescription);
+                                reject(new Error(`Job failed: ${response.jobStatusDescription}`));
+                                break;
+                            default:
+                                console.warn(`Unexpected job status after data upload: ${response.jobStatus}`);
+                                resolve({ status: 'warning', message: `Unexpected job status: ${response.jobStatus}`, response });
                         }
                     } else {
                         console.error('Invalid data upload response:', response);
@@ -347,11 +348,28 @@ class UploadWidget extends HTMLElement {
                 error: (jqXHR, textStatus, errorThrown) => {
                     console.error('Data upload request failed:', textStatus, errorThrown);
                     console.error('Error details:', jqXHR.responseText);
-                    if (textStatus === 'timeout') {
-                        reject(new Error('Data upload request timed out'));
-                    } else {
-                        reject(new Error(`Data upload failed: ${errorThrown}`));
+                    let errorMessage;
+                    switch (jqXHR.status) {
+                        case 400:
+                            errorMessage = 'Bad Request: The server cannot process the request due to a client error.';
+                            break;
+                        case 403:
+                            errorMessage = 'Unauthorized: You do not have permission to upload data.';
+                            break;
+                        case 404:
+                            errorMessage = 'Not Found: The specified job or endpoint could not be found.';
+                            break;
+                        case 500:
+                            errorMessage = 'Internal Server Error: An unexpected condition was encountered by the server.';
+                            break;
+                        default:
+                            errorMessage = `HTTP Error ${jqXHR.status}: ${jqXHR.statusText}`;
                     }
+                    if (textStatus === 'timeout') {
+                        errorMessage = 'Data upload request timed out';
+                    }
+                    console.error(errorMessage);
+                    reject(new Error(errorMessage));
                 }
             });
         });
