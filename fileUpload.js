@@ -339,12 +339,12 @@ class UploadWidget extends HTMLElement {
     
     _createJob(modelId, importType) {
         console.log('Creating job for modelId:', modelId);
-        const url = "${this.tenantUrl}/api/v1/dataimport/models/${modelId}";
+        const url = `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`;
         console.log('Creating job using URL:', url);
         console.log('importType:', importType);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: `${this.tenantUrl}/api/v1/dataimport/models/${modelId}`,
+                url: `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
