@@ -59,16 +59,16 @@ class UploadWidget extends HTMLElement {
     _createSheetJSLibrary() {
         return new Promise((resolve, reject) => {
             if (window.XLSX) {
-                console.log('SheetJS library already loaded');
+                console.log('ExcelJS library already loaded');
                 resolve();
                 return;
             }
 
             const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js';
             script.async = true;
             script.onload = () => {
-                console.log('SheetJS library loaded successfully');
+                console.log('ExcelJS library loaded successfully');
                 resolve();
             };
             script.onerror = () => {
@@ -155,24 +155,29 @@ class UploadWidget extends HTMLElement {
 
     }
 
-    _convertExcelToCSV(data) {
+    async function _convertExcelToCSV(data) {
         console.log('Entered convertExcelToCSV with:');
         console.log(data);
     
-        if (!window.XLSX) {
-            console.error('SheetJS library not loaded');
+        if (!window.ExcelJS) {
+            console.error('ExcelJS library not loaded');
             return null;
         }
     
         try {
-            // Read the Excel data
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
+            // Create a new workbook
+            const workbook = new ExcelJS.Workbook();
+            await workbook.xlsx.load(data);
+    
+            // Get the first worksheet
+            const worksheet = workbook.getWorksheet(1);
     
             // Convert the worksheet to CSV
-            const csvContent = XLSX.utils.sheet_to_csv(worksheet);
-            
+            let csvContent = '';
+            worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
+                csvContent += row.values.slice(1).join(',') + '\n';  // slice(1) to remove the first undefined value
+            });
+    
             console.log('Excel file successfully converted to CSV');
             console.log(csvContent);
             return csvContent;
