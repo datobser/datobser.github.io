@@ -155,7 +155,7 @@ class UploadWidget extends HTMLElement {
 
     }
 
-    async function _convertExcelToCSV(data) {
+    _convertExcelToCSV(data) {
         console.log('Entered convertExcelToCSV with:');
         console.log(data);
     
