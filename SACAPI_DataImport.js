@@ -234,6 +234,48 @@
         });
     }
     window.validateJob = validateJob;
+
+
+    function runJob(messagesElement) {
+        if (!accessToken || !csrfToken || !runJobURL) {
+            console.log('Access token, CSRF token, or run job URL is not set');
+            return Promise.reject('Missing required tokens or URL');
+        }
+    
+        return fetchWithTimeout(runJobURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
+                'x-csrf-token': csrfToken,
+                'x-sap-sac-custom-auth': 'true'
+            }
+        }, 120000)
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 412) {
+                    throw new Error('Precondition Failed: Job validation may have failed');
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Job run response:', data);
+            if (data.jobStatusURL) {
+                return checkJobStatus(data.jobStatusURL);
+            } else {
+                throw new Error('No job status URL provided');
+            }
+        })
+        .catch(error => {
+            console.error('Job Run Error:', error);
+            if (messagesElement) {
+                messagesElement.textContent = 'Job Run Error: ' + error.message;
+            }
+            throw error;
+        });
+    }
     
     
     function checkJobStatus(statusURL) {
