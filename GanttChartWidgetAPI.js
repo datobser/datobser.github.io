@@ -45,9 +45,9 @@
             this._shadowRoot.appendChild(dhtmlxGanttScript);
 
             const sacApiScript = document.createElement('script');
-            sacApiScript.src = 'https://datobser.github.io/SACAPI_DataImport.js';
+            sacApiScript.src = 'https://datobser.github.io/SACAPI_DataExport.js';
             sacApiScript.onload = () => {
-                console.log('SACAPI_DataImport.js loaded');
+                console.log('SACAPI_DataExport.js loaded');
             };
             document.head.appendChild(sacApiScript);
         }
@@ -79,16 +79,21 @@
             try {
                 await window.getAccessToken();
                 await window.getCsrfToken();
-                await window.createJob();
-                await window.validateJob();
-                const jobStatus = await window.runJob();
+                const jobInfo = await window.createExportJob();
                 
-                if (jobStatus && jobStatus.status === 'SUCCESSFUL') {
-                    console.log("Data successfully refreshed from SAP");
-                    this.tasks = this.processDataFromSAP(jobStatus.data);
+                if (!jobInfo || !jobInfo.jobURL) {
+                    throw new Error("Failed to create export job");
+                }
+        
+                const jobStatus = await window.runExportJob();
+                
+                if (jobStatus && jobStatus.jobStatus === 'COMPLETED') {
+                    console.log("Data export job completed successfully");
+                    const exportedData = await window.getExportedData();
+                    this.tasks = this.processDataFromSAP(exportedData);
                     this.render();
                 } else {
-                    console.error("Failed to refresh data from SAP");
+                    console.error("Failed to export data from SAP");
                 }
             } catch (error) {
                 console.error("Error refreshing from SAP model:", error);
