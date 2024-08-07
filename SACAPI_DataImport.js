@@ -89,6 +89,8 @@
     
 
     function createJob(messagesElement) {
+        console.log(accessToken);
+        console.log(csrfToken);
         if (!accessToken || !csrfToken) {
             console.log('Access token or CSRF token is not set');
             return;
@@ -124,15 +126,13 @@
     
     function uploadData(csvData) {
         console.log('uploadData is triggered');
+        console.log('accessToken:', accessToken);
+        console.log('csrfToken:', csrfToken);
         console.log('jobUrl:', jobUrl);
         if (!accessToken || !csrfToken || !jobUrl) {
             console.log('Access token, CSRF token, or job URL is not set');
             return;
         }
-        // Log the values of accessToken, csrfToken, and jobUrl
-        //console.log('accessToken:', accessToken);
-        //console.log('csrfToken:', csrfToken);
-        //console.log('jobUrl:', jobUrl);
         console.log('csvData:', csvData);
         return fetch(jobUrl, {
             method: 'POST',
