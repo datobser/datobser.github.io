@@ -76,8 +76,8 @@
     }
     window.createSubscription = createSubscription;
 
-    async function getExportedData(subscriptionID) {
-        const response = await fetch(`${apiBaseUrl}/providers/${namespaceID}/${providerID}/FactData?deltaid=${subscriptionID}`, {
+    async function getExportedData() {
+        const response = await fetch(`${apiBaseUrl}/providers/${namespaceID}/${providerID}/FactData`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
