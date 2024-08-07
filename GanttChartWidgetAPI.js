@@ -277,5 +277,5 @@
 
     }
 
-    customElements.define('com-demo-ganttchartwidget-api', GanttChartWidgetAPI);
+    customElements.define('gantt-chart-widget', GanttChartWidgetAPI);
 })();
