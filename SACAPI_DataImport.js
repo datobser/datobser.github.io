@@ -89,13 +89,12 @@
     
 
     function createJob(messagesElement) {
-        console.log(accessToken);
-        console.log(csrfToken);
+        console.log('Access Token:', accessToken);
+        console.log('CSRF Token:', csrfToken);
         if (!accessToken || !csrfToken) {
             console.log('Access token or CSRF token is not set');
-            return;
+            return Promise.reject('Access token or CSRF token is not set');
         }
-
         return fetch(apiEndpoint, {
             method: 'POST',
             headers: {
@@ -106,20 +105,30 @@
             },
             body: JSON.stringify(jobSettings)
         })
-            .then(response => {
-                console.log(response);  // Log the raw response object.
-                return response.json();
-            })
-            .then(data => {
-                jobUrl = data.jobURL;
-                console.log('Job URL:', jobUrl);
-                if (messagesElement) {
-                    messagesElement.textContent = '';  // Clear the messages
-                    messagesElement.textContent += 'Job URL: ' + jobUrl + '\n';
-                }
-
-            })
-            .catch(error => console.error('Error:', error));
+        .then(response => {
+            console.log('Create Job Response:', response);  // Log the raw response object.
+            return response.json();
+        })
+        .then(data => {
+            console.log('Create Job Data:', data);
+            jobUrl = data.jobURL;
+            validateJobURL = data.validateJobURL;  // Set the validateJobURL
+            console.log('Job URL:', jobUrl);
+            console.log('Validate Job URL:', validateJobURL);
+            if (messagesElement) {
+                messagesElement.textContent = '';  // Clear the messages
+                messagesElement.textContent += 'Job URL: ' + jobUrl + '\n';
+                messagesElement.textContent += 'Validate Job URL: ' + validateJobURL + '\n';
+            }
+            return data;  // Return the data for further chaining if needed
+        })
+        .catch(error => {
+            console.error('Error in createJob:', error);
+            if (messagesElement) {
+                messagesElement.textContent += 'Error in createJob: ' + error.message + '\n';
+            }
+            throw error;  // Re-throw the error for handling in the calling function
+        });
     }
     window.createJob = createJob;
 
