@@ -131,7 +131,6 @@ class UploadWidget extends HTMLElement {
                     // Convert ArrayBuffer to Blob for .xlsx files
                     const arrayBuffer = await new Response(result).arrayBuffer();
                     this._fileData = await this._convertExcelToCSV(arrayBuffer);
-                    this._fileType = 'csv';
                 } catch (error) {
                     console.error('Error during Excel to CSV conversion:', error);
                     this._fileData = null;
@@ -156,7 +155,13 @@ class UploadWidget extends HTMLElement {
             console.error('Error reading file:', error);
         };
     
-        reader.readAsArrayBuffer(file);  // Use readAsArrayBuffer for .xlsx files
+        if (this._fileType === 'csv') {
+            reader.readAsText(file); // Read CSV files as text
+        } 
+        else {
+            reader.readAsArrayBuffer(file); // Read Excel files as ArrayBuffer
+        }
+        this._fileType = 'csv';
     }
 
     async _convertExcelToCSV(data) {
