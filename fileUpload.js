@@ -167,7 +167,7 @@ class UploadWidget extends HTMLElement {
         try {
             // Create a new workbook
             const workbook = new ExcelJS.Workbook();
-            await workbook.xlsx.load(data);
+            workbook.xlsx.load(data);
     
             // Get the first worksheet
             const worksheet = workbook.getWorksheet(1);
