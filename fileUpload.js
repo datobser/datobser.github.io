@@ -151,7 +151,11 @@ class UploadWidget extends HTMLElement {
             console.error('Error reading file:', error);
         };
     
-        reader.readAsText(file);
+        if (this._fileType === 'xlsx') {
+            reader.readAsArrayBuffer(file);
+        } else {
+            reader.readAsText(file);
+        }
 
     }
 
