@@ -356,10 +356,10 @@
         async refreshFromSAPModel() {
             console.log("Refreshing data from SAP model");
             try {
-                await this.getAccessToken(this._shadowRoot.getElementById('messages'));
-                await this.getCsrfToken();
-                await this.createJob(this._shadowRoot.getElementById('messages'));
-                await this.validateJob(this._shadowRoot.getElementById('messages'));
+                await this._getAccessToken(this._shadowRoot.getElementById('messages'));
+                await this._getCsrfToken();
+                await this._createJob(this._shadowRoot.getElementById('messages'));
+                await this._validateJob(this._shadowRoot.getElementById('messages'));
                 const jobStatus = await this.runJob(this._shadowRoot.getElementById('messages'));
                 
                 if (jobStatus && jobStatus.status === 'SUCCESSFUL') {
