@@ -124,6 +124,7 @@
     
     function uploadData(csvData) {
         console.log('uploadData is triggered');
+        console.log('jobUrl:', jobUrl);
         if (!accessToken || !csrfToken || !jobUrl) {
             console.log('Access token, CSRF token, or job URL is not set');
             return;
@@ -131,7 +132,7 @@
         // Log the values of accessToken, csrfToken, and jobUrl
         //console.log('accessToken:', accessToken);
         //console.log('csrfToken:', csrfToken);
-        console.log('jobUrl:', jobUrl);
+        //console.log('jobUrl:', jobUrl);
         console.log('csvData:', csvData);
         return fetch(jobUrl, {
             method: 'POST',
