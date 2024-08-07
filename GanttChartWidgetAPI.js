@@ -205,7 +205,7 @@
         _getAccessToken() {
             console.log('Getting access token...');
             return new Promise((resolve, reject) => {
-                this.getAccessToken(this._shadowRoot.getElementById('messages'))
+                window.getAccessToken()
                     .then(() => {
                         console.log('Access token acquired');
                         resolve();
@@ -217,7 +217,7 @@
         _getCsrfToken() {
             console.log('Getting CSRF token...');
             return new Promise((resolve, reject) => {
-                this.getCsrfToken()
+                window.getCsrfToken()
                     .then(() => {
                         console.log('CSRF token acquired');
                         resolve();
@@ -229,7 +229,7 @@
         _createJob() {
             console.log('Creating job...');
             return new Promise((resolve, reject) => {
-                this.createJob(this._shadowRoot.getElementById('messages'))
+                window.createJob()
                     .then(() => {
                         console.log('Job created');
                         resolve();
@@ -242,7 +242,7 @@
             console.log('Uploading data...');
             const csvData = this.convertTasksToCSV(this.tasks);
             return new Promise((resolve, reject) => {
-                this.uploadData(csvData, this._shadowRoot.getElementById('messages'))
+                window.uploadData()
                     .then(() => {
                         console.log('Data uploaded');
                         resolve();
@@ -254,7 +254,7 @@
         _validateJob() {
             console.log('Validating job...');
             return new Promise((resolve, reject) => {
-                this.validateJob(this._shadowRoot.getElementById('messages'))
+                window.validateJob()
                     .then(() => {
                         console.log('Job validated');
                         resolve();
@@ -266,7 +266,7 @@
         _runJob() {
             console.log('Running job...');
             return new Promise((resolve, reject) => {
-                this.runJob(this._shadowRoot.getElementById('messages'))
+                window.runJob()
                     .then((jobStatus) => {
                         console.log('Job completed');
                         resolve(jobStatus);
