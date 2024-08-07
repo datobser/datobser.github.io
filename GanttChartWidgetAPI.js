@@ -178,18 +178,118 @@
             sacApiScript.src = 'https://datobser.github.io/SACAPI_DataImport.js';
             sacApiScript.onload = () => {
                 console.log('SACAPI_DataImport.js loaded');
-                this.initializeSAPAPI();
+                this._initializeAPIProcess();
             };
             document.head.appendChild(sacApiScript);
         }
 
-        initializeSAPAPI() {
-            this.getAccessToken = window.getAccessToken;
-            this.getCsrfToken = window.getCsrfToken;
-            this.createJob = window.createJob;
-            this.uploadData = window.uploadData;
-            this.validateJob = window.validateJob;
-            this.runJob = window.runJob;
+        _initializeAPIProcess() {
+            console.log('Initializing API process...');
+            return this._getAccessToken()
+                .then(() => this._getCsrfToken())
+                .then(() => this._createJob())
+                .then(() => this._uploadData())
+                .then(() => this._validateJob())
+                .then(() => this._runJob())
+                .then(jobStatus => {
+                    console.log('Final job status:', jobStatus);
+                    console.log('API process completed successfully');
+                    return jobStatus;
+                })
+                .catch(error => {
+                    console.error('API process error:', error);
+                    throw error; // Re-throw the error to be caught by the calling function
+                });
+        }
+    
+        _getAccessToken() {
+            console.log('Getting access token...');
+            return new Promise((resolve, reject) => {
+                this.getAccessToken(this._shadowRoot.getElementById('messages'))
+                    .then(() => {
+                        console.log('Access token acquired');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _getCsrfToken() {
+            console.log('Getting CSRF token...');
+            return new Promise((resolve, reject) => {
+                this.getCsrfToken()
+                    .then(() => {
+                        console.log('CSRF token acquired');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _createJob() {
+            console.log('Creating job...');
+            return new Promise((resolve, reject) => {
+                this.createJob(this._shadowRoot.getElementById('messages'))
+                    .then(() => {
+                        console.log('Job created');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _uploadData() {
+            console.log('Uploading data...');
+            const csvData = this.convertTasksToCSV(this.tasks);
+            return new Promise((resolve, reject) => {
+                this.uploadData(csvData, this._shadowRoot.getElementById('messages'))
+                    .then(() => {
+                        console.log('Data uploaded');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _validateJob() {
+            console.log('Validating job...');
+            return new Promise((resolve, reject) => {
+                this.validateJob(this._shadowRoot.getElementById('messages'))
+                    .then(() => {
+                        console.log('Job validated');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        _runJob() {
+            console.log('Running job...');
+            return new Promise((resolve, reject) => {
+                this.runJob(this._shadowRoot.getElementById('messages'))
+                    .then((jobStatus) => {
+                        console.log('Job completed');
+                        resolve(jobStatus);
+                    })
+                    .catch(reject);
+            });
+        }
+    
+        async refreshFromSAPModel() {
+            console.log("Refreshing data from SAP model");
+            try {
+                const jobStatus = await this._initializeAPIProcess();
+                
+                if (jobStatus && jobStatus.status === 'SUCCESSFUL') {
+                    console.log("Data successfully refreshed from SAP");
+                    this.tasks = this.processDataFromSAP(jobStatus.data);
+                    this.render();
+                } else {
+                    console.error("Failed to refresh data from SAP");
+                }
+            } catch (error) {
+                console.error("Error refreshing from SAP model:", error);
+            }
         }
 
         toggleDebuggingMode() {
