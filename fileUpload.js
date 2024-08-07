@@ -159,38 +159,46 @@ class UploadWidget extends HTMLElement {
 
     }
 
-    _convertExcelToCSV(data) {
-        console.log('Entered convertExcelToCSV with:');
-        console.log(data);
-
+    async _convertExcelToCSV(data) {
+        console.log('Entered convertExcelToCSV with:', data);
+    
         if (!window.ExcelJS) {
             console.error('ExcelJS library not loaded');
             return null;
         }
-
+    
         try {
             // Create a new workbook
             const workbook = new ExcelJS.Workbook();
-            workbook.xlsx.load(data);
-
+    
+            // Load the workbook from the ArrayBuffer
+            await workbook.xlsx.load(data);
+    
+            // Log the number of worksheets
+            console.log('Number of worksheets:', workbook.worksheets.length);
+    
             // Get the first worksheet
-            const worksheet = workbook.worksheets[0];
-
+            const worksheet = workbook.worksheets[0]; // Access the first worksheet directly
+    
             if (!worksheet) {
                 console.error('No worksheet found in the workbook');
                 return null;
             }
-
+    
+            // Log the worksheet name and number of rows
+            console.log('Worksheet name:', worksheet.name);
+            console.log('Number of rows in the worksheet:', worksheet.rowCount);
+    
             // Convert the worksheet to CSV
             let csvContent = '';
             worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
                 csvContent += row.values.slice(1).join(',') + '\n';  // slice(1) to remove the first undefined value
             });
-
+    
             console.log('Excel file successfully converted to CSV');
             console.log(csvContent);
             return csvContent;
-
+    
         } catch (error) {
             console.error('Error during Excel to CSV conversion:', error);
             return null;
