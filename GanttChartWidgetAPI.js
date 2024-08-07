@@ -79,22 +79,11 @@
             try {
                 await window.getAccessToken();
                 await window.getCsrfToken();
-                const jobInfo = await window.createExportJob();
-                
-                if (!jobInfo || !jobInfo.jobURL) {
-                    throw new Error("Failed to create export job");
-                }
-        
-                const jobStatus = await window.runExportJob();
-                
-                if (jobStatus && jobStatus.jobStatus === 'COMPLETED') {
-                    console.log("Data export job completed successfully");
-                    const exportedData = await window.getExportedData();
-                    this.tasks = this.processDataFromSAP(exportedData);
-                    this.render();
-                } else {
-                    console.error("Failed to export data from SAP");
-                }
+                await window.getProviders();
+                const subscriptionID = await window.createSubscription();
+                const exportedData = await window.getExportedData(subscriptionID);
+                this.tasks = this.processDataFromSAP(exportedData.value);
+                this.render();
             } catch (error) {
                 console.error("Error refreshing from SAP model:", error);
             }
