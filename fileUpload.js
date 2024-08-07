@@ -459,7 +459,7 @@ class UploadWidget extends HTMLElement {
         });
     }
 
-    _pollJobStatus(jobId, maxAttempts = 10, interval = 5000) {
+    _pollJobStatus(jobId, maxAttempts = 10, interval = 10000) {
         return new Promise((resolve, reject) => {
             let attempts = 0;
             let isFinished = false;
