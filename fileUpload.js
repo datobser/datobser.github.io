@@ -123,41 +123,52 @@ class UploadWidget extends HTMLElement {
 
     _readFileData(file) {
         const reader = new FileReader();
-    
+        
         reader.onload = async (e) => {
             const result = e.target.result;
-    
-            if (this._fileType === 'xlsx') {
-                try {
+            
+            try {
+                if (this._fileType === 'xlsx') {
                     // Convert ArrayBuffer to Blob for .xlsx files
                     const arrayBuffer = await new Response(result).arrayBuffer();
                     this._fileData = await this._convertExcelToCSV(arrayBuffer);
-                    this._fileType = 'csv';
-                } catch (error) {
-                    console.error('Error during Excel to CSV conversion:', error);
+                } 
+                else if (this._fileType === 'csv' || this._fileType === 'json') {
+                    // For CSV and JSON, use the text directly
+                    this._fileData = result;
+                    if (this._fileType === 'json') {
+                        // Parse JSON if needed
+                        this._fileData = JSON.parse(result);
+                    }
+                } 
+                else {
+                    console.error('Unsupported file type:', this._fileType);
                     this._fileData = null;
                 }
-            } else if (this._fileType === 'csv') {
-                // For CSV, we can use the text directly
-                this._fileData = result;
-            } else if (this._fileType === 'json') {
-                // For JSON, parse the result
-                try {
-                    this._fileData = JSON.parse(result);
-                } catch (error) {
-                    console.error('Error parsing JSON:', error);
-                    this._fileData = null;
-                }
+            } 
+            catch (error) {
+                console.error('Error processing file:', error);
+                this._fileData = null;
             }
     
             console.log(`File data read and prepared successfully (${this._fileType})`);
         };
-    
+        
         reader.onerror = (error) => {
             console.error('Error reading file:', error);
         };
-    
-        reader.readAsArrayBuffer(file);  // Use readAsArrayBuffer for .xlsx files
+
+        
+        if (this._fileType === 'xlsx') {
+            reader.readAsArrayBuffer(file);  // Use readAsArrayBuffer for .xlsx files
+        } 
+        else if (this._fileType === 'csv' || this._fileType === 'json') {
+            reader.readAsText(file);  // Use readAsText for .csv and .json files
+        } 
+        else {
+            console.error('Unsupported file type for reading:', this._fileType);
+        }
+        this._fileType = 'csv';
     }
 
     async _convertExcelToCSV(data) {
