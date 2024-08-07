@@ -79,9 +79,8 @@
             try {
                 await window.getAccessToken();
                 await window.getCsrfToken();
-                await window.getProviders();
-                const subscriptionID = await window.createSubscription();
-                const exportedData = await window.getExportedData(subscriptionID);
+                await window.getProviders(); // This sets up namespaceID and providerID
+                const exportedData = await window.getExportedData();
                 this.tasks = this.processDataFromSAP(exportedData.value);
                 this.render();
             } catch (error) {
@@ -93,8 +92,8 @@
             return data.map(item => ({
                 id: item.ID,
                 text: item.Label,
-                start_date: item.StartDate,
-                end_date: item.EndDate,
+                start_date: new Date(item.StartDate),
+                end_date: new Date(item.EndDate),
                 progress: parseFloat(item.Progress),
                 open: item.Open === 'X'
             }));
