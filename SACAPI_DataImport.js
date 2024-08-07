@@ -112,7 +112,7 @@
         .then(data => {
             console.log('Create Job Data:', data);
             jobUrl = data.jobURL;
-            this.validateJobURL = data.validateJobURL;  // Set the validateJobURL
+            validateJobURL = data.validateJobURL; // Set the validateJobURL
             console.log('Job URL:', jobUrl);
             console.log('Validate Job URL:', validateJobURL);
             if (messagesElement) {
