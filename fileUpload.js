@@ -221,7 +221,7 @@ class UploadWidget extends HTMLElement {
             this.dispatchEvent(new CustomEvent('uploadError', { detail: 'No file selected' }));
             return;
         }
-
+        console.log('Data to send:', this._fileData);
         this._progressBar.style.display = 'block';
         this._progressBar.value = 0;
 
