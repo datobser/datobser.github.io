@@ -48,7 +48,7 @@
             .then(response => response.json())
             .then(data => {
                 accessToken = data.access_token;
-                console.log('Access token:', accessToken);
+                //console.log('Access token:', accessToken);
                 if (messagesElement) {
                     messagesElement.textContent = '';  // Clear the messages
                     messagesElement.textContent += 'Access token: ' + accessToken + '\n';
@@ -76,7 +76,7 @@
         })
             .then(response => {
                 csrfToken = response.headers.get('x-csrf-token');
-                console.log('CSRF token:', csrfToken);
+                //console.log('CSRF token:', csrfToken);
                 if (messagesElement) {
                     messagesElement.textContent = '';  // Clear the messages
                     messagesElement.textContent += 'CSRF token: ' + csrfToken + '\n';
@@ -128,10 +128,9 @@
             console.log('Access token, CSRF token, or job URL is not set');
             return;
         }
-        console.log('CSV Data (first 500 chars):', csvData.substring(0, 500));
         // Log the values of accessToken, csrfToken, and jobUrl
-        console.log('accessToken:', accessToken);
-        console.log('csrfToken:', csrfToken);
+        //console.log('accessToken:', accessToken);
+        //console.log('csrfToken:', csrfToken);
         console.log('jobUrl:', jobUrl);
         console.log('csvData:', csvData);
         return fetch(jobUrl, {
