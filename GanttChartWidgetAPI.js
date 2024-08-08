@@ -93,40 +93,32 @@
         
             // First, create all tasks
             factData.forEach(item => {
+                const parentID = assignParentTask(item);
                 const task = {
                     id: item.ID,
                     text: item.Label,
                     start_date: new Date(item.StartDate),
                     end_date: new Date(item.EndDate),
                     progress: parseFloat(item.Progress) || 0,
-                    open: item.Open === 'X'
+                    open: item.Open === 'X',
+                    parent: parentID
                 };
                 idMap.set(item.ID, task);
                 tasks.push(task);
             });
         
-            // Then, set parent-child relationships based on the idList order
-            idList.forEach(id => {
-                const task = idMap.get(id);
-                if (task) {
-                    if (id.toLowerCase().startsWith('task a')) {
-                        task.parent = 'Projekt 1'; 
-                        
-                    } else if (id.toLowerCase().startsWith('task b')) {
-                        task.parent = 'Projekt 1';
-                    } else if (id.toLowerCase().startsWith('task b')) {
-                        task.parent = 'Projekt 1';
-                    }
-                    else if (id.toLowerCase().startsWith('task c')) {
-                        task.parent = 'Projekt 2';
-                    }
-                    else if (id.toLowerCase().startsWith('task d')) {
-                        task.parent = 'Projekt 2';
-                    }
+            
+        }
+
+        assignParentTask(task) {
+                const idLowerCase = id.toLowerCase();
+        
+                if (idLowerCase.startsWith('task a') || idLowerCase.startsWith('task b')) {
+                    return 'Projekt 1';
+                } else if (idLowerCase.startsWith('task c') || idLowerCase.startsWith('task d')) {
+                    return 'Projekt 2';
                 }
-            });
-            console.log('created tasks',tasks);
-            return tasks;
+            }
         }
 
         render() {
