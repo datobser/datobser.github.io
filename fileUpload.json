@@ -14,64 +14,47 @@
       "url": "https://datobser.github.io/fileUpload.js",
       "integrity": "",
       "ignoreIntegrity": true
-    },
-    {
-      "kind": "builder",
-      "tag": "upload-builder",
-      "url": "https://datobser.github.io//BfileUpload.js",
-      "integrity": "",
-      "ignoreIntegrity": true
     }
   ],
-  "properties": [
-    {
-      "name": "modelId",
+  "properties": {
+    "modelId": {
       "type": "string",
       "description": "ID of the selected model"
     },
-    {
-      "name": "importType",
+    "importType": {
       "type": "string",
       "description": "Type of import (e.g., factData, masterData)"
     },
-    {
-      "name": "mappings",
+    "mappings": {
       "type": "string",
       "description": "JSON string of column mappings"
     },
-    {
-      "name": "defaultValues",
+    "defaultValues": {
       "type": "string",
       "description": "JSON string of default values"
     },
-    {
-      "name": "jobSettings",
+    "jobSettings": {
       "type": "string",
       "description": "JSON string of job settings"
     }
-  ],
-  "methods": [
-    {
-      "name": "open",
+  },
+  "methods": {
+    "open": {
       "description": "Opens the file upload dialog"
     },
-    {
-      "name": "getTotalJobRowCount",
+    "getTotalJobRowCount": {
       "description": "Gets the total number of rows in the last job"
     },
-    {
-      "name": "getJobFailedRowCount",
+    "getJobFailedRowCount": {
       "description": "Gets the number of failed rows in the last job"
     }
-  ],
-  "events": [
-    {
-      "name": "onSuccess",
+  },
+  "events": {
+    "onSuccess": {
       "description": "Triggered when the import job completes successfully"
     },
-    {
-      "name": "onFailure",
+    "onFailure": {
       "description": "Triggered when the import job fails"
     }
-  ]
+  }
 }
