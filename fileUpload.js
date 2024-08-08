@@ -233,10 +233,10 @@ class UploadWidget extends HTMLElement {
                 console.log('validating...');
                 return this._validateJob(this._jobId);
             })
-            .then((uploadResponse) => {
-                console.log('Data upload response:', uploadResponse);
-                if (uploadResponse.status !== 'success') {
-                    throw new Error(`Data upload failed: ${uploadResponse.message}`);
+            .then((validateResponse) => {
+                console.log('Data upload response:', validateResponse);
+                if (validateResponse.jobStatus !== 'READY_FOR_WRITE') {
+                    throw new Error(`Validation failed: ${uploadResponse.message}`);
                 }
                 // Run job
                 return this._runJob(this._jobId);
