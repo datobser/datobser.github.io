@@ -389,6 +389,15 @@ class UploadWidget extends HTMLElement {
                 data: this._fileType === 'csv' ? this._fileData : JSON.stringify({ "Data": this._fileData }),
                 success: (response) => {
                     console.log('uploadData response received:', response);
+                
+                    if (response.failedRows && response.failedRows.length > 0) {
+                        console.log('Failed rows details:');
+                        response.failedRows.forEach((failedRow, index) => {
+                            console.log(`Row ${index + 1}:`, failedRow.row);
+                            console.log(`Reason: ${failedRow.reason}`);
+                        });
+                    }
+                    
                     if (response.upsertedNumberRows !== undefined) {
                         resolve({
                             status: 'success',
