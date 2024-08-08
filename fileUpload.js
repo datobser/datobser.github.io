@@ -427,8 +427,9 @@ class UploadWidget extends HTMLElement {
                     resolve(response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Job validation failed:', errorThrown);
-                    reject(new Error(`Failed to validate job: ${errorThrown}`));
+                    console.log('Job validation failed::', textStatus, errorThrown);
+                    console.log('Error details:', jqXHR.responseText);
+                    reject(new Error(`Failed to create job: ${errorThrown}`));
                 }
             });
         });
