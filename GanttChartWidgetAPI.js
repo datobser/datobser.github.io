@@ -4,7 +4,10 @@
     <style>
     #chart {
         width: 100%; 
-        height: 500px;  
+        height: 800px;  /* Increased height */
+    }
+    #refresh-button {
+        margin-top: 10px;
     }
     </style>
     <div id="chart"></div>
@@ -56,45 +59,49 @@
         configureGantt() {
             // Disable automatic fitting of tasks to the timeline
             gantt.config.fit_tasks = false;
-        
+
             // Enable horizontal scrolling
             gantt.config.autoscroll = true;
             gantt.config.autoscroll_speed = 30;
-        
+
             // Configure the main scale to show months
             gantt.config.scale_unit = "month";
             gantt.config.date_scale = "%F %Y";
             gantt.config.step = 1;
-        
+
             // Add a secondary scale for weeks
             gantt.config.subscales = [
                 {unit: "week", step: 1, date: "Week %W"}
             ];
-        
+
             // Set minimum column width to ensure readability
             gantt.config.min_column_width = 70;
-        
+
             // Set the initial date range (e.g., 2 years)
             const currentDate = new Date();
             gantt.config.start_date = new Date(currentDate.getFullYear(), 0, 1);
             gantt.config.end_date = new Date(currentDate.getFullYear() + 2, 0, 0);
-        
+
             // Adjust grid and chart widths
             gantt.config.grid_width = 300;
-            gantt.config.autosize = "y";
-        
+            gantt.config.autosize = false;  // Changed to false
+            gantt.config.height = 750;  // Set a fixed height
+
+            // Enable vertical scrolling for tasks
+            gantt.config.scroll_size = 20;
+
             // Disable task dragging and resizing for read-only view
             gantt.config.drag_move = false;
             gantt.config.drag_resize = false;
-        
+
             // Enable smart rendering for better performance with large datasets
             gantt.config.smart_rendering = true;
-        
+
             // Customize the appearance
             gantt.templates.task_class = (start, end, task) => {
                 return task.progress >= 0.5 ? "high-progress" : "low-progress";
             };
-        
+
             // Add custom CSS for task appearance
             const style = document.createElement('style');
             style.textContent = `
@@ -102,8 +109,8 @@
                 .low-progress { background-color: #FFC107; }
             `;
             this._shadowRoot.appendChild(style);
-        
-            gantt.render();
+
+            gantt.init(this._shadowRoot.getElementById('chart'));
         }
 
         static get metadata() {
