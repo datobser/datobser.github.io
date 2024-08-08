@@ -87,6 +87,7 @@
         }
 
         processDataFromSAP(factData, idList) {
+            console.log("entered processDataFromSAP");
             const idMap = new Map();
             const tasks = [];
         
