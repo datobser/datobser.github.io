@@ -150,7 +150,11 @@
         processDataFromSAP(factData, idList) {
             console.log("entered processDataFromSAP");
             const idMap = new Map();
-            const tasks = [];
+            const tasks = [
+                // Manually add parent projects
+                { id: 'Projekt 1', text: 'Projekt 1', start_date: new Date(2024, 3, 31), end_date: new Date(0), progress: 0, open: true },
+                { id: 'Projekt 2', text: 'Projekt 2', start_date: new Date(2024, 9, 30), end_date: new Date(0), progress: 0, open: true }
+            ];
         
             // First, create all tasks
             factData.forEach(item => {
@@ -166,9 +170,28 @@
                 };
                 idMap.set(item.ID, task);
                 tasks.push(task);
+        
+                // Update parent project dates
+                if (parentID) {
+                    const parentTask = tasks.find(t => t.id === parentID);
+                    if (parentTask) {
+                        parentTask.start_date = new Date(Math.min(parentTask.start_date, task.start_date));
+                        parentTask.end_date = new Date(Math.max(parentTask.end_date, task.end_date));
+                    }
+                }
             });
         
-            return tasks;  // Return the created tasks
+            // Calculate progress for parent projects
+            tasks.forEach(task => {
+                if (task.id === 'Projekt 1' || task.id === 'Projekt 2') {
+                    const childTasks = tasks.filter(t => t.parent === task.id);
+                    if (childTasks.length > 0) {
+                        task.progress = childTasks.reduce((sum, t) => sum + t.progress, 0) / childTasks.length;
+                    }
+                }
+            });
+        
+            return tasks;
         }
 
         assignParentTask(task) {
