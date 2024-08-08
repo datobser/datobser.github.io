@@ -130,26 +130,23 @@
         }
 
         render() {
-            console.log("entered render");
+            console.log("Entered render, tasks:", JSON.stringify(this.tasks));
             if (this._dhtmlxGanttReady) {
+                console.log("DHTMLX Gantt is ready");
                 const chartElement = this._shadowRoot.getElementById('chart');
-                
-                // Configure Gantt to use hierarchy
-                gantt.config.sort = true;
-                gantt.config.open_tree_initially = true;
-                gantt.config.row_height = 30;
-                gantt.config.indent_padding = 15;
-                gantt.config.columns = [
-                    {name: "text", label: "Task name", tree: true, width: '*'},
-                    {name: "start_date", label: "Start time", align: "center"},
-                    {name: "duration", label: "Duration", align: "center"}
-                ];
+                console.log("Chart element dimensions:", chartElement.offsetWidth, chartElement.offsetHeight);
                 
                 gantt.init(chartElement);
                 gantt.clearAll();
         
                 if (this.tasks.length > 0) {
-                    gantt.parse({ data: this.tasks });
+                    try {
+                        console.log("Parsing tasks into Gantt chart");
+                        gantt.parse({ data: this.tasks });
+                        console.log("Tasks parsed successfully");
+                    } catch (error) {
+                        console.error("Error parsing tasks:", error);
+                    }
                 } else {
                     console.log('No tasks to render');
                 }
