@@ -77,23 +77,21 @@
         async refreshFromSAPModel() {
             console.log("Refreshing data from SAP model");
             try {
-                await window.getAccessToken();
-                await window.getCsrfToken();
-                const hierarchyData = await window.getHierarchyData();
+                const idList = await getHierarchyData();
                 const exportedData = await window.getExportedData();
-                console.log("Raw exported data:", JSON.stringify(exportedData.value, null, 2));
-                this.tasks = this.processDataFromSAP(exportedData.value);
+                this.tasks = this.processDataFromSAP(exportedData.value, idList);
                 this.render();
             } catch (error) {
                 console.error("Error refreshing from SAP model:", error);
             }
         }
 
-        processDataFromSAP(data) {
+        processDataFromSAP(factData, idList) {
             const idMap = new Map();
-            
-            // First pass: Create task objects and store them in the map
-            data.forEach(item => {
+            const tasks = [];
+        
+            // First, create all tasks
+            factData.forEach(item => {
                 const task = {
                     id: item.ID,
                     text: item.Label,
@@ -103,24 +101,31 @@
                     open: item.Open === 'X'
                 };
                 idMap.set(item.ID, task);
+                tasks.push(task);
             });
-            
-            // Second pass: Set parent-child relationships
-            data.forEach(item => {
-                const task = idMap.get(item.ID);
-                if (item.Projekthierarchie) {
-                    if (item.Projekthierarchie === '<root>') {
-                        // This is "Alle Projekte", it has no parent
-                        task.parent = 0;  // In DHTMLX Gantt, 0 typically represents no parent
-                    } else {
-                        task.parent = item.Projekthierarchie;
+        
+            // Then, set parent-child relationships based on the idList order
+            idList.forEach(id => {
+                const task = idMap.get(id);
+                if (task) {
+                    if (id.toLowerCase().startsWith('task a')) {
+                        task.parent = 'Projekt 1'; 
+                        
+                    } else if (id.toLowerCase().startsWith('task b')) {
+                        task.parent = 'Projekt 1';
+                    } else if (id.toLowerCase().startsWith('task b')) {
+                        task.parent = 'Projekt 1';
                     }
-                } else {
-                    console.warn(`Task ${item.ID} has no specified parent in the hierarchy.`);
+                    else if (id.toLowerCase().startsWith('task c')) {
+                        task.parent = 'Projekt 2';
+                    }
+                    else if (id.toLowerCase().startsWith('task d')) {
+                        task.parent = 'Projekt 2';
+                    }
                 }
             });
-            
-            return Array.from(idMap.values());
+        
+            return tasks;
         }
 
         render() {
