@@ -78,10 +78,9 @@
             });
             
             const data = await response.json();
-            console.log('Hierarchy data:', data);
+            console.log('Raw hierarchy data:', data);
             
-            // Process the hierarchy data here
-            return processHierarchyData(data);
+            return data.value.map(item => item.ID);
         } catch (error) {
             console.error("Error fetching hierarchy data:", error);
         }
