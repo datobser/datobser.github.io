@@ -65,4 +65,32 @@
     }
     window.getExportedData = getExportedData;
 
+    async function getHierarchyData() {
+        try {
+            await window.getAccessToken();
+            await window.getCsrfToken();
+            
+            // Assuming you have namespaceID and providerID stored
+            const response = await fetch(`${apiBaseUrl}/providers/sac/Cl94sr05ultdetk3npm9hu6q83u/IDMaster`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            
+            const data = await response.json();
+            console.log('Hierarchy data:', data);
+            
+            // Process the hierarchy data here
+            return processHierarchyData(data);
+        } catch (error) {
+            console.error("Error fetching hierarchy data:", error);
+        }
+    }
+
+    function processHierarchyData(data) {
+        // Process the hierarchy data based on the structure returned by the API
+        // This will depend on the exact format of the data returned
+        // You might need to transform it into the format expected by your Gantt chart
+    }
+
 })();
