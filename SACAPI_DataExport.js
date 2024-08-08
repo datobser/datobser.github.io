@@ -86,6 +86,7 @@
             console.error("Error fetching hierarchy data:", error);
         }
     }
+    window.getHierarchyData = getHierarchyData;
 
     function processHierarchyData(data) {
         // Process the hierarchy data based on the structure returned by the API
