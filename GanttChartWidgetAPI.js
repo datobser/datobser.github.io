@@ -40,6 +40,7 @@
             dhtmlxGanttScript.src = 'https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js';
             dhtmlxGanttScript.onload = () => {
                 this._dhtmlxGanttReady = true;
+                this.configureGantt();
                 this.render();
             };
             this._shadowRoot.appendChild(dhtmlxGanttScript);
@@ -50,6 +51,20 @@
                 console.log('SACAPI_DataExport.js loaded');
             };
             document.head.appendChild(sacApiScript);
+        }
+
+        configureGantt() {
+            gantt.config.scale_unit = "month";
+            gantt.config.date_scale = "%F, %Y";
+            gantt.config.subscales = [
+                {unit: "week", step: 1, date: "%j"}
+            ];
+            gantt.config.min_column_width = 50;
+            gantt.config.scale_height = 90;
+
+            // Enable horizontal scrolling
+            gantt.config.autosize = "y";
+            gantt.config.autosize_min_width = 800;
         }
 
         static get metadata() {
