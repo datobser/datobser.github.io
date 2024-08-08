@@ -90,15 +90,17 @@
         }
 
         processDataFromSAP(data) {
-            return data.map(item => ({
+            return data.map(item => {
                 console.log("Processing item:", item);
-                id: item.ID,
-                text: item.Label,
-                start_date: new Date(item.StartDate),
-                end_date: new Date(item.EndDate),
-                progress: parseFloat(item.Progress),
-                open: item.Open === 'X'
-            }));
+                return {
+                    id: item.ID,
+                    text: item.Label,
+                    start_date: new Date(item.StartDate),
+                    end_date: new Date(item.EndDate),
+                    progress: parseFloat(item.Progress),
+                    open: item.Open === 'X'
+                };
+            });
         }
 
         render() {
