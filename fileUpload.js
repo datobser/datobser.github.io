@@ -344,6 +344,7 @@ class UploadWidget extends HTMLElement {
         const url = `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`;
         console.log('Creating job using URL:', url);
         console.log('importType:', importType);
+        console.log('Csrf token:', this._csrfToken);
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`,
