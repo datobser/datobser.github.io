@@ -54,26 +54,57 @@
         }
 
         configureGantt() {
-            // Deaktiviere fit_tasks, um horizontales Scrollen zu ermöglichen
+            // Disable automatic fitting of tasks to the timeline
             gantt.config.fit_tasks = false;
         
-            // Konfiguriere die Hauptskala auf Monatsbasis
+            // Enable horizontal scrolling
+            gantt.config.autoscroll = true;
+            gantt.config.autoscroll_speed = 30;
+        
+            // Configure the main scale to show months
             gantt.config.scale_unit = "month";
+            gantt.config.date_scale = "%F %Y";
             gantt.config.step = 1;
-            gantt.config.date_scale = "%F %Y"; // Zeigt den vollständigen Monatsnamen an
         
-            // Stelle sicher, dass das Diagramm eine feste Breite verwendet, damit Scrollen funktioniert
-            gantt.config.grid_width = 400;  // Breite des linken Gitters (Task-Namen)
-            gantt.config.min_column_width = 50;  // Mindestbreite jeder Spalte (Tag)
+            // Add a secondary scale for weeks
+            gantt.config.subscales = [
+                {unit: "week", step: 1, date: "Week %W"}
+            ];
         
-            // Andere mögliche Einstellungen, um das Scrollen zu erleichtern
-            gantt.config.autosize = "y"; // Anpassung der Höhe an die Inhalte
-            gantt.config.drag_resize = false; // Verhindert das Resizing durch Drag-and-Drop
-            gantt.config.drag_move = false; // Verhindert das Verschieben von Tasks
+            // Set minimum column width to ensure readability
+            gantt.config.min_column_width = 70;
+        
+            // Set the initial date range (e.g., 2 years)
+            const currentDate = new Date();
+            gantt.config.start_date = new Date(currentDate.getFullYear(), 0, 1);
+            gantt.config.end_date = new Date(currentDate.getFullYear() + 2, 0, 0);
+        
+            // Adjust grid and chart widths
+            gantt.config.grid_width = 300;
+            gantt.config.autosize = "y";
+        
+            // Disable task dragging and resizing for read-only view
+            gantt.config.drag_move = false;
+            gantt.config.drag_resize = false;
+        
+            // Enable smart rendering for better performance with large datasets
+            gantt.config.smart_rendering = true;
+        
+            // Customize the appearance
+            gantt.templates.task_class = (start, end, task) => {
+                return task.progress >= 0.5 ? "high-progress" : "low-progress";
+            };
+        
+            // Add custom CSS for task appearance
+            const style = document.createElement('style');
+            style.textContent = `
+                .high-progress { background-color: #4CAF50; }
+                .low-progress { background-color: #FFC107; }
+            `;
+            this._shadowRoot.appendChild(style);
         
             gantt.render();
         }
-
 
         static get metadata() {
             return {
