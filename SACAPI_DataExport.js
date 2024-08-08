@@ -33,29 +33,6 @@
     }
     window.getCsrfToken = getCsrfToken;
 
-    async function getProviders() {
-        const response = await fetch(`${apiBaseUrl}/administration/Namespaces`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
-        const data = await response.json();
-        console.log('Available namespaces:', data);
-        // You would typically select a namespace here
-        namespaceID = data.value[0].NamespaceID;  // Example: selecting the first namespace
-
-        const providersResponse = await fetch(`${apiBaseUrl}/administration/Namespaces(NamespaceID='${namespaceID}')/Providers`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            }
-        });
-        const providersData = await providersResponse.json();
-        console.log('Available providers:', providersData);
-        // You would typically select a provider here
-        providerID = providersData.value[0].ProviderID;  // Example: selecting the first provider
-    }
-    window.getProviders = getProviders;
-
     async function createSubscription() {
         const response = await fetch(`${apiBaseUrl}/administration/Subscriptions`, {
             method: 'POST',
