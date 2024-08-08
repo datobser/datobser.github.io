@@ -54,18 +54,26 @@
         }
 
         configureGantt() {
-            // Set fit_tasks to false to enable horizontal scrolling
+            // Deaktiviere fit_tasks, um horizontales Scrollen zu ermöglichen
             gantt.config.fit_tasks = false;
         
-            // Configure the Gantt chart to use a monthly scale
+            // Konfiguriere die Hauptskala auf Monatsbasis
             gantt.config.scale_unit = "month";
             gantt.config.step = 1;
+            gantt.config.date_scale = "%F %Y"; // Zeigt den vollständigen Monatsnamen an
         
-            // Additional configuration if needed
-            gantt.config.date_scale = "%F %Y"; // For displaying the full month name
-            gantt.config.subscales = [
-                {unit: "day", step: 1, date: "%j"} // Optional: Add day scale as subscale
-            ];
+            // Stelle sicher, dass das Diagramm eine feste Breite verwendet, damit Scrollen funktioniert
+            gantt.config.grid_width = 400;  // Breite des linken Gitters (Task-Namen)
+            gantt.config.min_column_width = 50;  // Mindestbreite jeder Spalte (Tag)
+        
+            // Andere mögliche Einstellungen, um das Scrollen zu erleichtern
+            gantt.config.autosize = "y"; // Anpassung der Höhe an die Inhalte
+            gantt.config.drag_resize = false; // Verhindert das Resizing durch Drag-and-Drop
+            gantt.config.drag_move = false; // Verhindert das Verschieben von Tasks
+        
+            // Gantt neu rendern, falls es schon initialisiert ist
+            gantt.init("gantt_here");
+            gantt.render();
         }
 
 
