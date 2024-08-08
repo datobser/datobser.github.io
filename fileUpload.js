@@ -571,7 +571,8 @@ class UploadWidget extends HTMLElement {
                     resolve(response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Failed to retrieve invalid rows:', errorThrown);
+                    console.error('Data upload request failed:', textStatus, errorThrown);
+                    console.error('Error details:', jqXHR.responseText);
                     reject(new Error(`Failed to retrieve invalid rows: ${errorThrown}`));
                 }
             });
