@@ -79,6 +79,7 @@
             try {
                 await window.getAccessToken();
                 await window.getCsrfToken();
+                const hierarchyData = await window.getHierarchyData();
                 const exportedData = await window.getExportedData();
                 console.log("Raw exported data:", JSON.stringify(exportedData.value, null, 2));
                 this.tasks = this.processDataFromSAP(exportedData.value);
