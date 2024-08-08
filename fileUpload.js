@@ -229,6 +229,10 @@ class UploadWidget extends HTMLElement {
                 // Upload data
                 return this._uploadData(jobId, this._fileData);
             })
+            .then(() => {
+                console.log('validating...');
+                return this._validateJob(this._jobId);
+            })
             .then((uploadResponse) => {
                 console.log('Data upload response:', uploadResponse);
                 if (uploadResponse.status !== 'success') {
@@ -401,6 +405,30 @@ class UploadWidget extends HTMLElement {
                     console.error('Data upload request failed:', textStatus, errorThrown);
                     console.error('Error details:', jqXHR.responseText);
                     reject(new Error(`Failed to upload data: ${errorThrown}`));
+                }
+            });
+        });
+    }
+
+
+    _validateJob(jobId) {
+        console.log('Validating job with jobId:', jobId);
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}/validate`,
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + this._accessToken,
+                    "x-csrf-token": this._csrfToken,
+                    "Content-Type": "application/json"
+                },
+                success: (response) => {
+                    console.log('Job validation response:', response);
+                    resolve(response);
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    console.error('Job validation failed:', errorThrown);
+                    reject(new Error(`Failed to validate job: ${errorThrown}`));
                 }
             });
         });
