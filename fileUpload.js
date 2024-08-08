@@ -327,7 +327,7 @@ class UploadWidget extends HTMLElement {
                     "x-sap-sac-custom-auth": "true"
                 },
                 success: (data, textStatus, jqXHR) => {
-                    console.log('CSRF token response:', data);
+                    console.log('got response from CSRF API:');
                     this._csrfToken = jqXHR.getResponseHeader("x-csrf-token");
                     resolve(this._csrfToken); // Resolve with the CSRF token
                 },
