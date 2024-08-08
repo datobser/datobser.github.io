@@ -71,8 +71,6 @@
             gantt.config.drag_resize = false; // Verhindert das Resizing durch Drag-and-Drop
             gantt.config.drag_move = false; // Verhindert das Verschieben von Tasks
         
-            // Gantt neu rendern, falls es schon initialisiert ist
-            gantt.init("gantt_here");
             gantt.render();
         }
 
