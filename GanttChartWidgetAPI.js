@@ -79,7 +79,6 @@
             try {
                 await window.getAccessToken();
                 await window.getCsrfToken();
-                await window.getProviders(); // This sets up namespaceID and providerID
                 const exportedData = await window.getExportedData();
                 console.log("Raw exported data:", JSON.stringify(exportedData.value, null, 2));
                 this.tasks = this.processDataFromSAP(exportedData.value);
