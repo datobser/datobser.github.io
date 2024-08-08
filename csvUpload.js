@@ -438,7 +438,7 @@ class UploadWidget extends HTMLElement {
                 error: (jqXHR, textStatus, errorThrown) => {
                     console.error('Job validation failed:', errorThrown);
                     if (jqXHR.responseJSON && jqXHR.responseJSON.error &&
-                        jqXHR.responseJSON.error.message.includes("Every row in temporary storage is invalid")) {
+                        //jqXHR.responseJSON.error.message.includes("Every row in temporary storage is invalid")) {
                         // Fetch invalid rows
                         this._getInvalidRows(jobId)
                             .then(invalidRows => {
