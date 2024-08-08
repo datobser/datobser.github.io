@@ -436,9 +436,24 @@ class UploadWidget extends HTMLElement {
                     resolve(response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.log('Job validation failed::', textStatus, errorThrown);
-                    console.log('Error details:', jqXHR.responseText);
-                    reject(new Error(`Failed to create job: ${errorThrown}`));
+                    console.error('Job validation failed:', errorThrown);
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.error &&
+                        jqXHR.responseJSON.error.message.includes("Every row in temporary storage is invalid")) {
+                        // Fetch invalid rows
+                        this._getInvalidRows(jobId)
+                            .then(invalidRows => {
+                                console.log('Invalid rows:', invalidRows);
+                                reject(new Error(`Validation failed. All rows are invalid. See console for details.`));
+                            })
+                            .catch(error => {
+                                console.error('Failed to fetch invalid rows:', error);
+                                reject(new Error(`Validation failed and couldn't fetch invalid rows: ${errorThrown}`));
+                            });
+                    } else {
+                        console.log('Job validation failed::', textStatus, errorThrown);
+                        console.log('Error details:', jqXHR.responseText);
+                        reject(new Error(`Failed to validate job: ${errorThrown}`));
+                    }
                 }
             });
         });
