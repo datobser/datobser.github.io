@@ -494,23 +494,8 @@ class UploadWidget extends HTMLElement {
             },
             error: (jqXHR, textStatus, errorThrown) => {
                 console.error('Job run request failed:', errorThrown);
-                this._getInvalidRows(jobId)
-                    .then(invalidRows => {
-                        if (invalidRows && invalidRows.length > 0) {
-                            console.log('Invalid rows detected:', invalidRows);
-                            console.log('Reasons for invalid rows:');
-                            invalidRows.forEach((row, index) => {
-                                console.log(`Row ${index + 1}:`, row.reason);
-                            });
-                        } else {
-                            console.log('No invalid rows detected, but job execution failed.');
-                        }
-                        reject(new Error(`Failed to run job: ${errorThrown}. ${invalidRows.length} invalid rows found.`));
-                    })
-                    .catch(error => {
-                        console.error('Failed to retrieve invalid rows:', error);
-                        reject(new Error(`Failed to run job: ${errorThrown}. Unable to retrieve invalid rows.`));
-                    });
+                console.log('Error details:', jqXHR.responseText);
+                reject(new Error(`Failed to validate job: ${errorThrown}`));
             }
         });
     });
