@@ -53,7 +53,7 @@
             document.head.appendChild(sacApiScript);
         }
 
-        function configureGantt() {
+        configureGantt() {
             // Set fit_tasks to false to enable horizontal scrolling
             gantt.config.fit_tasks = false;
         
