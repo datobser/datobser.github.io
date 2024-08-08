@@ -1,3 +1,4 @@
+
 class UploadWidget extends HTMLElement {
     constructor() {
         super();
@@ -122,53 +123,37 @@ class UploadWidget extends HTMLElement {
 
     _readFileData(file) {
         const reader = new FileReader();
-        
+    
         reader.onload = async (e) => {
             const result = e.target.result;
-            
-            try {
-                if (this._fileType === 'xlsx') {
-                    // Convert ArrayBuffer to Blob for .xlsx files
-                    this._fileData = await _convertExcelToCSV(result);
-                } 
-                else if (this._fileType === 'csv' || this._fileType === 'json') {
-                    // For CSV and JSON, use the text directly
-                    this._fileData = result;
-                    if (this._fileType === 'json') {
-                        // Parse JSON if needed
-                        this._fileData = JSON.parse(result);
-                    }
-                } 
-                else {
-                    console.error('Unsupported file type:', this._fileType);
+    
+            if (this._fileType === 'xlsx') {
+                try {
+                    // Convert ArrayBuffer to CSV for .xlsx files
+                    this._fileData = await this._convertExcelToCSV(result);
+                } catch (error) {
+                    console.error('Error during Excel to CSV conversion:', error);
                     this._fileData = null;
                 }
-            } 
-            catch (error) {
-                console.error('Error processing file:', error);
-                this._fileData = null;
+            } else if (this._fileType === 'csv') {
+                // For CSV, we can use the text directly
+                this._fileData = result;
             }
     
             console.log(`File data read and prepared successfully (${this._fileType})`);
         };
-        
+    
         reader.onerror = (error) => {
             console.error('Error reading file:', error);
         };
-
-        
+    
         if (this._fileType === 'xlsx') {
-            reader.readAsArrayBuffer(file);  // Use readAsArrayBuffer for .xlsx files
-        } 
-        else if (this._fileType === 'csv' || this._fileType === 'json') {
-            reader.readAsText(file);  // Use readAsText for .csv and .json files
-        } 
-        else {
-            console.error('Unsupported file type for reading:', this._fileType);
+            reader.readAsArrayBuffer(file); // Read Excel files as ArrayBuffer
+        } else if (this._fileType === 'csv') {
+            reader.readAsText(file); // Read CSV files as text
         }
-        this._fileType = 'csv';
     }
-
+    
     async _convertExcelToCSV(data) {
         console.log('Entered convertExcelToCSV with:', data);
     
@@ -178,35 +163,27 @@ class UploadWidget extends HTMLElement {
         }
     
         try {
-            // Create a new workbook
             const workbook = new ExcelJS.Workbook();
-    
-            // Load the workbook from the ArrayBuffer
             await workbook.xlsx.load(data);
     
-            // Log the number of worksheets
             console.log('Number of worksheets:', workbook.worksheets.length);
     
-            // Get the first worksheet
-            const worksheet = workbook.worksheets[0]; // Access the first worksheet directly
+            const worksheet = workbook.worksheets[0];
     
             if (!worksheet) {
                 console.error('No worksheet found in the workbook');
                 return null;
             }
     
-            // Log the worksheet name and number of rows
             console.log('Worksheet name:', worksheet.name);
             console.log('Number of rows in the worksheet:', worksheet.rowCount);
     
-            // Convert the worksheet to CSV
             let csvContent = '';
             worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
-                csvContent += row.values.slice(1).join(',') + '\n';  // slice(1) to remove the first undefined value
+                csvContent += row.values.slice(1).join(',') + '\n';
             });
     
             console.log('Excel file successfully converted to CSV');
-            console.log(csvContent);
             return csvContent;
     
         } catch (error) {
@@ -214,7 +191,6 @@ class UploadWidget extends HTMLElement {
             return null;
         }
     }
-
 
 
     
@@ -327,7 +303,7 @@ class UploadWidget extends HTMLElement {
                     "x-sap-sac-custom-auth": "true"
                 },
                 success: (data, textStatus, jqXHR) => {
-                    console.log('got response from CSRF API:');
+                    console.log('CSRF token response:', data);
                     this._csrfToken = jqXHR.getResponseHeader("x-csrf-token");
                     resolve(this._csrfToken); // Resolve with the CSRF token
                 },
@@ -344,7 +320,6 @@ class UploadWidget extends HTMLElement {
         const url = `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`;
         console.log('Creating job using URL:', url);
         console.log('importType:', importType);
-        console.log('Csrf token:', this._csrfToken);
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: `${this.tenantUrl}/api/v1/dataimport/models/${modelId}/${importType}`,
@@ -469,7 +444,7 @@ class UploadWidget extends HTMLElement {
         });
     }
 
-    _pollJobStatus(jobId, maxAttempts = 10, interval = 10000) {
+    _pollJobStatus(jobId, maxAttempts = 10, interval = 5000) {
         return new Promise((resolve, reject) => {
             let attempts = 0;
             let isFinished = false;
