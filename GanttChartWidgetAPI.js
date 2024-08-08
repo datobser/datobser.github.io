@@ -93,7 +93,7 @@
         
             // First, create all tasks
             factData.forEach(item => {
-                const parentID = assignParentTask(item);
+                const parentID = this.assignParentTask(item);
                 const task = {
                     id: item.ID,
                     text: item.Label,
@@ -107,18 +107,18 @@
                 tasks.push(task);
             });
         
-            
+            return tasks;  // Return the created tasks
         }
 
         assignParentTask(task) {
-                const idLowerCase = id.toLowerCase();
+            const idLowerCase = task.ID.toLowerCase();
         
-                if (idLowerCase.startsWith('task a') || idLowerCase.startsWith('task b')) {
-                    return 'Projekt 1';
-                } else if (idLowerCase.startsWith('task c') || idLowerCase.startsWith('task d')) {
-                    return 'Projekt 2';
-                }
+            if (idLowerCase.startsWith('task a') || idLowerCase.startsWith('task b')) {
+                return 'Projekt 1';
+            } else if (idLowerCase.startsWith('task c') || idLowerCase.startsWith('task d')) {
+                return 'Projekt 2';
             }
+            return null;
         }
 
         render() {
