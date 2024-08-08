@@ -4,7 +4,7 @@
     <style>
     #chart {
         width: 100%; 
-        height: 800px;  /* Increased height */
+        height: 80%;  /* Increased height */
     }
     #refresh-button {
         margin-top: 10px;
