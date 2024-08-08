@@ -53,14 +53,21 @@
             document.head.appendChild(sacApiScript);
         }
 
-        configureGantt() {
-             // Set fit_tasks to false to enable horizontal scrolling
-            gantt.config.fit_tasks = true;
-             // Configure the Gantt chart to use a monthly scale
+        function configureGantt() {
+            // Set fit_tasks to false to enable horizontal scrolling
+            gantt.config.fit_tasks = false;
+        
+            // Configure the Gantt chart to use a monthly scale
             gantt.config.scale_unit = "month";
             gantt.config.step = 1;
-
+        
+            // Additional configuration if needed
+            gantt.config.date_scale = "%F %Y"; // For displaying the full month name
+            gantt.config.subscales = [
+                {unit: "day", step: 1, date: "%j"} // Optional: Add day scale as subscale
+            ];
         }
+
 
         static get metadata() {
             return {
