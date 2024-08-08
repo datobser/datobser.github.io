@@ -130,6 +130,7 @@
         }
 
         render() {
+            console.log("entered render");
             if (this._dhtmlxGanttReady) {
                 const chartElement = this._shadowRoot.getElementById('chart');
                 
