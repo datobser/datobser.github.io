@@ -89,27 +89,57 @@
         }
 
         processDataFromSAP(data) {
-            return data.map(item => {
-                console.log("Processing item:", item);
-                return {
+            const idMap = new Map();
+            
+            // First pass: Create task objects and store them in the map
+            data.forEach(item => {
+                const task = {
                     id: item.ID,
                     text: item.Label,
                     start_date: new Date(item.StartDate),
                     end_date: new Date(item.EndDate),
-                    progress: parseFloat(item.Progress),
+                    progress: parseFloat(item.Progress) || 0,
                     open: item.Open === 'X'
                 };
+                idMap.set(item.ID, task);
             });
+            
+            // Second pass: Set parent-child relationships
+            data.forEach(item => {
+                const task = idMap.get(item.ID);
+                if (item.Projekthierarchie) {
+                    if (item.Projekthierarchie === '<root>') {
+                        // This is "Alle Projekte", it has no parent
+                        task.parent = 0;  // In DHTMLX Gantt, 0 typically represents no parent
+                    } else {
+                        task.parent = item.Projekthierarchie;
+                    }
+                } else {
+                    console.warn(`Task ${item.ID} has no specified parent in the hierarchy.`);
+                }
+            });
+            
+            return Array.from(idMap.values());
         }
 
         render() {
             if (this._dhtmlxGanttReady) {
                 const chartElement = this._shadowRoot.getElementById('chart');
+                
+                // Configure Gantt to use hierarchy
+                gantt.config.sort = true;
+                gantt.config.open_tree_initially = true;
+                gantt.config.row_height = 30;
+                gantt.config.indent_padding = 15;
+                gantt.config.columns = [
+                    {name: "text", label: "Task name", tree: true, width: '*'},
+                    {name: "start_date", label: "Start time", align: "center"},
+                    {name: "duration", label: "Duration", align: "center"}
+                ];
+                
                 gantt.init(chartElement);
                 gantt.clearAll();
-
-                console.log("Processed tasks:", JSON.stringify(this.tasks, null, 2));
-                
+        
                 if (this.tasks.length > 0) {
                     gantt.parse({ data: this.tasks });
                 } else {
