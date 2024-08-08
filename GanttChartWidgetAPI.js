@@ -81,6 +81,7 @@
                 await window.getCsrfToken();
                 await window.getProviders(); // This sets up namespaceID and providerID
                 const exportedData = await window.getExportedData();
+                console.log("Raw exported data:", JSON.stringify(exportedData.value, null, 2));
                 this.tasks = this.processDataFromSAP(exportedData.value);
                 this.render();
             } catch (error) {
@@ -90,6 +91,7 @@
 
         processDataFromSAP(data) {
             return data.map(item => ({
+                console.log("Processing item:", item);
                 id: item.ID,
                 text: item.Label,
                 start_date: new Date(item.StartDate),
@@ -104,6 +106,8 @@
                 const chartElement = this._shadowRoot.getElementById('chart');
                 gantt.init(chartElement);
                 gantt.clearAll();
+
+                console.log("Processed tasks:", JSON.stringify(this.tasks, null, 2));
                 
                 if (this.tasks.length > 0) {
                     gantt.parse({ data: this.tasks });
