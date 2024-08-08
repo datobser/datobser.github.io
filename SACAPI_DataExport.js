@@ -54,7 +54,7 @@
     window.createSubscription = createSubscription;
 
     async function getExportedData() {
-        const response = await fetch(`${apiBaseUrl}/providers/sac/Cag4sr05ulut226peu51e8vqn5f/FactData`, {
+        const response = await fetch(`${apiBaseUrl}/providers/sac/Cl94sr05ultdetk3npm9hu6q83u/FactData`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
             }
