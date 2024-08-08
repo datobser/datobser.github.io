@@ -125,7 +125,7 @@
                     }
                 }
             });
-        
+            console.log('created tasks',tasks);
             return tasks;
         }
 
