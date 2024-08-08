@@ -54,17 +54,12 @@
         }
 
         configureGantt() {
+             // Set fit_tasks to false to enable horizontal scrolling
+            gantt.config.fit_tasks = true;
+             // Configure the Gantt chart to use a monthly scale
             gantt.config.scale_unit = "month";
-            gantt.config.date_scale = "%F, %Y";
-            gantt.config.subscales = [
-                {unit: "week", step: 1, date: "%j"}
-            ];
-            gantt.config.min_column_width = 50;
-            gantt.config.scale_height = 90;
+            gantt.config.step = 1;
 
-            // Enable horizontal scrolling
-            gantt.config.autosize = "y";
-            gantt.config.autosize_min_width = 800;
         }
 
         static get metadata() {
