@@ -100,6 +100,7 @@ class ExcelWidget extends HTMLElement {
         this.shadowRoot.appendChild(this._fileInput);
         this.shadowRoot.appendChild(this._uploadButton);
         this.shadowRoot.appendChild(this._progressBar);
+        this.shadowRoot.appendChild(this._modelIdDisplay);
 
         console.log('UI elements rendered in shadow DOM');
     }
