@@ -1,4 +1,4 @@
-class UploadWidget extends HTMLElement {
+class ExcelWidget extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -590,4 +590,4 @@ class UploadWidget extends HTMLElement {
     }
 }
 
-customElements.define('excel-upload', UploadWidget);
+customElements.define('excel-upload', ExcelWidget);
