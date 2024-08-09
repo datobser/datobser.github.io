@@ -1,4 +1,3 @@
-
 class UploadWidget extends HTMLElement {
     constructor() {
         super();
@@ -8,7 +7,7 @@ class UploadWidget extends HTMLElement {
         this._tenantUrl = 'https://a2pp-1.eu10.hcs.cloud.sap';
         this._accessToken = null;
         this._csrfToken = null;
-        this._modelId = 'Ckh98b05ul4k484ria777k5h32';
+        this._modelId = 'Cl94sr05ultdetk3npm9hu6q83u';
         this._jobId = null;
         this._fileData = null;
         this._fileType = null;
@@ -230,10 +229,14 @@ class UploadWidget extends HTMLElement {
                 // Upload data
                 return this._uploadData(jobId, this._fileData);
             })
-            .then((uploadResponse) => {
-                console.log('Data upload response:', uploadResponse);
-                if (uploadResponse.status !== 'success') {
-                    throw new Error(`Data upload failed: ${uploadResponse.message}`);
+            .then(() => {
+                console.log('validating...');
+                return this._validateJob(this._jobId);
+            })
+            .then((validateResponse) => {
+                console.log('Data upload response:', validateResponse);
+                if (validateResponse.jobStatus !== 'READY_FOR_WRITE') {
+                    throw new Error(`Validation failed: ${uploadResponse.message}`);
                 }
                 // Run job
                 return this._runJob(this._jobId);
@@ -386,6 +389,15 @@ class UploadWidget extends HTMLElement {
                 data: this._fileType === 'csv' ? this._fileData : JSON.stringify({ "Data": this._fileData }),
                 success: (response) => {
                     console.log('uploadData response received:', response);
+                
+                    if (response.failedRows && response.failedRows.length > 0) {
+                        console.log('Failed rows details:');
+                        response.failedRows.forEach((failedRow, index) => {
+                            console.log(`Row ${index + 1}:`, failedRow.row);
+                            console.log(`Reason: ${failedRow.reason}`);
+                        });
+                    }
+                    
                     if (response.upsertedNumberRows !== undefined) {
                         resolve({
                             status: 'success',
@@ -408,11 +420,11 @@ class UploadWidget extends HTMLElement {
     }
 
 
-   _runJob(jobId) {
-        console.log('Running job with jobId:', jobId);
+    _validateJob(jobId) {
+        console.log('Validating job with jobId:', jobId);
         return new Promise((resolve, reject) => {
             $.ajax({
-                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}/run`,
+                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}/validate`,
                 method: "POST",
                 headers: {
                     "Authorization": "Bearer " + this._accessToken,
@@ -420,30 +432,74 @@ class UploadWidget extends HTMLElement {
                     "Content-Type": "application/json"
                 },
                 success: (response) => {
-                    console.log('Job run response:', response);
-                    resolve({ status: 'success', message: 'Job execution initiated', response });
+                    console.log('Job validation response:', response);
+                    resolve(response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Job run request failed:', errorThrown);
-                    if (jqXHR.responseJSON && jqXHR.responseJSON.error && jqXHR.responseJSON.error.message.includes("Every row in temporary storage is invalid")) {
+                    console.error('Job validation failed:', errorThrown);
+                    if (jqXHR.responseJSON && jqXHR.responseJSON.error &&
+                        jqXHR.responseJSON.error.message.includes("Every row in temporary storage is invalid")) {
+                        // Fetch invalid rows
                         this._getInvalidRows(jobId)
                             .then(invalidRows => {
-                                console.error('All rows are invalid. Invalid rows:', invalidRows);
-                                reject(new Error(`All rows are invalid. Please check the data and try again.`));
+                                console.log('Invalid rows:', invalidRows);
+                                reject(new Error(`Validation failed. All rows are invalid. See console for details.`));
                             })
                             .catch(error => {
-                                reject(new Error(`Failed to run job and retrieve invalid rows: ${error.message}`));
+                                console.error('Failed to fetch invalid rows:', error);
+                                reject(new Error(`Validation failed and couldn't fetch invalid rows: ${errorThrown}`));
                             });
                     } else {
-                        console.error('Data upload request failed:', textStatus, errorThrown);
-                        console.error('Error details:', jqXHR.responseText);
-                        reject(new Error(`Failed to run job: ${errorThrown}`));
+                        console.log('Job validation failed::', textStatus, errorThrown);
+                        console.log('Error details:', jqXHR.responseText);
+                        reject(new Error(`Failed to validate job: ${errorThrown}`));
                     }
                 }
             });
         });
     }
 
+
+   _runJob(jobId) {
+    console.log('Running job with jobId:', jobId);
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}/run`,
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + this._accessToken,
+                "x-csrf-token": this._csrfToken,
+                "Content-Type": "application/json"
+            },
+            success: (response) => {
+                console.log('Job run response:', response);
+                // Always check for invalid rows, even if the job execution succeeds
+                this._getInvalidRows(jobId)
+                    .then(invalidRows => {
+                        if (invalidRows && invalidRows.length > 0) {
+                            console.log('Invalid rows detected:', invalidRows);
+                            console.log('Reasons for invalid rows:');
+                            invalidRows.forEach((row, index) => {
+                                console.log(`Row ${index + 1}:`, row.reason);
+                            });
+                        } else {
+                            console.log('No invalid rows detected.');
+                        }
+                        resolve({ status: 'success', message: 'Job execution initiated', response, invalidRows });
+                    })
+                    .catch(error => {
+                        console.error('Failed to retrieve invalid rows:', error);
+                        resolve({ status: 'success', message: 'Job execution initiated, but failed to retrieve invalid rows', response });
+                    });
+            },
+            error: (jqXHR, textStatus, errorThrown) => {
+                console.error('Job run request failed:', errorThrown);
+                console.log('Error details:', jqXHR.responseText);
+                reject(new Error(`Failed to validate job: ${errorThrown}`));
+            }
+        });
+    });
+}
     _pollJobStatus(jobId, maxAttempts = 10, interval = 5000) {
         return new Promise((resolve, reject) => {
             let attempts = 0;
@@ -553,7 +609,8 @@ class UploadWidget extends HTMLElement {
                     resolve(response);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
-                    console.error('Failed to retrieve invalid rows:', errorThrown);
+                    console.error('getInvalidRows request failed:', textStatus, errorThrown);
+                    console.error('Error details:', jqXHR.responseText);
                     reject(new Error(`Failed to retrieve invalid rows: ${errorThrown}`));
                 }
             });
