@@ -554,4 +554,4 @@ class UploadWidget extends HTMLElement {
     }
 }
 
-customElements.define('upload-main', UploadWidget);
+customElements.define('csv-upload', UploadWidget);
