@@ -314,24 +314,21 @@ class CsvWidget extends HTMLElement {
                 },
                 data: this._fileType === 'csv' ? this._fileData : JSON.stringify({ "Data": this._fileData }),
                 success: (response) => {
-                    console.log('uploadData response received:', response);
-                
-                    if (response.failedRows && response.failedRows.length > 0) {
-                        console.log('Failed rows details:');
-                        response.failedRows.forEach((failedRow, index) => {
-                            console.log(`Row ${index + 1}:`, failedRow.row);
-                            console.log(`Reason: ${failedRow.reason}`);
-                        });
-                    }
+                    console.log('Full uploadData response:', response);
                     
-                    if (response.upsertedNumberRows !== undefined) {
+                    if (response.totalNumberRowsInCurrentRequest === 0) {
+                        console.warn('No rows were processed in this request.');
+                        if (response.failedRows && response.failedRows.length > 0) {
+                            console.error('All rows failed. Reasons:', response.failedRows.map(row => row.reason));
+                        }
+                        reject(new Error('No rows were processed. Please check your data format.'));
+                    } else if (response.upsertedNumberRows !== undefined) {
+                        console.log(`Processed rows: ${response.totalNumberRowsInCurrentRequest}, Upserted rows: ${response.upsertedNumberRows}, Failed rows: ${response.failedNumberRows}`);
                         resolve({
                             status: 'success',
                             message: 'Data uploaded successfully',
                             response: response
                         });
-                    } else if (response.error) {
-                        reject(new Error(`Data upload failed: ${response.error.message}`));
                     } else {
                         reject(new Error('Unexpected response format'));
                     }
