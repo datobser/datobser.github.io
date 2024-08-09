@@ -7,7 +7,7 @@ class CsvWidget extends HTMLElement {
         this._tenantUrl = 'https://a2pp-1.eu10.hcs.cloud.sap';
         this._accessToken = null;
         this._csrfToken = null;
-        this._modelId = 'Cl94sr05ultdetk3npm9hu6q83u';
+        this._modelId = 'Ckh98b05ul4k484ria777k5h32';
         this._jobId = null;
         this._fileData = null;
         this._fileType = null;
