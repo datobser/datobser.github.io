@@ -26,7 +26,7 @@ class UploadWidget extends HTMLElement {
     get clientId() { return this.getAttribute('client-id'); }
     get clientSecret() { return this.getAttribute('client-secret'); }
     get tokenUrl() { return this.getAttribute('token-url'); }
-    get acceptedFileTypes() { return this.getAttribute('accepted-file-types') || '.csv'; }
+    get acceptedFileTypes() { return this.getAttribute('accepted-file-types') || '.csv,.xlsx'; }
     get maxFileSize() { return parseInt(this.getAttribute('max-file-size')) || 10 * 1024 * 1024; } // 10MB default
 
     connectedCallback() {
