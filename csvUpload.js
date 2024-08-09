@@ -1,4 +1,4 @@
-class UploadWidget extends HTMLElement {
+class CsvWidget extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -554,4 +554,4 @@ class UploadWidget extends HTMLElement {
     }
 }
 
-customElements.define('csv-upload', UploadWidget);
+customElements.define('csv-upload', CsvWidget);
