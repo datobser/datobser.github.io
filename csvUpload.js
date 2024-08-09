@@ -47,6 +47,9 @@ class CsvWidget extends HTMLElement {
         this._progressBar = document.createElement('progress');
         this._progressBar.style.display = 'none';
 
+        this._modelIdDisplay = document.createElement('p');
+        this._modelIdDisplay.textContent = `sending CSV data to Model ID: ${this._modelId}`;
+
         this._fileInput.addEventListener('change', this._onFileChange.bind(this));
         this._uploadButton.addEventListener('click', this._onUploadPress.bind(this));
 
@@ -73,6 +76,7 @@ class CsvWidget extends HTMLElement {
         this.shadowRoot.appendChild(this._fileInput);
         this.shadowRoot.appendChild(this._uploadButton);
         this.shadowRoot.appendChild(this._progressBar);
+        this.shadowRoot.appendChild(this._modelIdDisplay);
 
         console.log('UI elements rendered in shadow DOM');
     }
