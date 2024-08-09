@@ -104,9 +104,16 @@ class UploadWidget extends HTMLElement {
     _onFileChange(event) {
         const file = event.target.files[0];
         console.log('File selected:', file);
-
+    
         this._uploadButton.disabled = !file;
         if (file) {
+            if (file.type !== 'text/csv') {
+                console.log('Invalid file type');
+                this._onTypeMismatch();
+                this._fileInput.value = '';
+                this._uploadButton.disabled = true;
+                return;
+            }
             if (file.size > this.maxFileSize) {
                 console.log('File size exceeds limit');
                 this._onFileSizeExceed();
@@ -114,84 +121,27 @@ class UploadWidget extends HTMLElement {
                 this._uploadButton.disabled = true;
             } else {
                 console.log('Reading file data');
-                this._fileType = file.name.split('.').pop().toLowerCase();
                 this._readFileData(file);
             }
         }
     }
-
+    
     _readFileData(file) {
         const reader = new FileReader();
     
-        reader.onload = async (e) => {
-            const result = e.target.result;
-    
-            if (this._fileType === 'xlsx') {
-                try {
-                    // Convert ArrayBuffer to CSV for .xlsx files
-                    this._fileData = await this._convertExcelToCSV(result);
-                } catch (error) {
-                    console.error('Error during Excel to CSV conversion:', error);
-                    this._fileData = null;
-                }
-            } else if (this._fileType === 'csv') {
-                // For CSV, we can use the text directly
-                this._fileData = result;
-            }
-    
-            console.log(`File data read and prepared successfully (${this._fileType})`);
+        reader.onload = (e) => {
+            this._fileData = e.target.result;
+            console.log('CSV file data read and prepared successfully');
         };
     
         reader.onerror = (error) => {
             console.error('Error reading file:', error);
+            this._fileData = null;
         };
     
-        if (this._fileType === 'xlsx') {
-            reader.readAsArrayBuffer(file); // Read Excel files as ArrayBuffer
-        } else if (this._fileType === 'csv') {
-            reader.readAsText(file); // Read CSV files as text
-        }
+        reader.readAsText(file);
     }
     
-    async _convertExcelToCSV(data) {
-        console.log('Entered convertExcelToCSV with:', data);
-    
-        if (!window.ExcelJS) {
-            console.error('ExcelJS library not loaded');
-            return null;
-        }
-    
-        try {
-            const workbook = new ExcelJS.Workbook();
-            await workbook.xlsx.load(data);
-    
-            console.log('Number of worksheets:', workbook.worksheets.length);
-    
-            const worksheet = workbook.worksheets[0];
-    
-            if (!worksheet) {
-                console.error('No worksheet found in the workbook');
-                return null;
-            }
-    
-            console.log('Worksheet name:', worksheet.name);
-            console.log('Number of rows in the worksheet:', worksheet.rowCount);
-    
-            let csvContent = '';
-            worksheet.eachRow({ includeEmpty: true }, function(row, rowNumber) {
-                csvContent += row.values.slice(1).join(',') + '\n';
-            });
-    
-            console.log('Excel file successfully converted to CSV');
-            return csvContent;
-    
-        } catch (error) {
-            console.error('Error during Excel to CSV conversion:', error);
-            return null;
-        }
-    }
-
-
     
     _onUploadPress() {
         console.log('Upload button pressed');
@@ -618,9 +568,9 @@ class UploadWidget extends HTMLElement {
     }
 
     _onTypeMismatch() {
-        console.log('File type mismatch');
-        
-    }
+        console.log('Invalid file type. Only CSV files are accepted.');
+        // You can add more user-friendly feedback here, such as displaying an error message
+    }}
 
     _onFileSizeExceed() {
         console.log('File size exceeds limit');
