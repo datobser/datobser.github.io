@@ -552,7 +552,7 @@ class CsvWidget extends HTMLElement {
             console.log('Reached active job limit. Cleaning up...');
             for (const job of activeJobs) {
                 if (job.status === 'READY_FOR_WRITE') {
-                    await this._deleteJob(job.jobID);
+                    await this._deleteJob(job.jobID); //await this._runJob(job.jobID); if you want to run those jobs
                 } else if (['READY_FOR_DATA', 'READY_FOR_VALIDATION'].includes(job.status)) {
                     await this._deleteJob(job.jobID);
                 }
