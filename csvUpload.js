@@ -550,9 +550,9 @@ class CsvWidget extends HTMLElement {
         if (activeJobs.length >= 100) { // Assuming the limit is 100
             console.log('Reached active job limit. Cleaning up...');
             for (const job of activeJobs) {
-                if (job.jobStatus === 'READY_FOR_WRITE') {
+                if (job.status === 'READY_FOR_WRITE') {
                     await this._deleteJob(job.jobID);
-                } else if (['READY_FOR_DATA', 'READY_FOR_VALIDATION'].includes(job.jobStatus)) {
+                } else if (['READY_FOR_DATA', 'READY_FOR_VALIDATION'].includes(job.status)) {
                     await this._deleteJob(job.jobID);
                 }
             }
