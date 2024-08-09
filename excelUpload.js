@@ -141,37 +141,27 @@ class UploadWidget extends HTMLElement {
         reader.onload = async (e) => {
             const result = e.target.result;
     
-            if (this._fileType === 'xlsx') {
-                try {
-                    // Convert ArrayBuffer to Blob for .xlsx files
-                    const arrayBuffer = await new Response(result).arrayBuffer();
-                    this._fileData = await this._convertExcelToCSV(arrayBuffer);
-                    this._fileType = 'csv';
-                } catch (error) {
-                    console.error('Error during Excel to CSV conversion:', error);
-                    this._fileData = null;
-                }
-            } else if (this._fileType === 'csv') {
-                // For CSV, we can use the text directly
-                this._fileData = result;
-            } else if (this._fileType === 'json') {
-                // For JSON, parse the result
-                try {
-                    this._fileData = JSON.parse(result);
-                } catch (error) {
-                    console.error('Error parsing JSON:', error);
-                    this._fileData = null;
-                }
-            }
+            try {
+                // Convert ArrayBuffer to Blob for Excel files
+                const arrayBuffer = await new Response(result).arrayBuffer();
+                this._fileData = await this._convertExcelToCSV(arrayBuffer);
+                this._fileType = 'csv'; // We convert Excel to CSV
     
-            console.log(`File data read and prepared successfully (${this._fileType})`);
+                console.log('File data read and prepared successfully');
+                this._uploadButton.disabled = false; // Enable the upload button
+            } catch (error) {
+                console.error('Error during file processing:', error);
+                this._fileData = null;
+                this._uploadButton.disabled = true;
+            }
         };
     
         reader.onerror = (error) => {
             console.error('Error reading file:', error);
+            this._uploadButton.disabled = true;
         };
     
-        reader.readAsArrayBuffer(file);  // Use readAsArrayBuffer for .xlsx files
+        reader.readAsArrayBuffer(file);
     }
 
     async _convertExcelToCSV(data) {
