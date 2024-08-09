@@ -571,7 +571,10 @@ class CsvWidget extends HTMLElement {
                 },
                 success: (response) => {
                     console.log(response);
-                    resolve(response.jobs || []);
+                    const jobsArray = Object.values(response).filter(job => typeof job === 'object');
+                    console.log(`Found ${jobsArray.length} jobs`);
+                    
+                    resolve(jobsArray || []);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
                     reject(new Error(`Failed to get active jobs: ${errorThrown}`));
