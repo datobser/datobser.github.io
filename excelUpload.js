@@ -47,6 +47,9 @@ class ExcelWidget extends HTMLElement {
         this._progressBar = document.createElement('progress');
         this._progressBar.style.display = 'none';
 
+        this._modelIdDisplay = document.createElement('p');
+        this._modelIdDisplay.textContent = `sending Excel data to Model ID: ${this._modelId}`;
+
         this._fileInput.addEventListener('change', this._onFileChange.bind(this));
         this._uploadButton.addEventListener('click', this._onUploadPress.bind(this));
 
