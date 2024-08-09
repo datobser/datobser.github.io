@@ -38,7 +38,8 @@ class UploadWidget extends HTMLElement {
     _createElements() {
         this._fileInput = document.createElement('input');
         this._fileInput.type = 'file';
-        this._fileInput.accept = this.acceptedFileTypes;
+        this._fileInput.accept = this.acceptedFileTypes || '.xlsx';
+
 
         this._uploadButton = document.createElement('button');
         this._uploadButton.textContent = 'Upload';
