@@ -314,12 +314,12 @@ class CsvWidget extends HTMLElement {
                 headers: {
                     "Authorization": `Bearer ${this._accessToken}`,
                     "x-csrf-token": this._csrfToken,
-                    "Content-Type": this._fileType === 'csv' ? "text/csv" : "application/json"
+                    "Content-Type": "text/csv"
                 },
-                data: this._fileType === 'csv' ? this._fileData : JSON.stringify({ "Data": this._fileData }),
+                data: this._fileData, // Send the CSV data directly
                 success: (response) => {
                     console.log('Full uploadData response:', response);
-                    
+    
                     if (response.totalNumberRowsInCurrentRequest === 0) {
                         console.warn('No rows were processed in this request.');
                         if (response.failedRows && response.failedRows.length > 0) {
