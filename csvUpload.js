@@ -146,6 +146,10 @@ class CsvWidget extends HTMLElement {
             })
             .then(({ accessToken, csrfToken }) => {
                 console.log('CSRF token obtained:', csrfToken);
+                // Check and cleanup active jobs before creating a new one
+                return this._checkAndCleanupActiveJobs();
+            })
+            .then(() => {
                 // Create job
                 return this._createJob(this._modelId, "factData");
             })
@@ -535,6 +539,60 @@ class CsvWidget extends HTMLElement {
                     console.error('getInvalidRows request failed:', textStatus, errorThrown);
                     console.error('Error details:', jqXHR.responseText);
                     reject(new Error(`Failed to retrieve invalid rows: ${errorThrown}`));
+                }
+            });
+        });
+    }
+
+
+    async _checkAndCleanupActiveJobs() {
+        const activeJobs = await this._getActiveJobs();
+        if (activeJobs.length >= 100) { // Assuming the limit is 100
+            console.log('Reached active job limit. Cleaning up...');
+            for (const job of activeJobs) {
+                if (job.jobStatus === 'READY_FOR_WRITE') {
+                    await this._deleteJob(job.jobID);
+                } else if (['READY_FOR_DATA', 'READY_FOR_VALIDATION'].includes(job.jobStatus)) {
+                    await this._deleteJob(job.jobID);
+                }
+            }
+        }
+    }
+
+    async _getActiveJobs() {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `${this.tenantUrl}/api/v1/dataimport/jobs`,
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + this._accessToken,
+                    "x-csrf-token": this._csrfToken
+                },
+                success: (response) => {
+                    resolve(response.jobs || []);
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    reject(new Error(`Failed to get active jobs: ${errorThrown}`));
+                }
+            });
+        });
+    }
+
+    async _deleteJob(jobId) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: `${this.tenantUrl}/api/v1/dataimport/jobs/${jobId}`,
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + this._accessToken,
+                    "x-csrf-token": this._csrfToken
+                },
+                success: () => {
+                    console.log(`Job ${jobId} deleted successfully`);
+                    resolve();
+                },
+                error: (jqXHR, textStatus, errorThrown) => {
+                    reject(new Error(`Failed to delete job ${jobId}: ${errorThrown}`));
                 }
             });
         });
