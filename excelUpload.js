@@ -37,7 +37,7 @@ class UploadWidget extends HTMLElement {
     _createElements() {
         this._fileInput = document.createElement('input');
         this._fileInput.type = 'file';
-        this._fileInput.accept = '.xlsx';
+        this._fileInput.accept = '.xlsx, .xls, .xlsm';
 
 
         this._uploadButton = document.createElement('button');
@@ -104,20 +104,35 @@ class UploadWidget extends HTMLElement {
     _onFileChange(event) {
         const file = event.target.files[0];
         console.log('File selected:', file);
-
-        this._uploadButton.disabled = !file;
-        if (file) {
-            if (file.size > this.maxFileSize) {
-                console.log('File size exceeds limit');
-                this._onFileSizeExceed();
-                this._fileInput.value = '';
-                this._uploadButton.disabled = true;
-            } else {
-                console.log('Reading file data');
-                this._fileType = file.name.split('.').pop().toLowerCase();
-                this._readFileData(file);
-            }
+    
+        this._uploadButton.disabled = true;
+        this._fileData = null;
+        this._fileType = null;
+    
+        if (!file) {
+            console.log('No file selected');
+            return;
         }
+    
+        if (file.size > this.maxFileSize) {
+            console.log('File size exceeds limit');
+            this._onFileSizeExceed();
+            this._fileInput.value = '';
+            return;
+        }
+    
+        const fileName = file.name.toLowerCase();
+        if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls') || fileName.endsWith('.xlsm')) {
+            this._fileType = 'excel';
+        } else {
+            console.error('Invalid file type. Please select an Excel file.');
+            this._onTypeMismatch();
+            this._fileInput.value = '';
+            return;
+        }
+    
+        console.log('File type:', this._fileType);
+        this._readFileData(file);
     }
 
     _readFileData(file) {
