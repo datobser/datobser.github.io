@@ -570,7 +570,7 @@ class UploadWidget extends HTMLElement {
     _onTypeMismatch() {
         console.log('Invalid file type. Only CSV files are accepted.');
         // You can add more user-friendly feedback here, such as displaying an error message
-    }}
+    }
 
     _onFileSizeExceed() {
         console.log('File size exceeds limit');
