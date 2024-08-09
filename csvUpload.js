@@ -547,6 +547,7 @@ class CsvWidget extends HTMLElement {
 
     async _checkAndCleanupActiveJobs() {
         const activeJobs = await this._getActiveJobs();
+        console.log(`Found ${activeJobs.length} active jobs.`);
         if (activeJobs.length >= 100) { // Assuming the limit is 100
             console.log('Reached active job limit. Cleaning up...');
             for (const job of activeJobs) {
