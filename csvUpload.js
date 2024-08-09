@@ -569,6 +569,7 @@ class CsvWidget extends HTMLElement {
                     "x-csrf-token": this._csrfToken
                 },
                 success: (response) => {
+                    console.log(response);
                     resolve(response.jobs || []);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
